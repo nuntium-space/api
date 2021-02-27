@@ -21,6 +21,26 @@ const server = Hapi.server({
 
 const init = async () =>
 {
+    server.route({
+        method: "POST",
+        path: "/users",
+        options: {},
+        handler: (request, h) =>
+        {
+            // TODO
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/sessions",
+        options: {},
+        handler: (request, h) =>
+        {
+            // TODO
+        }
+    });
+
     server.start();
 }
 
