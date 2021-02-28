@@ -4,6 +4,12 @@ DOMAINS
 -------
 */
 
+/*
+    An id is made up of three parts:
+    - a prefix (3 characters)
+    - a separator (an underscore)
+    - a random string
+*/
 create domain "id" as varchar(300) check(value like '___\_%');
 
 /*
@@ -13,6 +19,9 @@ create domain "id" as varchar(300) check(value like '___\_%');
 */
 create domain "email_address" as varchar(320);
 
+/*
+    A password must be at least '10' characters long
+*/
 create domain "password" as varchar(300) check(length(value) >= 10);
 
 /*
