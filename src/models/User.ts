@@ -76,15 +76,8 @@ export class User
     public static async retrieve(id: string): Promise<User | null>
     {
         const result = await Database.client.query(
-            `
-            select *
-            from "users"
-            where
-                "id" = $1
-            `,
-            [
-                id,
-            ],
+            `select * from "users" where "id" = $1`,
+            [ id ],
         );
 
         if (result.rowCount === 0)
@@ -102,7 +95,10 @@ export class User
 
     public async delete(): Promise<void>
     {
-        // TODO
+        await Database.client.query(
+            `delete from "users" where "id" = $1`,
+            [ this.id ],
+        );
     }
 
     public serialize(): ISerializedUser
