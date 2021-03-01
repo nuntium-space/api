@@ -35,6 +35,8 @@ create table "users"
 
     primary key ("id"),
 
+    unique ("email"),
+
     check ("id" like 'usr_%')
 );
 
@@ -45,6 +47,8 @@ create table "organizations"
     "user" id not null,
 
     primary key ("id"),
+
+    unique ("name"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
 
@@ -59,6 +63,8 @@ create table "publishers"
 
     primary key ("id"),
 
+    unique ("name"),
+
     foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
     check ("id" like 'pub_%')
@@ -71,6 +77,8 @@ create table "authors"
     "publisher" id not null,
 
     primary key ("id"),
+
+    unique ("user", "publisher"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
     foreign key ("publisher") references "publishers" on update cascade on delete cascade,
