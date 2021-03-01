@@ -19,8 +19,6 @@ create domain "id" as varchar(300) check(value like '___\_%');
 */
 create domain "email_address" as varchar(320);
 
-create domain "password" as text;
-
 /*
 ------
 TABLES
@@ -33,7 +31,7 @@ create table "users"
     "first_name" varchar(50) not null,
     "last_name" varchar(50) not null,
     "email" email_address not null,
-    "password" password not null,
+    "password" text not null,
 
     primary key ("id"),
 
