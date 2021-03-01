@@ -39,12 +39,33 @@ export class User
 {
     private constructor
     (
-        public readonly id: string,
-        public readonly first_name: string,
-        public readonly last_name: string,
-        public readonly email: string,
+        private readonly _id: string,
+        private _first_name: string,
+        private  _last_name: string,
+        private _email: string,
+        private _password: string,
     )
     {}
+
+    public get id(): string
+    {
+        return this._id;
+    }
+
+    public get first_name(): string
+    {
+        return this._first_name;
+    }
+
+    public get last_name(): string
+    {
+        return this._last_name;
+    }
+
+    public get email(): string
+    {
+        return this._email;
+    }
 
     public static async create(data: ICreateUser): Promise<User>
     {
@@ -90,15 +111,50 @@ export class User
 
     public async update(data: IUpdateUser): Promise<void>
     {
-        // TODO
+        this._first_name = data.first_name ?? this.first_name;
+        this._last_name = data.last_name ?? this.last_name;
+        this._email = data.email ?? this.email;
+        this._password = data.password
+            ? Utilities.hash(data.password)
+            : this._password;
+
+        const result = await Database.client.query(
+            `
+            update "users"
+            set
+                "first_name" = $1,
+                "last_name" = $2,
+                "email" = $3,
+                "password" = $4
+            where
+                "id" = $5
+            `,
+            [
+                this.first_name,
+                this.last_name,
+                this.email,
+                this._password,
+                this.id,
+            ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            throw new Error("Cannot update user");
+        }
     }
 
     public async delete(): Promise<void>
     {
-        await Database.client.query(
+        const result = await Database.client.query(
             `delete from "users" where "id" = $1`,
             [ this.id ],
         );
+
+        if (result.rowCount === 0)
+        {
+            throw new Error("Cannot delete user");
+        }
     }
 
     public serialize(): ISerializedUser
@@ -118,6 +174,7 @@ export class User
             data.first_name,
             data.last_name,
             data.email,
+            data.password,
         );
     }
 }
