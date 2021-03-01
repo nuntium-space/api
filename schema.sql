@@ -19,10 +19,7 @@ create domain "id" as varchar(300) check(value like '___\_%');
 */
 create domain "email_address" as varchar(320);
 
-/*
-    A password must be at least '10' characters long
-*/
-create domain "password" as varchar(300) check(length(value) >= 10);
+create domain "password" as text;
 
 /*
 ------
