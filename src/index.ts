@@ -1,5 +1,7 @@
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
+import { USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
+import { User } from "./models/User";
 import Database from "./utilities/Database";
 
 dotenv.config();
@@ -30,17 +32,29 @@ const init = async () =>
     server.route({
         method: "POST",
         path: "/users",
-        options: {},
-        handler: (request, h) =>
+        options: {
+            auth: false,
+            validate: {
+                payload: USER_CREATE_SCHEMA,
+            },
+            response: {
+                schema: USER_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
         {
-            // TODO
+            const user = await User.create(request.payload as any);
+
+            return user.serialize();
         }
     });
 
     server.route({
         method: "POST",
         path: "/sessions",
-        options: {},
+        options: {
+            auth: false,
+        },
         handler: (request, h) =>
         {
             // TODO
