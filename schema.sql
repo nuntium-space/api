@@ -87,7 +87,7 @@ create table "articles"
 (
     "id" id not null,
     "title" varchar(50) not null,
-    "content" varchar(10000) not null,
+    "content" text not null,
     "created_at" timestamp not null,
     "updated_at" timestamp not null,
     "author" id not null,
