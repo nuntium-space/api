@@ -1,3 +1,5 @@
+import Database from "../utilities/Database";
+
 interface IDatabaseUser
 {
     id: string,
@@ -44,7 +46,20 @@ export class User
 
     public static async create(data: ICreateUser): Promise<User>
     {
-        // TODO
+        const result = Database.client.query(
+            `
+            insert into "users"
+            ("id", "first_name", "last_name", "email", "password")
+            values
+            ($1, $2, $3, $4, $5)
+            `,
+            [
+                data.first_name,
+                data.last_name,
+                data.email,
+                
+            ],
+        );
     }
 
     public static async retrieve(id: string): Promise<User>
