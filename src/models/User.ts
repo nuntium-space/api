@@ -1,4 +1,6 @@
+import { Config } from "../config/Config";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 
 interface IDatabaseUser
 {
@@ -46,20 +48,29 @@ export class User
 
     public static async create(data: ICreateUser): Promise<User>
     {
-        const result = Database.client.query(
+        const result = await Database.client.query(
             `
             insert into "users"
             ("id", "first_name", "last_name", "email", "password")
             values
             ($1, $2, $3, $4, $5)
+            returning *
             `,
             [
+                Utilities.id(Config.ID_PREFIXES.USER),
                 data.first_name,
                 data.last_name,
                 data.email,
-                
+                Utilities.hash(data.password),
             ],
         );
+
+        if (result.rowCount === 0)
+        {
+            throw new Error("Cannot create user");
+        }
+
+        return User.deserialize(result.rows[0]);
     }
 
     public static async retrieve(id: string): Promise<User>
