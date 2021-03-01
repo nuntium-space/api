@@ -91,9 +91,9 @@ create table "articles"
     "id" id not null,
     "title" varchar(50) not null,
     "content" text not null,
+    "author" id not null,
     "created_at" timestamp not null,
     "updated_at" timestamp not null,
-    "author" id not null,
 
     primary key ("id"),
 
@@ -116,4 +116,25 @@ create table "sessions"
 
     check ("id" like 'ses_%'),
     check ("expires_at" > current_timestamp)
+);
+
+create table "comments"
+(
+    "id" id not null,
+    "content" text not null,
+    "user" id not null,
+    "article" id not null,
+    "parent" id,
+    "created_at" timestamp not null,
+    "updated_at" timestamp not null,
+
+    primary key ("id"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+    foreign key ("article") references "articles" on update cascade on delete cascade,
+    foreign key ("parent") references "comments" on update cascade on delete cascade,
+
+    check ("id" like 'cmt_%'),
+    check ("created_at" <= current_timestamp),
+    check ("updated_at" >= "created_at")
 );
