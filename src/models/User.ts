@@ -51,9 +51,9 @@ export class User
         const result = await Database.client.query(
             `
             insert into "users"
-            ("id", "first_name", "last_name", "email", "password")
+                ("id", "first_name", "last_name", "email", "password")
             values
-            ($1, $2, $3, $4, $5)
+                ($1, $2, $3, $4, $5)
             returning *
             `,
             [
@@ -73,9 +73,26 @@ export class User
         return User.deserialize(result.rows[0]);
     }
 
-    public static async retrieve(id: string): Promise<User>
+    public static async retrieve(id: string): Promise<User | null>
     {
-        // TODO
+        const result = await Database.client.query(
+            `
+            select *
+            from "users"
+            where
+                "id" = $1
+            `,
+            [
+                id,
+            ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            return null;
+        }
+
+        return User.deserialize(result.rows[0]);
     }
 
     public async update(data: IUpdateUser): Promise<void>
