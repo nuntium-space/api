@@ -7,9 +7,9 @@ export class Config
      * The required minimum length for every password added through the API.
      * 
      * @default
-     * 8
+     * 10
      */
-    public static readonly PASSWORD_MIN_LENGTH = 8;
+    public static readonly PASSWORD_MIN_LENGTH = 10;
 
     /**
      * Represents the duration of a session in seconds.
