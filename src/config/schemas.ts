@@ -7,6 +7,8 @@ MISCELLANEOUS SCHEMAS
 ---------------------
 */
 
+export const ID_SCHEMA = (prefix: string) => Joi.string().pattern(new RegExp(`/^${prefix}_.+$/`));
+
 export const EMAIL_SCHEMA = Joi.string().email();
 
 export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
@@ -22,10 +24,10 @@ RESPONSE SCHEMAS
 
 export const USER_SCHEMA = Joi
     .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
         first_name: Joi.string().required(),
         last_name: Joi.string().required(),
         email: EMAIL_SCHEMA.required(),
-        password: PASSWORD_SCHEMA.required(),
     });
 
 /*
