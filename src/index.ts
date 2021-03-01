@@ -1,4 +1,8 @@
 import Hapi from "@hapi/hapi";
+import dotenv from "dotenv";
+import Database from "./utilities/Database";
+
+dotenv.config();
 
 const server = Hapi.server({
     port: 4000,
@@ -21,6 +25,8 @@ const server = Hapi.server({
 
 const init = async () =>
 {
+    await Database.init();
+
     server.route({
         method: "POST",
         path: "/users",
