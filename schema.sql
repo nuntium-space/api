@@ -136,7 +136,8 @@ create table "comments"
 
     check ("id" like 'cmt_%'),
     check ("created_at" <= current_timestamp),
-    check ("updated_at" >= "created_at")
+    check ("updated_at" >= "created_at"),
+    check ("parent" <> "id")
 );
 
 create table "bundles"
