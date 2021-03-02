@@ -129,6 +129,38 @@ const init = async () =>
     });
 
     server.route({
+        method: "DELETE",
+        path: "/users/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const user = await User.retrieve(request.params.id);
+
+            if (!user)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await user.delete();
+
+            return h.response();
+        }
+    });
+
+    server.route({
         method: "GET",
         path: "/sessions/{id}",
         options: {
