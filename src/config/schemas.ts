@@ -7,7 +7,7 @@ MISCELLANEOUS SCHEMAS
 ---------------------
 */
 
-export const ID_SCHEMA = (prefix: string) => Joi.string().pattern(new RegExp(`/^${prefix}_.+$/`));
+export const ID_SCHEMA = (prefix: string) => Joi.string().pattern(new RegExp(`^${prefix}_.+$`));
 
 export const EMAIL_SCHEMA = Joi.string().email();
 
