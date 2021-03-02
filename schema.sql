@@ -138,3 +138,29 @@ create table "comments"
     check ("created_at" <= current_timestamp),
     check ("updated_at" >= "created_at")
 );
+
+create table "bundles"
+(
+    "id" id not null,
+    "name" varchar(50) not null,
+    "organization" id not null,
+    "price" money not null,
+
+    primary key ("id"),
+
+    foreign key ("organization") references "organizations" on update cascade on delete cascade,
+
+    check ("id" like 'bdl_%'),
+    check ("price" >= 0::money)
+);
+
+create table "bundles_publishers"
+(
+    "bundle" id not null,
+    "publisher" id not null,
+
+    primary key ("bundle", "publisher"),
+
+    foreign key ("bundle") references "bundles" on update cascade on delete cascade,
+    foreign key ("publisher") references "publishers" on update cascade on delete cascade
+);
