@@ -25,8 +25,8 @@ RESPONSE SCHEMAS
 export const USER_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-        first_name: Joi.string().required(),
-        last_name: Joi.string().required(),
+        first_name: Joi.string().max(50).required(),
+        last_name: Joi.string().max(50).required(),
         email: EMAIL_SCHEMA.required(),
     });
 
@@ -45,16 +45,16 @@ REQUEST SCHEMAS
 
 export const USER_CREATE_SCHEMA = Joi
     .object({
-        first_name: Joi.string().required(),
-        last_name: Joi.string().required(),
+        first_name: Joi.string().max(50).required(),
+        last_name: Joi.string().max(50).required(),
         email: EMAIL_SCHEMA.required(),
         password: PASSWORD_SCHEMA.required(),
     });
 
 export const USER_UPDATE_SCHEMA = Joi
     .object({
-        first_name: Joi.string(),
-        last_name: Joi.string(),
+        first_name: Joi.string().max(50),
+        last_name: Joi.string().max(50),
         email: EMAIL_SCHEMA,
         password: PASSWORD_SCHEMA,
     });
