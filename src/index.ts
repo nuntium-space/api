@@ -117,6 +117,13 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (session.user.email !== authenticatedUser.email)
+            {
+                throw Boom.forbidden();
+            }
+
             return session.serialize();
         }
     });
@@ -159,6 +166,13 @@ const init = async () =>
             if (!session)
             {
                 throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (session.user.email !== authenticatedUser.email)
+            {
+                throw Boom.forbidden();
             }
 
             await session.delete();
