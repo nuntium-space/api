@@ -33,6 +33,36 @@ const init = async () =>
 {
     await Database.init();
 
+    server.auth.scheme("token", () =>
+    {
+        return {
+            authenticate: async (request, h) =>
+            {
+                const authorization = request.raw.req.headers.authorization;
+
+                if (!authorization)
+                {
+                    throw Boom.unauthorized();
+                }
+
+                const session = await Session.retrieve(authorization.split(" ")[1]);
+
+                if (!session || session.hasExpired())
+                {
+                    throw Boom.unauthorized();
+                }
+
+                const { user } = session;
+
+                return h.authenticated({ credentials: { user } });
+            },
+        };
+    });
+
+    server.auth.strategy("session", "token");
+
+    server.auth.default({ strategy: "session" });
+
     server.ext("onPreResponse", (request, h) =>
     {
         const { response } = request;
