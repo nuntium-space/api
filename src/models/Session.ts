@@ -51,7 +51,7 @@ export class Session
     public static async create(data: ICreateSession): Promise<Session>
     {
         const user = await Database.client.query(
-            `select "password" from "users" where "email" = $1`,
+            `select "id", "password" from "users" where "email" = $1`,
             [ data.email ],
         );
 
@@ -65,6 +65,9 @@ export class Session
             throw new Error(`Wrong password`);
         }
 
+        const expires = new Date();
+        expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
+
         const result = await Database.client.query(
             `
             insert into "sessions"
@@ -75,8 +78,8 @@ export class Session
             `,
             [
                 Utilities.id(Config.ID_PREFIXES.SESSION),
-                data.email,
-                Utilities.hash(data.password),
+                user.rows[0].id,
+                expires.toISOString(),
             ],
         );
 
