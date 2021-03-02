@@ -119,6 +119,11 @@ export class Session
         }
     }
 
+    public hasExpired(): boolean
+    {
+        return this.expires_at < new Date();
+    }
+
     public serialize(): ISerializedSession
     {
         return {
