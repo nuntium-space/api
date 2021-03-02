@@ -7,9 +7,11 @@ MISCELLANEOUS SCHEMAS
 ---------------------
 */
 
-export const ID_SCHEMA = (prefix: string) => Joi.string().pattern(new RegExp(`^${prefix}_.+$`));
+export const STRING_SCHEMA = Joi.string().trim();
 
-export const EMAIL_SCHEMA = Joi.string().email();
+export const ID_SCHEMA = (prefix: string) => STRING_SCHEMA.pattern(new RegExp(`^${prefix}_.+$`));
+
+export const EMAIL_SCHEMA = STRING_SCHEMA.email();
 
 export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 
@@ -25,8 +27,8 @@ RESPONSE SCHEMAS
 export const USER_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-        first_name: Joi.string().max(50).required(),
-        last_name: Joi.string().max(50).required(),
+        first_name: STRING_SCHEMA.max(50).required(),
+        last_name: STRING_SCHEMA.max(50).required(),
         email: EMAIL_SCHEMA.required(),
     });
 
@@ -45,16 +47,16 @@ REQUEST SCHEMAS
 
 export const USER_CREATE_SCHEMA = Joi
     .object({
-        first_name: Joi.string().max(50).required(),
-        last_name: Joi.string().max(50).required(),
+        first_name: STRING_SCHEMA.max(50).required(),
+        last_name: STRING_SCHEMA.max(50).required(),
         email: EMAIL_SCHEMA.required(),
         password: PASSWORD_SCHEMA.required(),
     });
 
 export const USER_UPDATE_SCHEMA = Joi
     .object({
-        first_name: Joi.string().max(50),
-        last_name: Joi.string().max(50),
+        first_name: STRING_SCHEMA.max(50),
+        last_name: STRING_SCHEMA.max(50),
         email: EMAIL_SCHEMA,
         password: PASSWORD_SCHEMA,
     });
