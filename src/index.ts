@@ -76,6 +76,39 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/users/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+            },
+            response: {
+                schema: USER_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const user = await User.retrieve(request.params.id);
+
+            if (!user)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            return user.serialize();
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/users",
         options: {
@@ -119,7 +152,7 @@ const init = async () =>
 
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (session.user.email !== authenticatedUser.email)
+            if (session.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
@@ -170,7 +203,7 @@ const init = async () =>
 
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (session.user.email !== authenticatedUser.email)
+            if (session.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
