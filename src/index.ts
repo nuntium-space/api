@@ -186,10 +186,9 @@ const init = async () =>
         path: "/sessions/{id}",
         options: {
             validate: {
-                payload: SESSION_CREATE_SCHEMA,
-            },
-            response: {
-                schema: SESSION_SCHEMA,
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
+                }),
             },
         },
         handler: async (request, h) =>
