@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
 import { SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
@@ -29,6 +30,18 @@ const server = Hapi.server({
 const init = async () =>
 {
     await Database.init();
+
+    server.ext("onPreResponse", (request, h) =>
+    {
+        const { response } = request;
+
+        if (response instanceof Boom.Boom)
+        {
+            response.output.payload.message = response.message;
+        }
+
+        return h.continue;
+    });
 
     server.route({
         method: "POST",
