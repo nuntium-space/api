@@ -1,7 +1,9 @@
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
-import { SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
+import Joi from "joi";
+import { Config } from "./config/Config";
+import { ID_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
@@ -64,6 +66,32 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/sessions/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
+                }),
+            },
+            response: {
+                schema: SESSION_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const session = await Session.retrieve(request.params.id);
+
+            if (!session)
+            {
+                throw Boom.notFound();
+            }
+
+            return session.serialize();
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/sessions",
         options: {
@@ -80,6 +108,32 @@ const init = async () =>
             const session = await Session.create(request.payload as any);
 
             return session.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/sessions/{id}",
+        options: {
+            validate: {
+                payload: SESSION_CREATE_SCHEMA,
+            },
+            response: {
+                schema: SESSION_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const session = await Session.retrieve(request.params.id);
+
+            if (!session)
+            {
+                throw Boom.notFound();
+            }
+
+            await session.delete();
+
+            return h.response();
         }
     });
 
