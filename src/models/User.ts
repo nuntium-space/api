@@ -27,7 +27,7 @@ interface IUpdateUser
     password?: string,
 }
 
-interface ISerializedUser
+export interface ISerializedUser
 {
     id: string,
     first_name: string,
@@ -167,7 +167,7 @@ export class User
         };
     }
 
-    public static deserialize(data: IDatabaseUser): User
+    private static deserialize(data: IDatabaseUser): User
     {
         return new User(
             data.id,
