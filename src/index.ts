@@ -1,6 +1,6 @@
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
-import { USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
+import { SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
