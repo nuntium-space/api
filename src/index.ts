@@ -1,6 +1,7 @@
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
 import { USER_CREATE_SCHEMA, USER_SCHEMA } from "./config/schemas";
+import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
 
@@ -54,10 +55,18 @@ const init = async () =>
         path: "/sessions",
         options: {
             auth: false,
+            validate: {
+                payload: SESSION_CREATE_SCHEMA,
+            },
+            response: {
+                schema: SESSION_SCHEMA,
+            },
         },
-        handler: (request, h) =>
+        handler: async (request, h) =>
         {
-            // TODO
+            const session = await Session.create(request.payload as any);
+
+            return session.serialize();
         }
     });
 
