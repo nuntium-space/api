@@ -19,6 +19,8 @@ create domain "id" as varchar(300) check(value like '___\_%');
 */
 create domain "email_address" as varchar(320);
 
+create domain "url" as varchar(500) check(value like 'https://%');
+
 /*
 ------
 TABLES
@@ -59,12 +61,15 @@ create table "publishers"
 (
     "id" id not null,
     "name" varchar(50) not null,
+    "url" url not null,
+    "image" id not null,
     "organization" id not null,
 
     primary key ("id"),
 
     unique ("name"),
 
+    foreign key ("image") references "images" on update cascade on delete cascade,
     foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
     check ("id" like 'pub_%')
@@ -164,4 +169,14 @@ create table "bundles_publishers"
 
     foreign key ("bundle") references "bundles" on update cascade on delete cascade,
     foreign key ("publisher") references "publishers" on update cascade on delete cascade
+);
+
+create table "images"
+(
+    "id" id not null,
+    "data" bytea not null,
+
+    primary key ("id"),
+
+    check ("id" like 'img_%'),
 );
