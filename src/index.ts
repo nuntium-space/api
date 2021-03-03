@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import Joi from "joi";
 import { Config } from "./config/Config";
 import { ID_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_UPDATE_SCHEMA } from "./config/schemas";
+import { Organization } from "./models/Organization";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
@@ -73,6 +74,127 @@ const init = async () =>
         }
 
         return h.continue;
+    });
+
+    server.route({
+        method: "GET",
+        path: "/organizations/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+            },
+            response: {
+                schema: ORGANIZATION_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            return organization.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/organizations",
+        options: {
+            auth: false,
+            validate: {
+                payload: ORGANIZATION_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ORGANIZATION_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.create(request.payload as any);
+
+            return organization.serialize();
+        }
+    });
+
+    server.route({
+        method: "PATCH",
+        path: "/organizations/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+                payload: ORGANIZATION_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: ORGANIZATION_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await organization.update(request.payload as any);
+
+            return organization.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/organizations/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await organization.delete();
+
+            return h.response();
+        }
     });
 
     server.route({
@@ -163,7 +285,6 @@ const init = async () =>
             return user.serialize();
         }
     });
-
 
     server.route({
         method: "DELETE",
