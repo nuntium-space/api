@@ -13,10 +13,14 @@ export const ID_SCHEMA = (prefix: string) => STRING_SCHEMA.pattern(new RegExp(`^
 
 export const EMAIL_SCHEMA = STRING_SCHEMA.email();
 
+export const URL_SCHEMA = STRING_SCHEMA.max(500).uri({ scheme: "https" });
+
 export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
+
+export const IMAGE_SCHEMA = Joi.binary().max(2 ** 10);
 
 /*
 ----------------
