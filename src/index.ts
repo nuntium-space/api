@@ -3,7 +3,7 @@ import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
 import Joi from "joi";
 import { Config } from "./config/Config";
-import { ID_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_UPDATE_SCHEMA } from "./config/schemas";
+import { ID_SCHEMA, ORGANIZATION_CREATE_SCHEMA, ORGANIZATION_SCHEMA, ORGANIZATION_UPDATE_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_UPDATE_SCHEMA } from "./config/schemas";
 import { Organization } from "./models/Organization";
 import { Session } from "./models/Session";
 import { User } from "./models/User";

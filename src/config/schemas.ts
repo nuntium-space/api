@@ -39,6 +39,13 @@ export const SESSION_SCHEMA = Joi
         expires_at: DATETIME_SCHEMA.required(),
     });
 
+export const ORGANIZATION_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+        name: STRING_SCHEMA.max(50).required(),
+        owner: USER_SCHEMA.required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -59,6 +66,16 @@ export const USER_UPDATE_SCHEMA = Joi
         last_name: STRING_SCHEMA.max(50),
         email: EMAIL_SCHEMA,
         password: PASSWORD_SCHEMA,
+    });
+
+export const ORGANIZATION_CREATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50).required(),
+    });
+
+export const ORGANIZATION_UPDATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50),
     });
 
 export const SESSION_CREATE_SCHEMA = Joi
