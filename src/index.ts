@@ -123,7 +123,9 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const organization = await Organization.create(request.payload as any);
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            const organization = await Organization.create(request.payload as any, authenticatedUser);
 
             return organization.serialize();
         }
