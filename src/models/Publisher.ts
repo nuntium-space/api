@@ -8,7 +8,7 @@ interface IDatabasePublisher
     id: string,
     name: string,
     url: string,
-    image: Blob,
+    image: string,
     organization: string,
 }
 
@@ -16,7 +16,7 @@ interface ICreatePublisher
 {
     name: string,
     url: string,
-    image: Blob,
+    image: string,
     organization: string,
 }
 
@@ -24,7 +24,7 @@ interface IUpdatePublisher
 {
     name?: string,
     url?: string,
-    image?: Blob,
+    image?: string,
 }
 
 export interface ISerializedPublisher
@@ -43,7 +43,7 @@ export class Publisher
         private readonly _id: string,
         private _name: string,
         private _url: string,
-        private _image: Blob,
+        private _image: string,
         private  _organization: Organization,
     )
     {}
@@ -63,7 +63,7 @@ export class Publisher
         return this._url;
     }
 
-    public get image(): Blob
+    public get image(): string
     {
         return this._image;
     }
@@ -164,7 +164,7 @@ export class Publisher
             id: this.id,
             name: this.name,
             url: this.url,
-            image: URL.createObjectURL(this.image),
+            image: this.image,
             organization: this.organization.serialize(),
         };
     }
