@@ -113,7 +113,6 @@ const init = async () =>
         method: "POST",
         path: "/organizations",
         options: {
-            auth: false,
             validate: {
                 payload: ORGANIZATION_CREATE_SCHEMA,
             },
