@@ -50,6 +50,15 @@ export const ORGANIZATION_SCHEMA = Joi
         owner: USER_SCHEMA.required(),
     });
 
+export const PUBLISHER_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+        name: STRING_SCHEMA.max(50).required(),
+        url: URL_SCHEMA.required(),
+        image: IMAGE_SCHEMA.required(),
+        organization: ORGANIZATION_SCHEMA.required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -80,6 +89,21 @@ export const ORGANIZATION_CREATE_SCHEMA = Joi
 export const ORGANIZATION_UPDATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50),
+    });
+
+export const PUBLISHER_CREATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50).required(),
+        url: URL_SCHEMA.required(),
+        image: IMAGE_SCHEMA.required(),
+        organization: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+    });
+
+export const PUBLISHER_UPDATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50),
+        url: URL_SCHEMA,
+        image: IMAGE_SCHEMA,
     });
 
 export const SESSION_CREATE_SCHEMA = Joi

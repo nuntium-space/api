@@ -3,8 +3,9 @@ import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
 import Joi from "joi";
 import { Config } from "./config/Config";
-import { ID_SCHEMA, ORGANIZATION_CREATE_SCHEMA, ORGANIZATION_SCHEMA, ORGANIZATION_UPDATE_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_UPDATE_SCHEMA } from "./config/schemas";
+import { ID_SCHEMA, ORGANIZATION_CREATE_SCHEMA, ORGANIZATION_SCHEMA, ORGANIZATION_UPDATE_SCHEMA, PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_UPDATE_SCHEMA } from "./config/schemas";
 import { Organization } from "./models/Organization";
+import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
@@ -193,6 +194,123 @@ const init = async () =>
             }
 
             await organization.delete();
+
+            return h.response();
+        }
+    });
+
+    server.route({
+        method: "GET",
+        path: "/publishers/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+            },
+            response: {
+                schema: PUBLISHER_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            return publisher.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/publishers",
+        options: {
+            validate: {
+                payload: PUBLISHER_CREATE_SCHEMA,
+            },
+            response: {
+                schema: PUBLISHER_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            /**
+             * @todo
+             * 
+             * Check that the organization in the payload is owned by the authenticated user
+             */
+
+            const publisher = await Publisher.create(request.payload as any);
+
+            return publisher.serialize();
+        }
+    });
+
+    server.route({
+        method: "PATCH",
+        path: "/publishers/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+                payload: PUBLISHER_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: PUBLISHER_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            /**
+             * @todo
+             * 
+             * Check that the publisher is owned by the authenticated user
+             */
+
+            await publisher.update(request.payload as any);
+
+            return publisher.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/publishers/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            /**
+             * @todo
+             * 
+             * Check that the publisher is owned by the authenticated user
+             */
+
+            await publisher.delete();
 
             return h.response();
         }
