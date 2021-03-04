@@ -78,7 +78,10 @@ export const USER_UPDATE_SCHEMA = Joi
         first_name: STRING_SCHEMA.max(50),
         last_name: STRING_SCHEMA.max(50),
         email: EMAIL_SCHEMA,
-        password: PASSWORD_SCHEMA,
+        old_password: PASSWORD_SCHEMA.when(Joi.ref("new_password"), {
+            then: Joi.required(),
+        }),
+        new_password: PASSWORD_SCHEMA,
     });
 
 export const ORGANIZATION_CREATE_SCHEMA = Joi

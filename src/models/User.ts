@@ -24,7 +24,8 @@ interface IUpdateUser
     first_name?: string,
     last_name?: string,
     email?: string,
-    password?: string,
+    new_password?: string,
+    old_password?: string,
 }
 
 export interface ISerializedUser
@@ -114,9 +115,18 @@ export class User
         this._first_name = data.first_name ?? this.first_name;
         this._last_name = data.last_name ?? this.last_name;
         this._email = data.email ?? this.email;
-        this._password = data.password
-            ? Utilities.hash(data.password)
-            : this._password;
+
+        if (data.old_password)
+        {
+            if (!Utilities.verifyHash(data.old_password, this._password))
+            {
+                throw new Error(`Wrong password`);
+            }
+
+            this._password = data.new_password
+                ? Utilities.hash(data.new_password)
+                : this._password;
+        }
 
         const result = await Database.client.query(
             `
