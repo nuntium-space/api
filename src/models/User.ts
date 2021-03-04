@@ -120,7 +120,7 @@ export class User
         {
             if (!Utilities.verifyHash(data.old_password, this._password))
             {
-                throw new Error(`Wrong password`);
+                throw new Error(`"old_password" is wrong`);
             }
 
             this._password = data.new_password

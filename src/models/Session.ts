@@ -57,12 +57,12 @@ export class Session
 
         if (user.rowCount === 0)
         {
-            throw new Error(`The user '${data.email}' does not exist`);
+            throw new Error(`"email" '${data.email}' does not exist`);
         }
 
         if (!Utilities.verifyHash(data.password, user.rows[0].password))
         {
-            throw new Error(`Wrong password`);
+            throw new Error(`"password" is wrong`);
         }
 
         const expires = new Date();
