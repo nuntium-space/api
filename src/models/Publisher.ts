@@ -158,6 +158,16 @@ export class Publisher
         }
     }
 
+    public static async forOrganization(organization: Organization): Promise<Publisher[]>
+    {
+        const result = await Database.client.query(
+            `select * from "publishers" where "organization" = $1`,
+            [ organization.id ],
+        );
+
+        return Promise.all(result.rows.map(Publisher.deserialize));
+    }
+
     public serialize(): ISerializedPublisher
     {
         return {

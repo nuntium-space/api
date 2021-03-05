@@ -111,6 +111,41 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/organizations/{id}/publishers",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(PUBLISHER_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const publishers = await Publisher.forOrganization(organization);
+
+            return publishers.map(publisher => publisher.serialize());
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/organizations",
         options: {
