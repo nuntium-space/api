@@ -129,6 +129,16 @@ export class Organization
         }
     }
 
+    public static async forUser(user: User): Promise<Organization[]>
+    {
+        const result = await Database.client.query(
+            `select * from "organizations" where "user" = $1`,
+            [ user.id ],
+        );
+
+        return Promise.all(result.rows.map(Organization.deserialize));
+    }
+
     public serialize(): ISerializedOrganization
     {
         return {
