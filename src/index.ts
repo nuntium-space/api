@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import Joi from "joi";
 import { Config } from "./config/Config";
 import { ID_SCHEMA, ORGANIZATION_CREATE_SCHEMA, ORGANIZATION_SCHEMA, ORGANIZATION_UPDATE_SCHEMA, PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_UPDATE_SCHEMA } from "./config/schemas";
+import { Author } from "./models/Author";
 import { Organization } from "./models/Organization";
 import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
@@ -75,6 +76,88 @@ const init = async () =>
         }
 
         return h.continue;
+    });
+
+    server.route({
+        method: "GET",
+        path: "/authors/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
+                }),
+            },
+            response: {
+                schema: AUTHOR_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const author = await Author.retrieve(request.params.id);
+
+            if (!author)
+            {
+                throw Boom.notFound();
+            }
+
+            return author.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/authors",
+        options: {
+            validate: {
+                payload: AUTHOR_CREATE_SCHEMA,
+            },
+            response: {
+                schema: AUTHOR_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            /**
+             * @todo
+             * 
+             * Check that the publisher is owned by the authenticated user
+             */
+
+            const author = await Author.create(request.payload as any);
+
+            return author.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/authors/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const author = await Author.retrieve(request.params.id);
+
+            if (!author)
+            {
+                throw Boom.notFound();
+            }
+
+            /**
+             * @todo
+             * 
+             * Check that the author.publisher is owned by the authenticated user
+             */
+
+            await author.delete();
+
+            return h.response();
+        }
     });
 
     server.route({
