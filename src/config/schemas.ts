@@ -27,7 +27,9 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
-export const IMAGE_SCHEMA = STRING_SCHEMA.pattern(/^data:image\/.+;base64,.+$/).max(2 ** 10);
+export const IMAGE_SCHEMA = STRING_SCHEMA
+    .pattern(/^data:image\/.+;base64,.+$/)
+    .max(5 * (2 ** 20)); // 5MB
 
 /*
 ----------------
