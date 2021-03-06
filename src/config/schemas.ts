@@ -68,6 +68,13 @@ export const PUBLISHER_SCHEMA = Joi
         organization: ORGANIZATION_SCHEMA.required(),
     });
 
+export const AUTHOR_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
+        user: USER_SCHEMA.required(),
+        publisher: PUBLISHER_SCHEMA.required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -116,6 +123,12 @@ export const PUBLISHER_UPDATE_SCHEMA = Joi
         name: STRING_SCHEMA.max(50),
         url: URL_SCHEMA,
         image: IMAGE_SCHEMA,
+    });
+
+export const AUTHOR_CREATE_SCHEMA = Joi
+    .object({
+        user: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+        publisher: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
     });
 
 export const SESSION_CREATE_SCHEMA = Joi
