@@ -13,7 +13,14 @@ export const ID_SCHEMA = (prefix: string) => STRING_SCHEMA.pattern(new RegExp(`^
 
 export const EMAIL_SCHEMA = STRING_SCHEMA.email();
 
-export const URL_SCHEMA = STRING_SCHEMA.max(500).uri({ scheme: "https" });
+export const URL_SCHEMA = STRING_SCHEMA.max(500).uri({
+    scheme: "https",
+    domain: {
+        tlds: {
+            allow: true,
+        },
+    },
+});
 
 export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 
