@@ -2,6 +2,7 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedOrganization, Organization } from "./Organization";
+import { User } from "./User";
 
 interface IDatabasePublisher
 {
@@ -152,6 +153,11 @@ export class Publisher
         );
 
         return Promise.all(result.rows.map(Publisher.deserialize));
+    }
+
+    public isOwnedByUser(user: User): boolean
+    {
+        return this.organization.owner.id === user.id;
     }
 
     public serialize(): ISerializedPublisher

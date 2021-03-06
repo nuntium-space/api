@@ -123,11 +123,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            /**
-             * @todo
-             * 
-             * Check that the author.publisher is owned by the authenticated user
-             */
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!author.publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
 
             await author.delete();
 
@@ -340,11 +341,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            /**
-             * @todo
-             * 
-             * Check that the publisher is owned by the authenticated user
-             */
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
 
             const authors = await Author.forPublisher(publisher);
 
@@ -400,11 +402,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            /**
-             * @todo
-             * 
-             * Check that the publisher is owned by the authenticated user
-             */
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
 
             const author = await Author.create({
                 email: (request.payload as any).email,
@@ -438,11 +441,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            /**
-             * @todo
-             * 
-             * Check that the publisher is owned by the authenticated user
-             */
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
 
             await publisher.update(request.payload as any);
 
@@ -469,11 +473,12 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            /**
-             * @todo
-             * 
-             * Check that the publisher is owned by the authenticated user
-             */
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
 
             await publisher.delete();
 
