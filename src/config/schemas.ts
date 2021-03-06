@@ -27,10 +27,6 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
-export const IMAGE_SCHEMA = STRING_SCHEMA
-    .pattern(/^data:image\/.+;base64,.+$/)
-    .max(5 * (2 ** 20)); // 5MB
-
 /*
 ----------------
 RESPONSE SCHEMAS
@@ -64,7 +60,6 @@ export const PUBLISHER_SCHEMA = Joi
         id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
         name: STRING_SCHEMA.max(50).required(),
         url: URL_SCHEMA.required(),
-        image: IMAGE_SCHEMA.required(),
         organization: ORGANIZATION_SCHEMA.required(),
     });
 
@@ -114,7 +109,6 @@ export const PUBLISHER_CREATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50).required(),
         url: URL_SCHEMA.required(),
-        image: IMAGE_SCHEMA.required(),
         organization: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
     });
 
@@ -122,7 +116,6 @@ export const PUBLISHER_UPDATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50),
         url: URL_SCHEMA,
-        image: IMAGE_SCHEMA,
     });
 
 export const AUTHOR_CREATE_SCHEMA = Joi

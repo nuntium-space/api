@@ -62,7 +62,6 @@ create table "publishers"
     "id" id not null,
     "name" varchar(50) not null,
     "url" url not null,
-    "image" text not null,
     "organization" id not null,
 
     primary key ("id"),

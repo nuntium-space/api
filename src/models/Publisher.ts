@@ -8,7 +8,6 @@ interface IDatabasePublisher
     id: string,
     name: string,
     url: string,
-    image: string,
     organization: string,
 }
 
@@ -16,7 +15,6 @@ interface ICreatePublisher
 {
     name: string,
     url: string,
-    image: string,
     organization: string,
 }
 
@@ -24,7 +22,6 @@ interface IUpdatePublisher
 {
     name?: string,
     url?: string,
-    image?: string,
 }
 
 export interface ISerializedPublisher
@@ -32,7 +29,6 @@ export interface ISerializedPublisher
     id: string,
     name: string,
     url: string,
-    image: string,
     organization: ISerializedOrganization,
 }
 
@@ -43,7 +39,6 @@ export class Publisher
         private readonly _id: string,
         private _name: string,
         private _url: string,
-        private _image: string,
         private  _organization: Organization,
     )
     {}
@@ -63,11 +58,6 @@ export class Publisher
         return this._url;
     }
 
-    public get image(): string
-    {
-        return this._image;
-    }
-
     public get organization(): Organization
     {
         return this._organization;
@@ -78,16 +68,15 @@ export class Publisher
         const result = await Database.client.query(
             `
             insert into "publishers"
-                ("id", "name", "url", "image", "organization")
+                ("id", "name", "url", "organization")
             values
-                ($1, $2, $3, $4, $5)
+                ($1, $2, $3, $4)
             returning *
             `,
             [
                 Utilities.id(Config.ID_PREFIXES.PUBLISHER),
                 data.name,
                 data.url,
-                data.image,
                 data.organization,
             ],
         );
@@ -119,22 +108,19 @@ export class Publisher
     {
         this._name = data.name ?? this.name;
         this._url = data.url ?? this.url;
-        this._image = data.image ?? this.image;
 
         const result = await Database.client.query(
             `
             update "publishers"
             set
                 "name" = $1,
-                "url" = $2,
-                "image" = $3
+                "url" = $2
             where
-                "id" = $4
+                "id" = $3
             `,
             [
                 this.name,
                 this.url,
-                this.image,
                 this.id,
             ],
         );
@@ -174,7 +160,6 @@ export class Publisher
             id: this.id,
             name: this.name,
             url: this.url,
-            image: this.image,
             organization: this.organization.serialize(),
         };
     }
@@ -192,7 +177,6 @@ export class Publisher
             data.id,
             data.name,
             data.url,
-            data.image,
             organization,
         );
     }
