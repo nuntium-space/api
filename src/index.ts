@@ -105,31 +105,6 @@ const init = async () =>
     });
 
     server.route({
-        method: "POST",
-        path: "/authors",
-        options: {
-            validate: {
-                payload: AUTHOR_CREATE_SCHEMA,
-            },
-            response: {
-                schema: AUTHOR_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            /**
-             * @todo
-             * 
-             * Check that the publisher is owned by the authenticated user
-             */
-
-            const author = await Author.create(request.payload as any);
-
-            return author.serialize();
-        }
-    });
-
-    server.route({
         method: "DELETE",
         path: "/authors/{id}",
         options: {
@@ -399,6 +374,44 @@ const init = async () =>
             const publisher = await Publisher.create(request.payload as any);
 
             return publisher.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/publishers/{id}/authors",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+                payload: AUTHOR_CREATE_SCHEMA,
+            },
+            response: {
+                schema: AUTHOR_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            /**
+             * @todo
+             * 
+             * Check that the publisher is owned by the authenticated user
+             */
+
+            const author = await Author.create({
+                email: (request.payload as any).email,
+                publisher: publisher.id,
+            });
+
+            return author.serialize();
         }
     });
 

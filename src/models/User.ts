@@ -110,6 +110,21 @@ export class User
         return User.deserialize(result.rows[0]);
     }
 
+    public static async retrieveWithEmail(email: string): Promise<User | null>
+    {
+        const result = await Database.client.query(
+            `select * from "users" where "email" = $1`,
+            [ email ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            return null;
+        }
+
+        return User.deserialize(result.rows[0]);
+    }
+
     public async update(data: IUpdateUser): Promise<void>
     {
         this._first_name = data.first_name ?? this.first_name;

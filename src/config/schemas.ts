@@ -127,8 +127,7 @@ export const PUBLISHER_UPDATE_SCHEMA = Joi
 
 export const AUTHOR_CREATE_SCHEMA = Joi
     .object({
-        user: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-        publisher: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+        email: EMAIL_SCHEMA.required(),
     });
 
 export const SESSION_CREATE_SCHEMA = Joi

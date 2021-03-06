@@ -13,7 +13,7 @@ interface IDatabaseAuthor
 
 interface ICreateAuthor
 {
-    user: string,
+    email: string,
     publisher: string,
 }
 
@@ -51,6 +51,13 @@ export class Author
 
     public static async create(data: ICreateAuthor): Promise<Author>
     {
+        const user = await User.retrieveWithEmail(data.email);
+
+        if (!user)
+        {
+            throw new Error(`"email" ${data.email} does not exist`);
+        }
+
         const result = await Database.client.query(
             `
             insert into "authors"
@@ -61,7 +68,7 @@ export class Author
             `,
             [
                 Utilities.id(Config.ID_PREFIXES.AUTHOR),
-                data.user,
+                user.id,
                 data.publisher,
             ],
         );
