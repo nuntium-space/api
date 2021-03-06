@@ -344,6 +344,40 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/publishers/{id}/authors",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(AUTHOR_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            /**
+             * @todo
+             * 
+             * Check that the publisher is owned by the authenticated user
+             */
+
+            const authors = await Author.forPublisher(publisher);
+
+            return authors.map(author => author.serialize());
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/publishers",
         options: {
