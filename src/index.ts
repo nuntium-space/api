@@ -459,6 +459,34 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/publishers/{id}/articles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            const articles = await Article.forPublisher(publisher);
+
+            return articles.map(article => article.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/publishers/{id}/authors",
         options: {
             validate: {
