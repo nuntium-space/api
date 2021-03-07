@@ -155,6 +155,26 @@ export class Publisher
         return Promise.all(result.rows.map(Publisher.deserialize));
     }
 
+    public static async forUser(user: User): Promise<Publisher[]>
+    {
+        const result = await Database.client.query(
+            `
+            select p.*
+            from
+                authors as a
+                inner join
+                publishers as p
+                on
+                    a.user = $1
+                    and
+                    p.id = a.publisher
+            `,
+            [ user.id ],
+        );
+
+        return Promise.all(result.rows.map(Publisher.deserialize));
+    }
+
     public isOwnedByUser(user: User): boolean
     {
         return this.organization.owner.id === user.id;
