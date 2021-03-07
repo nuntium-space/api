@@ -70,6 +70,16 @@ export const AUTHOR_SCHEMA = Joi
         publisher: PUBLISHER_SCHEMA.required(),
     });
 
+export const ARTICLE_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+        title: STRING_SCHEMA.max(50).required(),
+        content: STRING_SCHEMA.required(),
+        author: AUTHOR_SCHEMA.required(),
+        created_at: DATETIME_SCHEMA.required(),
+        updated_at: DATETIME_SCHEMA.required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -127,4 +137,17 @@ export const SESSION_CREATE_SCHEMA = Joi
     .object({
         email: EMAIL_SCHEMA.required(),
         password: PASSWORD_SCHEMA.required(),
+    });
+
+export const ARTICLE_CREATE_SCHEMA = Joi
+    .object({
+        title: STRING_SCHEMA.max(50).required(),
+        content: STRING_SCHEMA.required(),
+        author: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
+    });
+
+export const ARTICLE_UPDATE_SCHEMA = Joi
+    .object({
+        title: STRING_SCHEMA.max(50),
+        content: STRING_SCHEMA,
     });
