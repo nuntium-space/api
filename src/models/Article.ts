@@ -2,6 +2,7 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author, ISerializedAuthor } from "./Author";
+import { Publisher } from "./Publisher";
 
 interface IDatabaseArticle
 {
@@ -161,6 +162,26 @@ export class Article
         {
             throw new Error("Cannot delete article");
         }
+    }
+
+    public static async forPublisher(publisher: Publisher): Promise<Article[]>
+    {
+        const result = await Database.client.query(
+            `
+            select art.*
+            from
+                articles as art
+                inner join
+                authors as aut
+                on
+                    art.author = aut.id
+                    and
+                    aut.publisher = $1
+            `,
+            [ publisher.id ],
+        );
+
+        return Promise.all(result.rows.map(Article.deserialize));
     }
 
     public serialize(): ISerializedArticle
