@@ -133,6 +133,7 @@ export class Article
                 "content" = $2
             where
                 "id" = $3
+            returning "updated_at"
             `,
             [
                 this.title,
@@ -145,6 +146,8 @@ export class Article
         {
             throw new Error("Cannot update article");
         }
+
+        this._updated_at = result.rows[0].updated_at;
     }
 
     public async delete(): Promise<void>
