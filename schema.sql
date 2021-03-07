@@ -95,8 +95,8 @@ create table "articles"
     "title" varchar(50) not null,
     "content" text not null,
     "author" id not null,
-    "created_at" timestamp not null,
-    "updated_at" timestamp not null,
+    "created_at" timestamp not null default current_timestamp,
+    "updated_at" timestamp not null default current_timestamp,
 
     primary key ("id"),
 
