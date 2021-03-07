@@ -4,6 +4,9 @@ import dotenv from "dotenv";
 import Joi from "joi";
 import { Config } from "./config/Config";
 import {
+    ARTICLE_CREATE_SCHEMA,
+    ARTICLE_SCHEMA,
+    ARTICLE_UPDATE_SCHEMA,
     AUTHOR_CREATE_SCHEMA,
     AUTHOR_SCHEMA,
     ID_SCHEMA,
@@ -19,6 +22,7 @@ import {
     USER_SCHEMA,
     USER_UPDATE_SCHEMA
 } from "./config/schemas";
+import { Article } from "./models/Article";
 import { Author } from "./models/Author";
 import { Organization } from "./models/Organization";
 import { Publisher } from "./models/Publisher";
@@ -91,6 +95,125 @@ const init = async () =>
         }
 
         return h.continue;
+    });
+
+    server.route({
+        method: "GET",
+        path: "/articles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                }),
+            },
+            response: {
+                schema: ARTICLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const article = await Article.retrieve(request.params.id);
+
+            if (!article)
+            {
+                throw Boom.notFound();
+            }
+
+            return article.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/articles",
+        options: {
+            validate: {
+                payload: ARTICLE_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ARTICLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            /**
+             * @todo
+             * 
+             * Check that the author in the payload is the authenticated user
+             */
+
+            const article = await Article.create(request.payload as any);
+
+            return article.serialize();
+        }
+    });
+
+    server.route({
+        method: "PATCH",
+        path: "/articles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                }),
+                payload: ARTICLE_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: ARTICLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const article = await Article.retrieve(request.params.id);
+
+            if (!article)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (article.author.user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await article.update(request.payload as any);
+
+            return article.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/articles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const article = await Article.retrieve(request.params.id);
+
+            if (!article)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (article.author.user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await article.delete();
+
+            return h.response();
+        }
     });
 
     server.route({
