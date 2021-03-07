@@ -168,3 +168,28 @@ create table "bundles_publishers"
     foreign key ("bundle") references "bundles" on update cascade on delete cascade,
     foreign key ("publisher") references "publishers" on update cascade on delete cascade
 );
+
+/*
+---------
+FUNCTIONS
+---------
+*/
+
+create function trigger_update_updated_at()
+returns trigger as $$
+begin
+  new."updated_at" = current_timestamp;
+  return new;
+end;
+$$ language plpgsql;
+
+/*
+--------
+TRIGGERS
+--------
+*/
+
+create trigger "update_updated_at"
+before update on "articles"
+for each row
+execute procedure trigger_update_updated_at();
