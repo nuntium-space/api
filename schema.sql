@@ -128,8 +128,8 @@ create table "comments"
     "user" id not null,
     "article" id not null,
     "parent" id,
-    "created_at" timestamp not null,
-    "updated_at" timestamp not null,
+    "created_at" timestamp not null default current_timestamp,
+    "updated_at" timestamp not null default current_timestamp,
 
     primary key ("id"),
 
@@ -191,5 +191,10 @@ TRIGGERS
 
 create trigger "update_updated_at"
 before update on "articles"
+for each row
+execute procedure trigger_update_updated_at();
+
+create trigger "update_updated_at"
+before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
