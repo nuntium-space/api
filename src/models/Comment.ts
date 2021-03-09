@@ -28,13 +28,20 @@ interface IUpdateComment
     content?: string,
 }
 
+interface ICommentExpandOptions
+{
+    user?: boolean,
+    article?: boolean,
+    parent?: boolean,
+}
+
 export interface ISerializedComment
 {
     id: string,
     content: string,
-    user: ISerializedUser,
-    article: ISerializedArticle,
-    parent: ISerializedComment | null,
+    user: ISerializedUser | { id: string },
+    article: ISerializedArticle | { id: string },
+    parent: ISerializedComment | { id: string } | null,
     created_at: string,
     updated_at: string,
 }
@@ -45,9 +52,9 @@ export class Comment
     (
         private readonly _id: string,
         private _content: string,
-        private _user: User,
-        private _article: Article,
-        private _parent: Comment | null,
+        private _user: User | { id: string },
+        private _article: Article | { id: string },
+        private _parent: Comment | { id: string } | null,
         private _created_at: Date,
         private _updated_at: Date,
     )
@@ -63,17 +70,17 @@ export class Comment
         return this._content;
     }
 
-    public get user(): User
+    public get user(): User | { id: string }
     {
         return this._user;
     }
 
-    public get article(): Article
+    public get article(): Article | { id: string }
     {
         return this._article;
     }
 
-    public get parent(): Comment | null
+    public get parent(): Comment | { id: string } | null
     {
         return this._parent;
     }
@@ -115,7 +122,7 @@ export class Comment
         return Comment.deserialize(result.rows[0]);
     }
 
-    public static async retrieve(id: string): Promise<Comment | null>
+    public static async retrieve(id: string, expand?: ICommentExpandOptions): Promise<Comment | null>
     {
         const result = await Database.client.query(
             `select * from "comments" where "id" = $1`,
@@ -127,7 +134,7 @@ export class Comment
             return null;
         }
 
-        return Comment.deserialize(result.rows[0]);
+        return Comment.deserialize(result.rows[0], expand);
     }
 
     public async update(data: IUpdateComment): Promise<void>
@@ -170,14 +177,14 @@ export class Comment
         }
     }
 
-    public static async forArticle(article: Article): Promise<Comment[]>
+    public static async forArticle(article: Article, expand?: ICommentExpandOptions): Promise<Comment[]>
     {
         const result = await Database.client.query(
             `select * from comments where "article" = $1`,
             [ article.id ],
         );
 
-        return Promise.all(result.rows.map(Comment.deserialize));
+        return Promise.all(result.rows.map(row => Comment.deserialize(row, expand)));
     }
 
     public serialize(): ISerializedComment
@@ -185,40 +192,72 @@ export class Comment
         return {
             id: this.id,
             content: this.content,
-            user: this.user.serialize(),
-            article: this.article.serialize(),
-            parent: this.parent?.serialize() ?? null,
+            user: this.user instanceof User
+                ? this.user.serialize()
+                : this.user,
+            article: this.article instanceof Article
+                ? this.article.serialize()
+                : this.article,
+            parent: this.parent instanceof Comment
+                ? this.parent.serialize()
+                : this.parent,
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
         };
     }
 
-    private static async deserialize(data: IDatabaseComment): Promise<Comment>
+    private static async deserialize(data: IDatabaseComment, expand?: ICommentExpandOptions): Promise<Comment>
     {
-        const user = await User.retrieve(data.user);
+        let article: Article | { id: string };
+        let parent: Comment | { id: string } | null;
+        let user: User | { id: string };
 
-        if (!user)
+        if (expand?.article)
         {
-            throw new Error(`The user '${data.user}' does not exist`);
+            const temp = await Article.retrieve(data.article);
+
+            if (!temp)
+            {
+                throw new Error(`The article '${data.article}' does not exist`);
+            }
+
+            article = temp;
+        }
+        else
+        {
+            article = { id: data.article };
         }
 
-        const article = await Article.retrieve(data.article);
-
-        if (!article)
+        if (expand?.parent && data.parent !== null)
         {
-            throw new Error(`The article '${data.article}' does not exist`);
-        }
+            const temp = await Comment.retrieve(data.parent);
 
-        let parent: Comment | null = null;
-
-        if (data.parent !== null)
-        {
-            parent = await Comment.retrieve(data.parent);
-
-            if (!parent)
+            if (!temp)
             {
                 throw new Error(`The comment '${data.parent}' does not exist`);
             }
+
+            parent = temp;
+        }
+        else
+        {
+            parent = { id: data.parent };
+        }
+
+        if (expand?.user)
+        {
+            const temp = await User.retrieve(data.user);
+
+            if (!temp)
+            {
+                throw new Error(`The user '${data.user}' does not exist`);
+            }
+
+            user = temp;
+        }
+        else
+        {
+            user = { id: data.user };
         }
 
         return new Comment(
