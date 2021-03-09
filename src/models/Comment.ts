@@ -28,13 +28,6 @@ interface IUpdateComment
     content?: string,
 }
 
-interface ICommentExpandOptions
-{
-    user?: boolean,
-    article?: boolean,
-    parent?: boolean,
-}
-
 export interface ISerializedComment
 {
     id: string,
@@ -122,7 +115,7 @@ export class Comment
         return Comment.deserialize(result.rows[0]);
     }
 
-    public static async retrieve(id: string, expand?: ICommentExpandOptions): Promise<Comment | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Comment | null>
     {
         const result = await Database.client.query(
             `select * from "comments" where "id" = $1`,
@@ -177,7 +170,7 @@ export class Comment
         }
     }
 
-    public static async forArticle(article: Article, expand?: ICommentExpandOptions): Promise<Comment[]>
+    public static async forArticle(article: Article, expand?: string[]): Promise<Comment[]>
     {
         const result = await Database.client.query(
             `select * from comments where "article" = $1`,
@@ -206,13 +199,13 @@ export class Comment
         };
     }
 
-    private static async deserialize(data: IDatabaseComment, expand?: ICommentExpandOptions): Promise<Comment>
+    private static async deserialize(data: IDatabaseComment, expand?: string[]): Promise<Comment>
     {
         let article: Article | { id: string };
         let parent: Comment | { id: string } | null = null;
         let user: User | { id: string };
 
-        if (expand?.article)
+        if (expand?.includes("article"))
         {
             const temp = await Article.retrieve(data.article);
 
@@ -230,7 +223,7 @@ export class Comment
 
         if (data.parent !== null)
         {
-            if (expand?.parent)
+            if (expand?.includes("parent"))
             {
                 const temp = await Comment.retrieve(data.parent);
 
@@ -247,7 +240,7 @@ export class Comment
             }
         }
 
-        if (expand?.user)
+        if (expand?.includes("user"))
         {
             const temp = await User.retrieve(data.user);
 
