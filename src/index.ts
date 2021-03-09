@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
 import Joi from "joi";
+import qs from "qs";
 import { Config } from "./config/Config";
 import {
     ARTICLE_CREATE_SCHEMA,
@@ -52,6 +53,9 @@ const server = Hapi.server({
         response: {
             emptyStatusCode: 204,
         },
+    },
+    query: {
+        parser: qs.parse,
     },
 });
 
@@ -135,6 +139,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("article", "parent", "user"),
+                }),
             },
             response: {
                 schema: Joi.array().items(COMMENT_SCHEMA).required(),
@@ -149,7 +156,7 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            const comments = await Comment.forArticle(article);
+            const comments = await Comment.forArticle(article, request.query.expand);
 
             return comments.map(comment => comment.serialize());
         }

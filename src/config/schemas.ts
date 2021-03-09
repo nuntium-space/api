@@ -29,6 +29,10 @@ export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().for
 
 export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: ID_SCHEMA(prefix).required() });
 
+export const EXPAND_OPTIONS_SCHEMA = (...fields: string[]) => Joi.object({
+    expand: fields.map(field => ({ [field]: Joi.boolean().required() })),
+});
+
 /*
 ----------------
 RESPONSE SCHEMAS
