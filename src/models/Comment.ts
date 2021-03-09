@@ -1,3 +1,4 @@
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -32,9 +33,9 @@ export interface ISerializedComment
 {
     id: string,
     content: string,
-    user: ISerializedUser | { id: string },
-    article: ISerializedArticle | { id: string },
-    parent: ISerializedComment | { id: string } | null,
+    user: ISerializedUser | INotExpandedResource,
+    article: ISerializedArticle | INotExpandedResource,
+    parent: ISerializedComment | INotExpandedResource | null,
     created_at: string,
     updated_at: string,
 }
@@ -45,9 +46,9 @@ export class Comment
     (
         private readonly _id: string,
         private _content: string,
-        private _user: User | { id: string },
-        private _article: Article | { id: string },
-        private _parent: Comment | { id: string } | null,
+        private _user: User | INotExpandedResource,
+        private _article: Article | INotExpandedResource,
+        private _parent: Comment | INotExpandedResource | null,
         private _created_at: Date,
         private _updated_at: Date,
     )
@@ -63,17 +64,17 @@ export class Comment
         return this._content;
     }
 
-    public get user(): User | { id: string }
+    public get user(): User | INotExpandedResource
     {
         return this._user;
     }
 
-    public get article(): Article | { id: string }
+    public get article(): Article | INotExpandedResource
     {
         return this._article;
     }
 
-    public get parent(): Comment | { id: string } | null
+    public get parent(): Comment | INotExpandedResource | null
     {
         return this._parent;
     }
@@ -201,9 +202,9 @@ export class Comment
 
     private static async deserialize(data: IDatabaseComment, expand?: string[]): Promise<Comment>
     {
-        let article: Article | { id: string };
-        let parent: Comment | { id: string } | null = null;
-        let user: User | { id: string };
+        let article: Article | INotExpandedResource;
+        let parent: Comment | INotExpandedResource | null = null;
+        let user: User | INotExpandedResource;
 
         if (expand?.includes("article"))
         {
