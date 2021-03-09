@@ -80,6 +80,18 @@ export const ARTICLE_SCHEMA = Joi
         updated_at: DATETIME_SCHEMA.required(),
     });
 
+export const COMMENT_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
+        content: STRING_SCHEMA.required(),
+        user: USER_SCHEMA.required(),
+        article: ARTICLE_SCHEMA.required(),
+        // Recursive schema
+        parent: Joi.link("/").allow(null).required(),
+        created_at: DATETIME_SCHEMA.required(),
+        updated_at: DATETIME_SCHEMA.required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -149,5 +161,16 @@ export const ARTICLE_CREATE_SCHEMA = Joi
 export const ARTICLE_UPDATE_SCHEMA = Joi
     .object({
         title: STRING_SCHEMA.max(50),
+        content: STRING_SCHEMA,
+    });
+
+export const COMMENT_CREATE_SCHEMA = Joi
+    .object({
+        content: STRING_SCHEMA.required(),
+        parent: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).allow(null).required(),
+    });
+
+export const COMMENT_UPDATE_SCHEMA = Joi
+    .object({
         content: STRING_SCHEMA,
     });
