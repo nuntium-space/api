@@ -209,11 +209,16 @@ export class Comment
             throw new Error(`The article '${data.article}' does not exist`);
         }
 
-        const parent = await Comment.retrieve(data.parent);
+        let parent: Comment | null = null;
 
-        if (!parent)
+        if (data.parent !== null)
         {
-            throw new Error(`The comment '${data.parent}' does not exist`);
+            parent = await Comment.retrieve(data.parent);
+
+            if (!parent)
+            {
+                throw new Error(`The comment '${data.parent}' does not exist`);
+            }
         }
 
         return new Comment(
