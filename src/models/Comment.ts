@@ -209,7 +209,7 @@ export class Comment
     private static async deserialize(data: IDatabaseComment, expand?: ICommentExpandOptions): Promise<Comment>
     {
         let article: Article | { id: string };
-        let parent: Comment | { id: string } | null;
+        let parent: Comment | { id: string } | null = null;
         let user: User | { id: string };
 
         if (expand?.article)
@@ -228,20 +228,23 @@ export class Comment
             article = { id: data.article };
         }
 
-        if (expand?.parent && data.parent !== null)
+        if (data.parent !== null)
         {
-            const temp = await Comment.retrieve(data.parent);
-
-            if (!temp)
+            if (expand?.parent)
             {
-                throw new Error(`The comment '${data.parent}' does not exist`);
-            }
+                const temp = await Comment.retrieve(data.parent);
 
-            parent = temp;
-        }
-        else
-        {
-            parent = { id: data.parent };
+                if (!temp)
+                {
+                    throw new Error(`The comment '${data.parent}' does not exist`);
+                }
+
+                parent = temp;
+            }
+            else
+            {
+                parent = { id: data.parent };
+            }
         }
 
         if (expand?.user)

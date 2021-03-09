@@ -27,6 +27,8 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
+export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: ID_SCHEMA(prefix).required() });
+
 /*
 ----------------
 RESPONSE SCHEMAS
@@ -84,10 +86,29 @@ export const COMMENT_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
         content: STRING_SCHEMA.required(),
-        user: USER_SCHEMA.required(),
-        article: ARTICLE_SCHEMA.required(),
+        user: Joi
+            .alternatives()
+            .try(
+                USER_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+            )
+            .required(),
+        article: Joi
+            .alternatives()
+            .try(
+                ARTICLE_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ARTICLE),
+            )
+            .required(),
         // Recursive schema
-        parent: Joi.link("..").allow(null).required(),
+        parent: Joi
+            .alternatives()
+            .try(
+                Joi.link("..."),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.COMMENT),
+                null,
+            )
+            .required(),
         created_at: DATETIME_SCHEMA.required(),
         updated_at: DATETIME_SCHEMA.required(),
     });
