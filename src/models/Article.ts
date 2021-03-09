@@ -191,7 +191,7 @@ export class Article
         return {
             id: this.id,
             title: this.title,
-            content: options?.preview
+            content: options?.preview && this.content.length > Config.ARTICLE_PREVIEW_LENGTH
                 ? this.content.substr(0, Config.ARTICLE_PREVIEW_LENGTH) + "..."
                 : this.content,
             reading_time: readingTime(this.content).minutes,
