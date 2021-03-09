@@ -2,7 +2,6 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Article, ISerializedArticle } from "./Article";
-import { Publisher } from "./Publisher";
 import { ISerializedUser, User } from "./User";
 
 interface IDatabaseComment
@@ -171,21 +170,11 @@ export class Comment
         }
     }
 
-    public static async forPublisher(publisher: Publisher): Promise<Comment[]>
+    public static async forArticle(article: Article): Promise<Comment[]>
     {
         const result = await Database.client.query(
-            `
-            select art.*
-            from
-                comments as art
-                inner join
-                authors as aut
-                on
-                    art.author = aut.id
-                    and
-                    aut.publisher = $1
-            `,
-            [ publisher.id ],
+            `select * from comments where "article" = $1`,
+            [ article.id ],
         );
 
         return Promise.all(result.rows.map(Comment.deserialize));
@@ -213,14 +202,14 @@ export class Comment
             throw new Error(`The user '${data.user}' does not exist`);
         }
 
-        const article = await Article.retrieve(data.user);
+        const article = await Article.retrieve(data.article);
 
         if (!article)
         {
             throw new Error(`The article '${data.article}' does not exist`);
         }
 
-        const parent = await Comment.retrieve(data.user);
+        const parent = await Comment.retrieve(data.parent);
 
         if (!parent)
         {
