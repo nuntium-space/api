@@ -1,3 +1,4 @@
+import readingTime from "reading-time";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -32,6 +33,7 @@ export interface ISerializedArticle
     id: string,
     title: string,
     content: string,
+    reading_time: number,
     author: ISerializedAuthor,
     created_at: string,
     updated_at: string,
@@ -190,6 +192,7 @@ export class Article
             id: this.id,
             title: this.title,
             content: this.content,
+            reading_time: readingTime(this.content).minutes,
             author: this.author.serialize(),
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
