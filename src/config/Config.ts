@@ -15,4 +15,6 @@ export class Config
         SESSION: "ses",
         COMMENT: "cmt",
     };
+
+    public static readonly ARTICLE_PREVIEW_LENGTH = 200;
 }

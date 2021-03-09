@@ -645,7 +645,7 @@ const init = async () =>
 
             const articles = await Article.forPublisher(publisher);
 
-            return articles.map(article => article.serialize());
+            return articles.map(article => article.serialize({ preview: true }));
         }
     });
 

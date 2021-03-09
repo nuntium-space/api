@@ -186,12 +186,14 @@ export class Article
         return Promise.all(result.rows.map(Article.deserialize));
     }
 
-    public serialize(): ISerializedArticle
+    public serialize(options?: { preview?: boolean }): ISerializedArticle
     {
         return {
             id: this.id,
             title: this.title,
-            content: this.content,
+            content: options?.preview
+                ? this.content.substr(0, Config.ARTICLE_PREVIEW_LENGTH) + "..."
+                : this.content,
             reading_time: readingTime(this.content).minutes,
             author: this.author.serialize(),
             created_at: this.created_at.toISOString(),
