@@ -349,6 +349,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("article", "parent", "user"),
+                }),
             },
             response: {
                 schema: COMMENT_SCHEMA,
@@ -356,7 +359,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const comment = await Comment.retrieve(request.params.id);
+            const comment = await Comment.retrieve(request.params.id, request.query.expand);
 
             if (!comment)
             {
