@@ -87,7 +87,7 @@ export const COMMENT_SCHEMA = Joi
         user: USER_SCHEMA.required(),
         article: ARTICLE_SCHEMA.required(),
         // Recursive schema
-        parent: Joi.link("/").allow(null).required(),
+        parent: Joi.link("..").allow(null).required(),
         created_at: DATETIME_SCHEMA.required(),
         updated_at: DATETIME_SCHEMA.required(),
     });

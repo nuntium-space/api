@@ -128,6 +128,34 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/articles/{id}/comments",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(COMMENT_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const article = await Article.retrieve(request.params.id);
+
+            if (!article)
+            {
+                throw Boom.notFound();
+            }
+
+            const comments = await Comment.forArticle(article);
+
+            return comments.map(comment => comment.serialize());
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/articles",
         options: {
