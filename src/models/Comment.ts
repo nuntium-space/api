@@ -127,7 +127,7 @@ export class Comment
     public static async retrieve(id: string, expand?: string[]): Promise<Comment | null>
     {
         const result = await Database.client.query(
-            `select * from "comments" where "id" = $1`,
+            `select * from "v_comments" where "id" = $1`,
             [ id ],
         );
 
