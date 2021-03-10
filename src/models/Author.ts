@@ -1,3 +1,4 @@
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -20,8 +21,8 @@ interface ICreateAuthor
 export interface ISerializedAuthor
 {
     id: string,
-    user: ISerializedUser,
-    publisher: ISerializedPublisher,
+    user: ISerializedUser | INotExpandedResource,
+    publisher: ISerializedPublisher | INotExpandedResource,
 }
 
 export class Author
@@ -29,8 +30,8 @@ export class Author
     private constructor
     (
         private readonly _id: string,
-        private _user: User,
-        private  _publisher: Publisher,
+        private _user: User | INotExpandedResource,
+        private  _publisher: Publisher | INotExpandedResource,
     )
     {}
 
@@ -39,17 +40,17 @@ export class Author
         return this._id;
     }
 
-    public get user(): User
+    public get user(): User | INotExpandedResource
     {
         return this._user;
     }
 
-    public get publisher(): Publisher
+    public get publisher(): Publisher | INotExpandedResource
     {
         return this._publisher;
     }
 
-    public static async create(data: ICreateAuthor): Promise<Author>
+    public static async create(data: ICreateAuthor, expand?: string[]): Promise<Author>
     {
         const user = await User.retrieveWithEmail(data.email);
 
@@ -78,10 +79,10 @@ export class Author
             throw new Error("Cannot create author");
         }
 
-        return Author.deserialize(result.rows[0]);
+        return Author.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieve(id: string): Promise<Author | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Author | null>
     {
         const result = await Database.client.query(
             `select * from "authors" where "id" = $1`,
@@ -93,7 +94,7 @@ export class Author
             return null;
         }
 
-        return Author.deserialize(result.rows[0]);
+        return Author.deserialize(result.rows[0], expand);
     }
 
     public async delete(): Promise<void>
@@ -109,39 +110,64 @@ export class Author
         }
     }
 
-    public static async forPublisher(publisher: Publisher): Promise<Author[]>
+    public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Author[]>
     {
         const result = await Database.client.query(
             `select * from "authors" where "publisher" = $1`,
             [ publisher.id ],
         );
 
-        return Promise.all(result.rows.map(Author.deserialize));
+        return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
     }
 
     public serialize(): ISerializedAuthor
     {
         return {
             id: this.id,
-            user: this.user.serialize(),
-            publisher: this.publisher.serialize(),
+            user: this.user instanceof User
+                ? this.user.serialize()
+                : this.user,
+            publisher: this.publisher instanceof Publisher
+                ? this.publisher.serialize()
+                : this.publisher,
         };
     }
 
-    private static async deserialize(data: IDatabaseAuthor): Promise<Author>
+    private static async deserialize(data: IDatabaseAuthor, expand?: string[]): Promise<Author>
     {
-        const user = await User.retrieve(data.user);
+        let user: User | INotExpandedResource;
+        let publisher: Publisher | INotExpandedResource;
 
-        if (!user)
+        if (expand?.includes("user"))
         {
-            throw new Error(`The user '${data.user}' does not exist`);
+            const temp = await User.retrieve(data.user);
+
+            if (!temp)
+            {
+                throw new Error(`The user '${data.user}' does not exist`);
+            }
+
+            user = temp;
+        }
+        else
+        {
+            user = { id: data.user };
         }
 
-        const publisher = await Publisher.retrieve(data.publisher);
-
-        if (!publisher)
+        if (expand?.includes("publisher"))
         {
-            throw new Error(`The publisher '${data.publisher}' does not exist`);
+            const temp = await Publisher.retrieve(data.publisher);
+
+            if (!temp)
+            {
+                throw new Error(`The publisher '${data.publisher}' does not exist`);
+            }
+
+            publisher = temp;
+        }
+        else
+        {
+            publisher = { id: data.publisher };
         }
 
         return new Author(

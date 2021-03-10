@@ -68,8 +68,20 @@ export const PUBLISHER_SCHEMA = Joi
 export const AUTHOR_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
-        user: USER_SCHEMA.required(),
-        publisher: PUBLISHER_SCHEMA.required(),
+        user: Joi
+            .alternatives()
+            .try(
+                USER_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+            )
+            .required(),
+        publisher: Joi
+            .alternatives()
+            .try(
+                PUBLISHER_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.PUBLISHER),
+            )
+            .required(),
     });
 
 export const ARTICLE_SCHEMA = Joi

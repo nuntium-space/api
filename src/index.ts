@@ -311,6 +311,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("user", "publisher"),
+                }),
             },
             response: {
                 schema: AUTHOR_SCHEMA,
@@ -318,7 +321,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const author = await Author.retrieve(request.params.id);
+            const author = await Author.retrieve(request.params.id, request.query.expand);
 
             if (!author)
             {
@@ -348,12 +351,14 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
+            /*
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (!author.publisher.isOwnedByUser(authenticatedUser))
             {
                 throw Boom.forbidden();
             }
+            */
 
             await author.delete();
 
@@ -680,6 +685,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("user", "publisher"),
+                }),
             },
             response: {
                 schema: Joi.array().items(AUTHOR_SCHEMA).required(),
@@ -701,7 +709,7 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            const authors = await Author.forPublisher(publisher);
+            const authors = await Author.forPublisher(publisher, request.query.expand);
 
             return authors.map(author => author.serialize());
         }
@@ -740,6 +748,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("user", "publisher"),
+                }),
                 payload: AUTHOR_CREATE_SCHEMA,
             },
             response: {
@@ -762,10 +773,13 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            const author = await Author.create({
-                email: (request.payload as any).email,
-                publisher: publisher.id,
-            });
+            const author = await Author.create(
+                {
+                    email: (request.payload as any).email,
+                    publisher: publisher.id,
+                },
+                request.query.expand,
+            );
 
             return author.serialize();
         }
