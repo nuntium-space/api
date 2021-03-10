@@ -234,7 +234,12 @@ export class Comment
 
         if (expand?.includes("article"))
         {
-            const temp = await Article.retrieve(data.article);
+            const temp = await Article.retrieve(
+                data.article,
+                expand
+                    .filter(e => e.startsWith("article."))
+                    .map(e => e.replace("article.", "")),
+            );
 
             if (!temp)
             {
@@ -252,7 +257,12 @@ export class Comment
         {
             if (expand?.includes("parent"))
             {
-                const temp = await Comment.retrieve(data.parent);
+                const temp = await Comment.retrieve(
+                    data.parent,
+                    expand
+                        .filter(e => e.startsWith("parent."))
+                        .map(e => e.replace("parent.", "")),
+                );
 
                 if (!temp)
                 {
