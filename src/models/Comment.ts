@@ -171,14 +171,35 @@ export class Comment
         }
     }
 
-    public static async forArticle(article: Article, expand?: string[]): Promise<Comment[]>
+    public static async forArticle(article: Article, options?: {
+        parent?: string | null,
+        expand?: string[],
+    }): Promise<Comment[]>
     {
+        const params = [ article.id ];
+
+        if (typeof options?.parent === "string")
+        {
+            params.push(options.parent);
+        }
+
         const result = await Database.client.query(
-            `select * from comments where "article" = $1`,
-            [ article.id ],
+            `
+            select *, (select count(*) from comments where parent = c.id) as "reply_count"
+            from
+                (
+                    select *
+                    from comments
+                    where
+                        "article" = $1
+                        and
+                        "parent" ${typeof options?.parent === "string" ? "= $2" : "is null"}
+                ) as c
+            `,
+            params,
         );
 
-        return Promise.all(result.rows.map(row => Comment.deserialize(row, expand)));
+        return Promise.all(result.rows.map(row => Comment.deserialize(row, options?.expand)));
     }
 
     public serialize(): ISerializedComment

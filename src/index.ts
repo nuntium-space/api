@@ -140,6 +140,7 @@ const init = async () =>
                     id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
                 }),
                 query: Joi.object({
+                    parent: ID_SCHEMA(Config.ID_PREFIXES.COMMENT),
                     expand: Joi.array().items("article", "parent", "user"),
                 }),
             },
@@ -156,7 +157,10 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            const comments = await Comment.forArticle(article, request.query.expand);
+            const comments = await Comment.forArticle(article, {
+                parent: request.query.parent ?? null,
+                expand: request.query.expand,
+            });
 
             return comments.map(comment => comment.serialize());
         }
