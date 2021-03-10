@@ -12,6 +12,7 @@ interface IDatabaseComment
     user: string,
     article: string,
     parent: string,
+    reply_count: number,
     created_at: Date,
     updated_at: Date,
 }
@@ -36,6 +37,7 @@ export interface ISerializedComment
     user: ISerializedUser | INotExpandedResource,
     article: ISerializedArticle | INotExpandedResource,
     parent: ISerializedComment | INotExpandedResource | null,
+    reply_count: number,
     created_at: string,
     updated_at: string,
 }
@@ -49,6 +51,7 @@ export class Comment
         private _user: User | INotExpandedResource,
         private _article: Article | INotExpandedResource,
         private _parent: Comment | INotExpandedResource | null,
+        private _reply_count: number,
         private _created_at: Date,
         private _updated_at: Date,
     )
@@ -77,6 +80,11 @@ export class Comment
     public get parent(): Comment | INotExpandedResource | null
     {
         return this._parent;
+    }
+
+    public get reply_count(): number
+    {
+        return this._reply_count;
     }
 
     public get created_at(): Date
@@ -185,16 +193,12 @@ export class Comment
 
         const result = await Database.client.query(
             `
-            select *, (select count(*) from comments where parent = c.id) as "reply_count"
-            from
-                (
-                    select *
-                    from comments
-                    where
-                        "article" = $1
-                        and
-                        "parent" ${typeof options?.parent === "string" ? "= $2" : "is null"}
-                ) as c
+            select *
+            from "v_comments"
+            where
+                "article" = $1
+                and
+                "parent" ${typeof options?.parent === "string" ? "= $2" : "is null"}
             `,
             params,
         );
@@ -216,6 +220,7 @@ export class Comment
             parent: this.parent instanceof Comment
                 ? this.parent.serialize()
                 : this.parent,
+            reply_count: this.reply_count,
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
         };
@@ -284,6 +289,7 @@ export class Comment
             user,
             article,
             parent,
+            data.reply_count,
             data.created_at,
             data.updated_at,
         );

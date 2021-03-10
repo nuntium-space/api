@@ -110,6 +110,7 @@ export const COMMENT_SCHEMA = Joi
                 null,
             )
             .required(),
+        reply_count: Joi.number().min(0).required(),
         created_at: DATETIME_SCHEMA.required(),
         updated_at: DATETIME_SCHEMA.required(),
     });
