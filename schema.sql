@@ -170,6 +170,17 @@ create table "bundles_publishers"
 );
 
 /*
+-----
+VIEWS
+-----
+*/
+
+create view "v_comments"
+as
+	select *, (select count(*) from "comments" where "parent" = "c"."id") as "reply_count"
+	from "comments" as c
+
+/*
 ---------
 FUNCTIONS
 ---------
