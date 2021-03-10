@@ -210,7 +210,12 @@ export class Article
 
         if (expand?.includes("author"))
         {
-            const temp = await Author.retrieve(data.author);
+            const temp = await Author.retrieve(
+                data.author,
+                expand
+                    .filter(e => e.startsWith("author."))
+                    .map(e => e.replace("author.", "")),
+            );
 
             if (!temp)
             {

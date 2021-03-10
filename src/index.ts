@@ -114,7 +114,7 @@ const init = async () =>
                     id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
                 }),
                 query: Joi.object({
-                    expand: Joi.array().items("author"),
+                    expand: Joi.array().items("author", "author.user", "author.publisher"),
                 }),
             },
             response: {
@@ -175,7 +175,7 @@ const init = async () =>
         options: {
             validate: {
                 query: Joi.object({
-                    expand: Joi.array().items("author"),
+                    expand: Joi.array().items("author", "author.user", "author.publisher"),
                 }),
                 payload: ARTICLE_CREATE_SCHEMA,
             },
@@ -655,7 +655,7 @@ const init = async () =>
                     id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
                 }),
                 query: Joi.object({
-                    expand: Joi.array().items("author"),
+                    expand: Joi.array().items("author", "author.user", "author.publisher"),
                 }),
             },
             response: {
