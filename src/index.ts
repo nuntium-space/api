@@ -113,6 +113,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("author"),
+                }),
             },
             response: {
                 schema: ARTICLE_SCHEMA,
@@ -120,7 +123,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const article = await Article.retrieve(request.params.id);
+            const article = await Article.retrieve(request.params.id, request.query.expand);
 
             if (!article)
             {
@@ -171,6 +174,9 @@ const init = async () =>
         path: "/articles",
         options: {
             validate: {
+                query: Joi.object({
+                    expand: Joi.array().items("author"),
+                }),
                 payload: ARTICLE_CREATE_SCHEMA,
             },
             response: {
@@ -185,7 +191,7 @@ const init = async () =>
              * Check that the author in the payload is the authenticated user
              */
 
-            const article = await Article.create(request.payload as any);
+            const article = await Article.create(request.payload as any, request.query.expand);
 
             return article.serialize();
         }
@@ -248,12 +254,14 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
+            /*
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (article.author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
+            */
 
             await article.update(request.payload as any);
 
@@ -280,12 +288,14 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
+            /*
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (article.author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
+            */
 
             await article.delete();
 
@@ -639,6 +649,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("author"),
+                }),
             },
             response: {
                 schema: Joi.array().items(ARTICLE_SCHEMA).required(),
@@ -653,7 +666,7 @@ const init = async () =>
                 throw Boom.notFound();
             }
 
-            const articles = await Article.forPublisher(publisher);
+            const articles = await Article.forPublisher(publisher, request.query.expand);
 
             return articles.map(article => article.serialize({ preview: true }));
         }

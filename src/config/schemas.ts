@@ -78,7 +78,13 @@ export const ARTICLE_SCHEMA = Joi
         title: STRING_SCHEMA.max(50).required(),
         content: STRING_SCHEMA.required(),
         reading_time: Joi.number().min(0).required(),
-        author: AUTHOR_SCHEMA.required(),
+        author: Joi
+            .alternatives()
+            .try(
+                AUTHOR_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.AUTHOR),
+            )
+            .required(),
         created_at: DATETIME_SCHEMA.required(),
         updated_at: DATETIME_SCHEMA.required(),
     });

@@ -1,4 +1,5 @@
 import readingTime from "reading-time";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -34,7 +35,7 @@ export interface ISerializedArticle
     title: string,
     content: string,
     reading_time: number,
-    author: ISerializedAuthor,
+    author: ISerializedAuthor | INotExpandedResource,
     created_at: string,
     updated_at: string,
 }
@@ -46,7 +47,7 @@ export class Article
         private readonly _id: string,
         private _title: string,
         private _content: string,
-        private _author: Author,
+        private _author: Author | INotExpandedResource,
         private _created_at: Date,
         private _updated_at: Date,
     )
@@ -67,7 +68,7 @@ export class Article
         return this._content;
     }
 
-    public get author(): Author
+    public get author(): Author | INotExpandedResource
     {
         return this._author;
     }
@@ -82,7 +83,7 @@ export class Article
         return this._updated_at;
     }
 
-    public static async create(data: ICreateArticle): Promise<Article>
+    public static async create(data: ICreateArticle, expand?: string[]): Promise<Article>
     {
         const result = await Database.client.query(
             `
@@ -105,10 +106,10 @@ export class Article
             throw new Error("Cannot create article");
         }
 
-        return Article.deserialize(result.rows[0]);
+        return Article.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieve(id: string): Promise<Article | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Article | null>
     {
         const result = await Database.client.query(
             `select * from "articles" where "id" = $1`,
@@ -120,7 +121,7 @@ export class Article
             return null;
         }
 
-        return Article.deserialize(result.rows[0]);
+        return Article.deserialize(result.rows[0], expand);
     }
 
     public async update(data: IUpdateArticle): Promise<void>
@@ -166,7 +167,7 @@ export class Article
         }
     }
 
-    public static async forPublisher(publisher: Publisher): Promise<Article[]>
+    public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Article[]>
     {
         const result = await Database.client.query(
             `
@@ -183,7 +184,7 @@ export class Article
             [ publisher.id ],
         );
 
-        return Promise.all(result.rows.map(Article.deserialize));
+        return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
     }
 
     public serialize(options?: { preview?: boolean }): ISerializedArticle
@@ -195,19 +196,32 @@ export class Article
                 ? this.content.substr(0, Config.ARTICLE_PREVIEW_LENGTH) + "..."
                 : this.content,
             reading_time: readingTime(this.content).minutes,
-            author: this.author.serialize(),
+            author: this.author instanceof Author
+                ? this.author.serialize()
+                : this.author,
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
         };
     }
 
-    private static async deserialize(data: IDatabaseArticle): Promise<Article>
+    private static async deserialize(data: IDatabaseArticle, expand?: string[]): Promise<Article>
     {
-        const author = await Author.retrieve(data.author);
+        let author: Author | INotExpandedResource;
 
-        if (!author)
+        if (expand?.includes("author"))
         {
-            throw new Error(`The author '${data.author}' does not exist`);
+            const temp = await Author.retrieve(data.author);
+
+            if (!temp)
+            {
+                throw new Error(`The author '${data.author}' does not exist`);
+            }
+
+            author = temp;
+        }
+        else
+        {
+            author = { id: data.author };
         }
 
         return new Article(
