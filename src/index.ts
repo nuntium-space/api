@@ -195,6 +195,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
                 }),
+                query: Joi.object({
+                    expand: Joi.array().items("article", "parent", "user"),
+                }),
                 payload: COMMENT_CREATE_SCHEMA,
             },
             response: {
@@ -205,11 +208,14 @@ const init = async () =>
         {
             const authenticatedUser = request.auth.credentials.user as User;
 
-            const comment = await Comment.create({
-                ...request.payload as any,
-                article: request.params.id,
-                user: authenticatedUser.id,
-            });
+            const comment = await Comment.create(
+                {
+                    ...request.payload as any,
+                    article: request.params.id,
+                    user: authenticatedUser.id,
+                },
+                request.query.expand,
+            );
 
             return comment.serialize();
         }

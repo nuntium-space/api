@@ -89,7 +89,7 @@ export class Comment
         return this._updated_at;
     }
 
-    public static async create(data: ICreateComment): Promise<Comment>
+    public static async create(data: ICreateComment, expand?: string[]): Promise<Comment>
     {
         const result = await Database.client.query(
             `
@@ -113,7 +113,7 @@ export class Comment
             throw new Error("Cannot create comment");
         }
 
-        return Comment.deserialize(result.rows[0]);
+        return Comment.deserialize(result.rows[0], expand);
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Comment | null>
