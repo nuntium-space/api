@@ -23,7 +23,6 @@ interface ICreateBundle
 interface IUpdateBundle
 {
     name?: string,
-    price?: number,
 }
 
 export interface ISerializedBundle
@@ -45,7 +44,7 @@ export class Bundle
         private readonly _id: string,
         private _name: string,
         private readonly _organization: Organization | INotExpandedResource,
-        private _price: number,
+        private readonly _price: number,
         private readonly _stripe_price_id: string,
     )
     {}
@@ -138,20 +137,17 @@ export class Bundle
     public async update(data: IUpdateBundle): Promise<void>
     {
         this._name = data.name ?? this.name;
-        this._price = data.price ?? this.price;
 
         const result = await Database.client.query(
             `
             update "bundles"
             set
-                "name" = $1,
-                "price" = $2
+                "name" = $1
             where
-                "id" = $3
+                "id" = $2
             `,
             [
                 this.name,
-                this.price,
                 this.id,
             ],
         );
