@@ -1,3 +1,4 @@
+import { Stripe } from "stripe";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
@@ -34,6 +35,10 @@ export interface ISerializedBundle
 
 export class Bundle
 {
+    private static _stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", {
+        apiVersion: "2020-08-27",
+    });
+
     private constructor
     (
         private readonly _id: string,
@@ -85,6 +90,31 @@ export class Bundle
         {
             throw new Error("Cannot create bundle");
         }
+
+        await Bundle._stripe.products
+            .create({
+                name: data.name,
+            })
+            .then(product =>
+            {
+                console.log(product.id);
+
+                return Bundle._stripe.prices.create({
+                    currency: "usd",
+                    product: product.id,
+                    unit_amount_decimal: data.price.toString(),
+                });
+            })
+            .then(price =>
+            {
+                console.log(price.id);
+            })
+            .catch(error =>
+            {
+                // TODO
+
+                console.log(error);
+            });
 
         return Bundle.deserialize(result.rows[0], expand);
     }
