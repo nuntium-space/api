@@ -70,7 +70,7 @@ export class Bundle
             insert into "bundles"
                 ("id", "name", "organization", "price")
             values
-                ($1, $2, $3, $4)
+                ($1, $2, $3, $4::money)
             returning *
             `,
             [
