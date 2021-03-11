@@ -20,7 +20,6 @@ interface ICreateArticle
 {
     title: string,
     content: string,
-    author: string,
 }
 
 interface IUpdateArticle
@@ -83,7 +82,7 @@ export class Article
         return this._updated_at;
     }
 
-    public static async create(data: ICreateArticle, expand?: string[]): Promise<Article>
+    public static async create(data: ICreateArticle, author: Author, expand?: string[]): Promise<Article>
     {
         const result = await Database.client.query(
             `
@@ -97,7 +96,7 @@ export class Article
                 Utilities.id(Config.ID_PREFIXES.ARTICLE),
                 data.title,
                 data.content,
-                data.author,
+                author.id,
             ],
         );
 

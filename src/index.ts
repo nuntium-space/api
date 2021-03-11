@@ -172,34 +172,6 @@ const init = async () =>
 
     server.route({
         method: "POST",
-        path: "/articles",
-        options: {
-            validate: {
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-                payload: ARTICLE_CREATE_SCHEMA,
-            },
-            response: {
-                schema: ARTICLE_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            /**
-             * @todo
-             * 
-             * Check that the author in the payload is the authenticated user
-             */
-
-            const article = await Article.create(request.payload as any, request.query.expand);
-
-            return article.serialize();
-        }
-    });
-
-    server.route({
-        method: "POST",
         path: "/articles/{id}/comments",
         options: {
             validate: {
@@ -747,6 +719,48 @@ const init = async () =>
             const publisher = await Publisher.create(request.payload as any);
 
             return publisher.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/publishers/{id}/articles",
+        options: {
+            validate: {
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+                payload: ARTICLE_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ARTICLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            const author = await Author.retrieveWithUserAndPublisher(authenticatedUser, publisher);
+
+            if (!author)
+            {
+                throw Boom.forbidden();
+            }
+
+            const article = await Article.create(
+                request.payload as any,
+                author,
+                request.query.expand,
+            );
+
+            return article.serialize();
         }
     });
 

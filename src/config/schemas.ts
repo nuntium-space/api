@@ -198,7 +198,6 @@ export const ARTICLE_CREATE_SCHEMA = Joi
     .object({
         title: STRING_SCHEMA.max(50).required(),
         content: STRING_SCHEMA.required(),
-        author: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
     });
 
 export const ARTICLE_UPDATE_SCHEMA = Joi
