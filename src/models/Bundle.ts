@@ -101,8 +101,6 @@ export class Bundle
             })
             .then(product =>
             {
-                console.log(product.id);
-
                 return Bundle._stripe.prices.create({
                     currency: "usd",
                     product: product.id,
@@ -111,7 +109,9 @@ export class Bundle
             })
             .then(price =>
             {
-                console.log(price.id);
+                // TODO:
+                // Store price.id in the db
+                // It is needed when creating a subscription
             })
             .catch(async () =>
             {
