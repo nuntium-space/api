@@ -75,7 +75,7 @@ export class Bundle
             insert into "bundles"
                 ("id", "name", "organization", "price")
             values
-                ($1, $2, $3, $4::money)
+                ($1, $2, $3, $4)
             returning *
             `,
             [
@@ -102,7 +102,7 @@ export class Bundle
                 return Bundle._stripe.prices.create({
                     currency: "usd",
                     product: product.id,
-                    unit_amount_decimal: data.price.toString(),
+                    unit_amount: data.price,
                 });
             })
             .then(price =>

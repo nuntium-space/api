@@ -148,14 +148,14 @@ create table "bundles"
     "id" id not null,
     "name" varchar(50) not null,
     "organization" id not null,
-    "price" money not null,
+    "price" int not null,
 
     primary key ("id"),
 
     foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
     check ("id" like 'bdl_%'),
-    check ("price" >= 0::money)
+    check ("price" >= 0)
 );
 
 create table "bundles_publishers"

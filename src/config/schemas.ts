@@ -27,6 +27,8 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
+export const MONEY_SCHEMA = Joi.number().integer().min(0);
+
 export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: ID_SCHEMA(prefix).required() });
 
 export const EXPAND_QUERY_SCHEMA = Joi.array().items(STRING_SCHEMA);
@@ -146,7 +148,7 @@ export const BUNDLE_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ORGANIZATION),
             )
             .required(),
-        price: Joi.number().min(0).required(),
+        price: MONEY_SCHEMA.required(),
     });
 
 /*
@@ -234,11 +236,11 @@ export const COMMENT_UPDATE_SCHEMA = Joi
 export const BUNDLE_CREATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50).required(),
-        price: Joi.number().min(0).required(),
+        price: MONEY_SCHEMA.required(),
     });
 
 export const BUNDLE_UPDATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50),
-        price: Joi.number().min(0),
+        price: MONEY_SCHEMA,
     });
