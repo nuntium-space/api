@@ -70,6 +70,8 @@ export class Bundle
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
     {
+        await Database.client.query("BEGIN");
+
         const result = await Database.client.query(
             `
             insert into "bundles"
@@ -88,6 +90,8 @@ export class Bundle
 
         if (result.rowCount === 0)
         {
+            await Database.client.query("ROLLBACK");
+
             throw new Error("Cannot create bundle");
         }
 
@@ -109,12 +113,14 @@ export class Bundle
             {
                 console.log(price.id);
             })
-            .catch(error =>
+            .catch(async () =>
             {
-                // TODO
+                await Database.client.query("ROLLBACK");
 
-                console.log(error);
+                throw new Error("Cannot create bundle");
             });
+
+        await Database.client.query("COMMIT");
 
         return Bundle.deserialize(result.rows[0], expand);
     }
