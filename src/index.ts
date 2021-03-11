@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import dotenv from "dotenv";
 import Joi from "joi";
 import qs from "qs";
 import { Config } from "./config/Config";
@@ -39,8 +42,6 @@ import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
-
-dotenv.config();
 
 const server = Hapi.server({
     port: 4000,
