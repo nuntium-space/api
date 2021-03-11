@@ -248,21 +248,24 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const article = await Article.retrieve(request.params.id);
+            const article = await Article.retrieve(request.params.id, [ "author" ]);
 
             if (!article)
             {
                 throw Boom.notFound();
             }
 
-            /*
+            if (!(article.author instanceof Author))
+            {
+                throw Boom.badImplementation();
+            }
+
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (article.author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
-            */
 
             await article.update(request.payload as any);
 
@@ -282,21 +285,24 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const article = await Article.retrieve(request.params.id);
+            const article = await Article.retrieve(request.params.id, [ "author" ]);
 
             if (!article)
             {
                 throw Boom.notFound();
             }
 
-            /*
+            if (!(article.author instanceof Author))
+            {
+                throw Boom.badImplementation();
+            }
+
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (article.author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
-            */
 
             await article.delete();
 
@@ -345,21 +351,24 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const author = await Author.retrieve(request.params.id);
+            const author = await Author.retrieve(request.params.id, [ "publisher" ]);
 
             if (!author)
             {
                 throw Boom.notFound();
             }
 
-            /*
+            if (!(author.publisher instanceof Publisher))
+            {
+                throw Boom.badImplementation();
+            }
+
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (!author.publisher.isOwnedByUser(authenticatedUser))
             {
                 throw Boom.forbidden();
             }
-            */
 
             await author.delete();
 
