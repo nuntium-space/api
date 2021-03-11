@@ -10,6 +10,8 @@ import {
     ARTICLE_UPDATE_SCHEMA,
     AUTHOR_CREATE_SCHEMA,
     AUTHOR_SCHEMA,
+    BUNDLE_SCHEMA,
+    BUNDLE_UPDATE_SCHEMA,
     COMMENT_CREATE_SCHEMA,
     COMMENT_SCHEMA,
     COMMENT_UPDATE_SCHEMA,
@@ -29,6 +31,7 @@ import {
 } from "./config/schemas";
 import { Article } from "./models/Article";
 import { Author } from "./models/Author";
+import { Bundle } from "./models/Bundle";
 import { Comment } from "./models/Comment";
 import { Organization } from "./models/Organization";
 import { Publisher } from "./models/Publisher";
@@ -343,6 +346,113 @@ const init = async () =>
             }
 
             await author.delete();
+
+            return h.response();
+        }
+    });
+
+    server.route({
+        method: "GET",
+        path: "/bundles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: BUNDLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
+
+            if (!bundle)
+            {
+                throw Boom.notFound();
+            }
+
+            return bundle.serialize();
+        }
+    });
+
+    server.route({
+        method: "PATCH",
+        path: "/bundles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+                payload: BUNDLE_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: BUNDLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
+
+            if (!bundle)
+            {
+                throw Boom.notFound();
+            }
+
+            if (!(bundle.organization instanceof Organization))
+            {
+                throw Boom.badImplementation();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (bundle.organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await bundle.update(request.payload as any);
+
+            return bundle.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/bundles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
+
+            if (!bundle)
+            {
+                throw Boom.notFound();
+            }
+
+            if (!(bundle.organization instanceof Organization))
+            {
+                throw Boom.badImplementation();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (bundle.organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await bundle.delete();
 
             return h.response();
         }
