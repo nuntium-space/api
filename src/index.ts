@@ -10,6 +10,7 @@ import {
     ARTICLE_UPDATE_SCHEMA,
     AUTHOR_CREATE_SCHEMA,
     AUTHOR_SCHEMA,
+    BUNDLE_CREATE_SCHEMA,
     BUNDLE_SCHEMA,
     BUNDLE_UPDATE_SCHEMA,
     COMMENT_CREATE_SCHEMA,
@@ -641,6 +642,46 @@ const init = async () =>
             const organization = await Organization.create(request.payload as any, authenticatedUser);
 
             return organization.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/organizations/{id}/bundles",
+        options: {
+            validate: {
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+                payload: BUNDLE_CREATE_SCHEMA,
+            },
+            response: {
+                schema: BUNDLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const bundle = await Bundle.create(
+                request.payload as any,
+                organization,
+                request.query.expand,
+            );
+
+            return bundle.serialize();
         }
     });
 
