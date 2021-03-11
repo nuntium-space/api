@@ -11,6 +11,7 @@ interface IDatabaseBundle
     name: string,
     organization: string,
     price: number,
+    stripe_price_id: string,
 }
 
 interface ICreateBundle
@@ -43,8 +44,9 @@ export class Bundle
     (
         private readonly _id: string,
         private _name: string,
-        private _organization: Organization | INotExpandedResource,
+        private readonly _organization: Organization | INotExpandedResource,
         private _price: number,
+        private readonly _stripe_price_id: string,
     )
     {}
 
@@ -227,6 +229,7 @@ export class Bundle
             data.name,
             organization,
             parseInt(data.price.toString()),
+            data.stripe_price_id,
         );
     }
 }
