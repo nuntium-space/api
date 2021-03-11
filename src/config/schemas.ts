@@ -135,6 +135,20 @@ export const COMMENT_SCHEMA = Joi
         updated_at: DATETIME_SCHEMA.required(),
     });
 
+export const BUNDLE_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+        name: STRING_SCHEMA.max(50).required(),
+        organization: Joi
+            .alternatives()
+            .try(
+                ORGANIZATION_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ORGANIZATION),
+            )
+            .required(),
+        price: Joi.number().min(0).required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -215,4 +229,16 @@ export const COMMENT_CREATE_SCHEMA = Joi
 export const COMMENT_UPDATE_SCHEMA = Joi
     .object({
         content: STRING_SCHEMA,
+    });
+
+export const BUNDLE_CREATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50).required(),
+        price: Joi.number().min(0).required(),
+    });
+
+export const BUNDLE_UPDATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50),
+        price: Joi.number().min(0),
     });
