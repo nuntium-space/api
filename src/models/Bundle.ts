@@ -190,7 +190,7 @@ export class Bundle
             data.id,
             data.name,
             organization,
-            data.price,
+            parseInt(data.price.toString()),
         );
     }
 }
