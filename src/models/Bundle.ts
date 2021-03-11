@@ -11,6 +11,7 @@ interface IDatabaseBundle
     name: string,
     organization: string,
     price: number,
+    stripe_product_id: string,
     stripe_price_id: string,
 }
 
@@ -45,6 +46,7 @@ export class Bundle
         private _name: string,
         private readonly _organization: Organization | INotExpandedResource,
         private readonly _price: number,
+        private readonly _stripe_product_id: string,
         private readonly _stripe_price_id: string,
     )
     {}
@@ -88,7 +90,7 @@ export class Bundle
                 return Database.client.query(
                     `
                     insert into "bundles"
-                        ("id", "name", "organization", "price", "stripe_price_id")
+                        ("id", "name", "organization", "price", "stripe_product_id", "stripe_price_id")
                     values
                         ($1, $2, $3, $4, $5)
                     returning *
@@ -98,6 +100,7 @@ export class Bundle
                         data.name,
                         organization.id,
                         data.price,
+                        price.product,
                         price.id,
                     ],
                 );
@@ -218,6 +221,7 @@ export class Bundle
             data.name,
             organization,
             parseInt(data.price.toString()),
+            data.stripe_product_id,
             data.stripe_price_id,
         );
     }

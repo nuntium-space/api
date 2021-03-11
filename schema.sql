@@ -149,6 +149,7 @@ create table "bundles"
     "name" varchar(50) not null,
     "organization" id not null,
     "price" int not null,
+    "stripe_product_id" text not null,
     "stripe_price_id" text not null,
 
     primary key ("id"),
