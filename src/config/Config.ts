@@ -14,6 +14,7 @@ export class Config
         ARTICLE: "art",
         SESSION: "ses",
         COMMENT: "cmt",
+        BUNDLE: "bdl",
     };
 
     public static readonly ARTICLE_PREVIEW_LENGTH = 200;
