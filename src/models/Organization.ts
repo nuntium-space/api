@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -77,7 +78,7 @@ export class Organization
         return Organization.deserialize(result.rows[0]);
     }
 
-    public static async retrieve(id: string): Promise<Organization | null>
+    public static async retrieve(id: string): Promise<Organization>
     {
         const result = await Database.pool.query(
             `select * from "organizations" where "id" = $1`,
@@ -86,7 +87,7 @@ export class Organization
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Organization.deserialize(result.rows[0]);

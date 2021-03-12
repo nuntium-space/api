@@ -194,11 +194,6 @@ export class Publisher
     {
         const organization = await Organization.retrieve(data.organization);
 
-        if (!organization)
-        {
-            throw new Error(`The organization '${data.organization}' does not exist`);
-        }
-
         return new Publisher(
             data.id,
             data.name,

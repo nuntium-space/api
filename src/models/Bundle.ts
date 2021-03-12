@@ -160,37 +160,32 @@ export class Bundle
 
         console.log(this._stripe_product_id, this._stripe_price_id);
 
-        const result = await Database.pool.query(
-            `
-            update "bundles"
-            set
-                "name" = $1
-            where
-                "id" = $2
-            `,
-            [
-                this.name,
-                this.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw new Error("Cannot update bundle");
-        }
+        await Database.pool
+            .query(
+                `
+                update "bundles"
+                set
+                    "name" = $1
+                where
+                    "id" = $2
+                `,
+                [
+                    this.name,
+                    this.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
     }
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "bundles" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw new Error("Cannot delete bundle");
-        }
     }
 
     public async addPublisher(publisher: Publisher): Promise<void>
@@ -202,7 +197,7 @@ export class Bundle
             )
             .catch(() =>
             {
-                throw new Error(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
+                throw Boom.badRequest(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
             });
     }
 
@@ -241,23 +236,9 @@ export class Bundle
 
     private static async deserialize(data: IDatabaseBundle, expand?: string[]): Promise<Bundle>
     {
-        let organization: Organization | INotExpandedResource;
-
-        if (expand?.includes("organization"))
-        {
-            const temp = await Organization.retrieve(data.organization);
-
-            if (!temp)
-            {
-                throw new Error(`The author '${data.organization}' does not exist`);
-            }
-
-            organization = temp;
-        }
-        else
-        {
-            organization = { id: data.organization };
-        }
+        const organization = expand?.includes("organization")
+            ? await Organization.retrieve(data.organization)
+            : { id: data.organization };
 
         return new Bundle(
             data.id,

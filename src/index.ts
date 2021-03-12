@@ -548,11 +548,6 @@ const init = async () =>
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            if (!organization)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (organization.owner.id !== authenticatedUser.id)
@@ -584,11 +579,6 @@ const init = async () =>
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            if (!organization)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (organization.owner.id !== authenticatedUser.id)
@@ -618,11 +608,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const organization = await Organization.retrieve(request.params.id);
-
-            if (!organization)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
@@ -676,11 +661,6 @@ const init = async () =>
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            if (!organization)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (organization.owner.id !== authenticatedUser.id)
@@ -716,11 +696,6 @@ const init = async () =>
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            if (!organization)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (organization.owner.id !== authenticatedUser.id)
@@ -747,11 +722,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const organization = await Organization.retrieve(request.params.id);
-
-            if (!organization)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
