@@ -103,6 +103,9 @@ export class Bundle
         await Bundle._stripe.products
             .create({
                 name: data.name,
+                metadata: {
+                    bundle_id: result.rows[0].id,
+                },
             })
             .then(product =>
             {
@@ -110,6 +113,9 @@ export class Bundle
                     currency: "usd",
                     product: product.id,
                     unit_amount: data.price,
+                    metadata: {
+                        bundle_id: result.rows[0].id,
+                    },
                 });
             })
             .catch(async () =>
