@@ -84,7 +84,7 @@ const init = async () =>
 
                 const session = await Session.retrieve(authorization.split(" ")[1]);
 
-                if (!session || session.hasExpired())
+                if (session.hasExpired())
                 {
                     throw Boom.unauthorized();
                 }
@@ -1109,11 +1109,6 @@ const init = async () =>
         {
             const session = await Session.retrieve(request.params.id);
 
-            if (!session)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (session.user.id !== authenticatedUser.id)
@@ -1158,11 +1153,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const session = await Session.retrieve(request.params.id);
-
-            if (!session)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
