@@ -11,6 +11,8 @@ interface IDatabaseBundle
     name: string,
     organization: string,
     price: number,
+    stripe_product_id: string,
+    stripe_price_id: string,
 }
 
 interface ICreateBundle
@@ -22,7 +24,6 @@ interface ICreateBundle
 interface IUpdateBundle
 {
     name?: string,
-    price?: number,
 }
 
 export interface ISerializedBundle
@@ -43,8 +44,10 @@ export class Bundle
     (
         private readonly _id: string,
         private _name: string,
-        private _organization: Organization | INotExpandedResource,
-        private _price: number,
+        private readonly _organization: Organization | INotExpandedResource,
+        private readonly _price: number,
+        private readonly _stripe_product_id: string,
+        private readonly _stripe_price_id: string,
     )
     {}
 
@@ -70,9 +73,11 @@ export class Bundle
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
     {
-        await Database.client.query("BEGIN");
+        const client = await Database.pool.connect();
 
-        const result = await Database.client.query(
+        await client.query("BEGIN");
+
+        const result = await client.query(
             `
             insert into "bundles"
                 ("id", "name", "organization", "price")
@@ -90,7 +95,7 @@ export class Bundle
 
         if (result.rowCount === 0)
         {
-            await Database.client.query("ROLLBACK");
+            await client.query("ROLLBACK");
 
             throw new Error("Cannot create bundle");
         }
@@ -98,6 +103,9 @@ export class Bundle
         await Bundle._stripe.products
             .create({
                 name: data.name,
+                metadata: {
+                    bundle_id: result.rows[0].id,
+                },
             })
             .then(product =>
             {
@@ -105,29 +113,26 @@ export class Bundle
                     currency: "usd",
                     product: product.id,
                     unit_amount: data.price,
+                    metadata: {
+                        bundle_id: result.rows[0].id,
+                    },
                 });
-            })
-            .then(price =>
-            {
-                // TODO:
-                // Store price.id in the db
-                // It is needed when creating a subscription
             })
             .catch(async () =>
             {
-                await Database.client.query("ROLLBACK");
+                await client.query("ROLLBACK");
 
                 throw new Error("Cannot create bundle");
             });
 
-        await Database.client.query("COMMIT");
+        await client.query("COMMIT");
 
         return Bundle.deserialize(result.rows[0], expand);
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Bundle | null>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `select * from "bundles" where "id" = $1`,
             [ id ],
         );
@@ -143,20 +148,19 @@ export class Bundle
     public async update(data: IUpdateBundle): Promise<void>
     {
         this._name = data.name ?? this.name;
-        this._price = data.price ?? this.price;
 
-        const result = await Database.client.query(
+        console.log(this._stripe_product_id, this._stripe_price_id);
+
+        const result = await Database.pool.query(
             `
             update "bundles"
             set
-                "name" = $1,
-                "price" = $2
+                "name" = $1
             where
-                "id" = $3
+                "id" = $2
             `,
             [
                 this.name,
-                this.price,
                 this.id,
             ],
         );
@@ -169,7 +173,7 @@ export class Bundle
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `delete from "bundles" where "id" = $1`,
             [ this.id ],
         );
@@ -182,7 +186,7 @@ export class Bundle
 
     public static async forOrganization(organization: Organization, expand?: string[]): Promise<Bundle[]>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `select * from "bundles" where "organization" = $1`,
             [ organization.id ],
         );
@@ -227,6 +231,8 @@ export class Bundle
             data.name,
             organization,
             parseInt(data.price.toString()),
+            data.stripe_product_id,
+            data.stripe_price_id,
         );
     }
 }

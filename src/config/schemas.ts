@@ -242,5 +242,4 @@ export const BUNDLE_CREATE_SCHEMA = Joi
 export const BUNDLE_UPDATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50),
-        price: MONEY_SCHEMA,
     });

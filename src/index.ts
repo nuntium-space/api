@@ -42,6 +42,7 @@ import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
+import Stripe from "stripe";
 
 const server = Hapi.server({
     port: 4000,
@@ -67,7 +68,7 @@ const server = Hapi.server({
 
 const init = async () =>
 {
-    await Database.init();
+    Database.init();
 
     server.auth.scheme("token", () =>
     {
@@ -587,6 +588,44 @@ const init = async () =>
             }
 
             return organization.serialize();
+        }
+    });
+
+    server.route({
+        method: "GET",
+        path: "/organizations/{id}/bundles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const bundles = await Bundle.forOrganization(organization, request.query.expand);
+
+            return bundles.map(bundle => bundle.serialize());
         }
     });
 
@@ -1302,6 +1341,97 @@ const init = async () =>
             await session.delete();
 
             return h.response();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/webhooks/stripe",
+        options: {
+            auth: false,
+            payload: {
+                output: "data",
+                parse: false,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
+
+            let event: Stripe.Event;
+
+            try
+            {
+                event = stripe.webhooks.constructEvent(
+                    request.payload as any,
+                    request.headers["stripe-signature"],
+                    process.env.STRIPE_WEBHOOK_SECRET ?? "",
+                );
+            }
+            catch (err)
+            {
+                throw Boom.badRequest();
+            }
+
+            switch (event.type)
+            {
+                case "price.created":
+                {
+                    const price = event.data.object as Stripe.Price;
+
+                    const result = await Database.pool.query(
+                        `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
+                        [
+                            price.id,
+                            price.metadata.bundle_id,
+                        ],
+                    );
+
+                    if (result.rowCount === 0)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    break;
+                }
+                case "price.deleted":
+                {
+                    break;
+                }
+                case "price.updated":
+                {
+                    break;
+                }
+                case "product.created":
+                {
+                    const product = event.data.object as Stripe.Product;
+
+                    const result = await Database.pool.query(
+                        `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
+                        [
+                            product.id,
+                            product.metadata.bundle_id,
+                        ],
+                    );
+
+                    if (result.rowCount === 0)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    break;
+                }
+                case "product.deleted":
+                {
+                    break;
+                }
+                case "product.updated":
+                {
+                    break;
+                }
+            }
+
+            return { received: true };
         }
     });
 
