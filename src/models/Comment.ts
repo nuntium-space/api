@@ -230,7 +230,10 @@ export class Comment
     {
         let article: Article | INotExpandedResource;
         let parent: Comment | INotExpandedResource | null = null;
-        let user: User | INotExpandedResource;
+
+        const user = expand?.includes("user")
+            ? await User.retrieve(data.user)
+            : { id: data.user };
 
         if (expand?.includes("article"))
         {
@@ -275,22 +278,6 @@ export class Comment
             {
                 parent = { id: data.parent };
             }
-        }
-
-        if (expand?.includes("user"))
-        {
-            const temp = await User.retrieve(data.user);
-
-            if (!temp)
-            {
-                throw new Error(`The user '${data.user}' does not exist`);
-            }
-
-            user = temp;
-        }
-        else
-        {
-            user = { id: data.user };
         }
 
         return new Comment(

@@ -116,7 +116,7 @@ export class User
         return User.deserialize(result.rows[0]);
     }
 
-    public static async retrieveWithEmail(email: string): Promise<User | null>
+    public static async retrieveWithEmail(email: string): Promise<User>
     {
         const result = await Database.pool.query(
             `select * from "users" where "email" = $1`,
@@ -125,7 +125,7 @@ export class User
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return User.deserialize(result.rows[0]);

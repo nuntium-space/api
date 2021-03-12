@@ -52,11 +52,6 @@ export class Session
     {
         const user = await User.retrieveWithEmail(data.email);
 
-        if (!user)
-        {
-            throw new Error(`"email" '${data.email}' does not exist`);
-        }
-
         if (!Utilities.verifyHash(data.password, user.password))
         {
             throw new Error(`"password" is wrong`);
@@ -133,11 +128,6 @@ export class Session
     private static async deserialize(data: IDatabaseSession): Promise<Session>
     {
         const user = await User.retrieve(data.user);
-
-        if (!user)
-        {
-            throw new Error(`The user '${data.user}' does not exist`);
-        }
 
         return new Session(
             data.id,

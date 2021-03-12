@@ -1028,11 +1028,6 @@ const init = async () =>
         {
             const user = await User.retrieve(request.params.id);
 
-            if (!user)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (user.id !== authenticatedUser.id)
@@ -1060,11 +1055,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const user = await User.retrieve(request.params.id);
-
-            if (!user)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
@@ -1095,11 +1085,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const user = await User.retrieve(request.params.id);
-
-            if (!user)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
@@ -1152,11 +1137,6 @@ const init = async () =>
         {
             const user = await User.retrieve(request.params.id);
 
-            if (!user)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (user.id !== authenticatedUser.id)
@@ -1183,11 +1163,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const user = await User.retrieve(request.params.id);
-
-            if (!user)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 

@@ -54,11 +54,6 @@ export class Author
     {
         const user = await User.retrieveWithEmail(data.email);
 
-        if (!user)
-        {
-            throw new Error(`"email" ${data.email} does not exist`);
-        }
-
         const result = await Database.pool.query(
             `
             insert into "authors"
@@ -150,24 +145,11 @@ export class Author
 
     private static async deserialize(data: IDatabaseAuthor, expand?: string[]): Promise<Author>
     {
-        let user: User | INotExpandedResource;
+        const user = expand?.includes("user")
+            ? await User.retrieve(data.user)
+            : { id: data.user };
+
         let publisher: Publisher | INotExpandedResource;
-
-        if (expand?.includes("user"))
-        {
-            const temp = await User.retrieve(data.user);
-
-            if (!temp)
-            {
-                throw new Error(`The user '${data.user}' does not exist`);
-            }
-
-            user = temp;
-        }
-        else
-        {
-            user = { id: data.user };
-        }
 
         if (expand?.includes("publisher"))
         {
