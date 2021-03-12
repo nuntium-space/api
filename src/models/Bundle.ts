@@ -126,9 +126,7 @@ export class Bundle
 
     public static async retrieve(id: string, expand?: string[]): Promise<Bundle | null>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `select * from "bundles" where "id" = $1`,
             [ id ],
         );
@@ -147,9 +145,7 @@ export class Bundle
 
         console.log(this._stripe_product_id, this._stripe_price_id);
 
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `
             update "bundles"
             set
@@ -171,9 +167,7 @@ export class Bundle
 
     public async delete(): Promise<void>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `delete from "bundles" where "id" = $1`,
             [ this.id ],
         );
@@ -186,9 +180,7 @@ export class Bundle
 
     public static async forOrganization(organization: Organization, expand?: string[]): Promise<Bundle[]>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `select * from "bundles" where "organization" = $1`,
             [ organization.id ],
         );

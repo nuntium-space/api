@@ -59,9 +59,7 @@ export class Author
             throw new Error(`"email" ${data.email} does not exist`);
         }
 
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `
             insert into "authors"
                 ("id", "user", "publisher")
@@ -86,9 +84,7 @@ export class Author
 
     public static async retrieve(id: string, expand?: string[]): Promise<Author | null>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `select * from "authors" where "id" = $1`,
             [ id ],
         );
@@ -103,9 +99,7 @@ export class Author
 
     public static async retrieveWithUserAndPublisher(user: User, publisher: Publisher, expand?: string[]): Promise<Author | null>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `select * from "authors" where "user" = $1 and "publisher" = $2`,
             [ user.id, publisher.id ],
         );
@@ -120,9 +114,7 @@ export class Author
 
     public async delete(): Promise<void>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `delete from "authors" where "id" = $1`,
             [ this.id ],
         );
@@ -135,9 +127,7 @@ export class Author
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Author[]>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `select * from "authors" where "publisher" = $1`,
             [ publisher.id ],
         );

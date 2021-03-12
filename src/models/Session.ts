@@ -65,9 +65,7 @@ export class Session
         const expires = new Date();
         expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `
             insert into "sessions"
                 ("id", "user", "expires_at")
@@ -92,9 +90,7 @@ export class Session
 
     public static async retrieve(id: string): Promise<Session | null>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `select * from "sessions" where "id" = $1`,
             [ id ],
         );
@@ -109,9 +105,7 @@ export class Session
 
     public async delete(): Promise<void>
     {
-        const client = await Database.pool.connect();
-
-        const result = await client.query(
+        const result = await Database.pool.query(
             `delete from "sessions" where "id" = $1`,
             [ this.id ],
         );
