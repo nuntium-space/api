@@ -424,11 +424,6 @@ const init = async () =>
         {
             const comment = await Comment.retrieve(request.params.id, request.query.expand);
 
-            if (!comment)
-            {
-                throw Boom.notFound();
-            }
-
             return comment.serialize();
         }
     });
@@ -450,11 +445,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const comment = await Comment.retrieve(request.params.id);
-
-            if (!comment)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
@@ -482,11 +472,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const comment = await Comment.retrieve(request.params.id);
-
-            if (!comment)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 

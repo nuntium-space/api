@@ -238,35 +238,24 @@ export class Comment
               )
             : { id: data.article };
 
-        let parent: Comment | INotExpandedResource | null = null;
+        const parent = data.parent !== null
+            ?
+            (
+                expand?.includes("parent")
+                    ?
+                        await Comment.retrieve(
+                            data.parent,
+                            expand
+                                .filter(e => e.startsWith("parent."))
+                                .map(e => e.replace("parent.", "")),
+                        )
+                    : { id: data.parent }
+            )
+            : null;
 
         const user = expand?.includes("user")
             ? await User.retrieve(data.user)
             : { id: data.user };
-
-        if (data.parent !== null)
-        {
-            if (expand?.includes("parent"))
-            {
-                const temp = await Comment.retrieve(
-                    data.parent,
-                    expand
-                        .filter(e => e.startsWith("parent."))
-                        .map(e => e.replace("parent.", "")),
-                );
-
-                if (!temp)
-                {
-                    throw new Error(`The comment '${data.parent}' does not exist`);
-                }
-
-                parent = temp;
-            }
-            else
-            {
-                parent = { id: data.parent };
-            }
-        }
 
         return new Comment(
             data.id,
