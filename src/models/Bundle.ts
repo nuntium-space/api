@@ -128,6 +128,8 @@ export class Bundle
 
         await client.query("COMMIT");
 
+        client.release();
+
         return Bundle.deserialize(result.rows[0], expand);
     }
 
