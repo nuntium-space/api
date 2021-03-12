@@ -112,23 +112,19 @@ export class Bundle
                 throw Boom.badRequest();
             });
 
-        await Config.STRIPE.products
+        await Config.STRIPE.prices
             .create({
-                name: data.name,
-                metadata: {
-                    bundle_id: result.rows[0].id,
-                },
-            })
-            .then(product =>
-            {
-                return Config.STRIPE.prices.create({
-                    currency: "usd",
-                    product: product.id,
-                    unit_amount: data.price,
+                currency: "usd",
+                product_data: {
+                    name: data.name,
                     metadata: {
                         bundle_id: result.rows[0].id,
                     },
-                });
+                },
+                unit_amount: data.price,
+                metadata: {
+                    bundle_id: result.rows[0].id,
+                },
             })
             .catch(async () =>
             {
