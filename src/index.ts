@@ -1333,6 +1333,18 @@ const init = async () =>
 
             switch (event.type)
             {
+                case "price.created":
+                {
+                    break;
+                }
+                case "price.deleted":
+                {
+                    break;
+                }
+                case "price.updated":
+                {
+                    break;
+                }
                 case "product.created":
                 {
                     break;
