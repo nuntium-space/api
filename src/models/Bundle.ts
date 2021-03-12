@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { Stripe } from "stripe";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
@@ -98,7 +99,7 @@ export class Bundle
             {
                 await client.query("ROLLBACK");
 
-                throw new Error("Cannot create bundle");
+                throw Boom.badRequest();
             });
 
         await Bundle._stripe.products
@@ -123,7 +124,7 @@ export class Bundle
             {
                 await client.query("ROLLBACK");
 
-                throw new Error("Cannot create bundle");
+                throw Boom.badRequest();
             });
 
         await client.query("COMMIT");
@@ -133,7 +134,7 @@ export class Bundle
         return Bundle.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieve(id: string, expand?: string[]): Promise<Bundle | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Bundle>
     {
         const result = await Database.pool.query(
             `select * from "bundles" where "id" = $1`,
@@ -142,7 +143,7 @@ export class Bundle
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Bundle.deserialize(result.rows[0], expand);

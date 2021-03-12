@@ -374,11 +374,6 @@ const init = async () =>
         {
             const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
 
-            if (!bundle)
-            {
-                throw Boom.notFound();
-            }
-
             return bundle.serialize();
         }
     });
@@ -400,11 +395,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
-
-            if (!bundle)
-            {
-                throw Boom.notFound();
-            }
 
             if (!(bundle.organization instanceof Organization))
             {
@@ -437,11 +427,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
-
-            if (!bundle)
-            {
-                throw Boom.notFound();
-            }
 
             if (!(bundle.organization instanceof Organization))
             {
