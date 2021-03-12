@@ -1,5 +1,4 @@
 import Boom from "@hapi/boom";
-import { Stripe } from "stripe";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
@@ -38,10 +37,6 @@ export interface ISerializedBundle
 
 export class Bundle
 {
-    private static _stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", {
-        apiVersion: "2020-08-27",
-    });
-
     private constructor
     (
         private readonly _id: string,
@@ -71,6 +66,16 @@ export class Bundle
     public get price(): number
     {
         return this._price;
+    }
+
+    public get stripe_product_id(): string
+    {
+        return this._stripe_product_id;
+    }
+
+    public get stripe_price_id(): string
+    {
+        return this._stripe_price_id;
     }
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
@@ -107,7 +112,7 @@ export class Bundle
                 throw Boom.badRequest();
             });
 
-        await Bundle._stripe.products
+        await Config.STRIPE.products
             .create({
                 name: data.name,
                 metadata: {
@@ -116,7 +121,7 @@ export class Bundle
             })
             .then(product =>
             {
-                return Bundle._stripe.prices.create({
+                return Config.STRIPE.prices.create({
                     currency: "usd",
                     product: product.id,
                     unit_amount: data.price,
@@ -179,7 +184,7 @@ export class Bundle
                 throw Boom.badRequest();
             });
 
-        await Bundle._stripe.products
+        await Config.STRIPE.products
             .update(
                 this._stripe_product_id,
                 {
@@ -209,7 +214,7 @@ export class Bundle
             [ this.id ],
         );
 
-        await Bundle._stripe.prices
+        await Config.STRIPE.prices
             .update(
                 this._stripe_price_id,
                 {
@@ -218,7 +223,7 @@ export class Bundle
             )
             .then(() =>
             {
-                return Bundle._stripe.products
+                return Config.STRIPE.products
                     .update(
                         this._stripe_product_id,
                         {

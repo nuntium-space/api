@@ -1,3 +1,5 @@
+import Stripe from "stripe";
+
 export class Config
 {
     public static readonly PASSWORD_MIN_LENGTH = 10;
@@ -18,4 +20,6 @@ export class Config
     };
 
     public static readonly ARTICLE_PREVIEW_LENGTH = 200;
+
+    public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 }

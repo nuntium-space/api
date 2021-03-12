@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
+import { Bundle } from "./Bundle";
 
 interface IDatabaseUser
 {
@@ -181,6 +182,45 @@ export class User
             `delete from "users" where "id" = $1`,
             [ this.id ],
         );
+    }
+
+    public async subscribeToBundle(bundle: Bundle): Promise<void>
+    {
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await Database.pool
+            .query(
+                `insert into "users_bundle" ("user", "bundle") values ($1, $2)`,
+                [ this.id, bundle.id ],
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest(`Cannot subscribe user '${this.id}' to bundle ${bundle.id}`);
+            });
+
+        await Config.STRIPE.subscriptions
+            .create({
+                customer: "TODO",
+                items: [
+                    {
+                        price: bundle.stripe_price_id,
+                    },
+                ],
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public serialize(): ISerializedUser

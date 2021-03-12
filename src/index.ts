@@ -1179,13 +1179,11 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
-
             let event: Stripe.Event;
 
             try
             {
-                event = stripe.webhooks.constructEvent(
+                event = Config.STRIPE.webhooks.constructEvent(
                     request.payload as any,
                     request.headers["stripe-signature"],
                     process.env.STRIPE_WEBHOOK_SECRET ?? "",
