@@ -100,27 +100,27 @@ export class Comment
 
     public static async create(data: ICreateComment, expand?: string[]): Promise<Comment>
     {
-        const result = await Database.pool.query(
-            `
-            insert into "comments"
-                ("id", "content", "user", "article", "parent")
-            values
-                ($1, $2, $3, $4, $5)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.COMMENT),
-                data.content,
-                data.user,
-                data.article,
-                data.parent,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "comments"
+                    ("id", "content", "user", "article", "parent")
+                values
+                    ($1, $2, $3, $4, $5)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.COMMENT),
+                    data.content,
+                    data.user,
+                    data.article,
+                    data.parent,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return Comment.deserialize(result.rows[0], expand);
     }
@@ -144,40 +144,35 @@ export class Comment
     {
         this._content = data.content ?? this.content;
 
-        const result = await Database.pool.query(
-            `
-            update "comments"
-            set
-                "content" = $1
-            where
-                "id" = $2
-            returning "updated_at"
-            `,
-            [
-                this.content,
-                this.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                update "comments"
+                set
+                    "content" = $1
+                where
+                    "id" = $2
+                returning "updated_at"
+                `,
+                [
+                    this.content,
+                    this.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         this._updated_at = result.rows[0].updated_at;
     }
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "comments" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
     }
 
     public static async forArticle(article: Article, options?: {

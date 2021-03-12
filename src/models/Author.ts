@@ -55,25 +55,25 @@ export class Author
     {
         const user = await User.retrieveWithEmail(data.email);
 
-        const result = await Database.pool.query(
-            `
-            insert into "authors"
-                ("id", "user", "publisher")
-            values
-                ($1, $2, $3)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.AUTHOR),
-                user.id,
-                data.publisher,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "authors"
+                    ("id", "user", "publisher")
+                values
+                    ($1, $2, $3)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.AUTHOR),
+                    user.id,
+                    data.publisher,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return Author.deserialize(result.rows[0], expand);
     }
@@ -110,15 +110,10 @@ export class Author
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "authors" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Author[]>

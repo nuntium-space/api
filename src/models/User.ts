@@ -76,27 +76,27 @@ export class User
 
     public static async create(data: ICreateUser): Promise<User>
     {
-        const result = await Database.pool.query(
-            `
-            insert into "users"
-                ("id", "first_name", "last_name", "email", "password")
-            values
-                ($1, $2, $3, $4, $5)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.USER),
-                data.first_name,
-                data.last_name,
-                data.email,
-                Utilities.hash(data.password),
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "users"
+                    ("id", "first_name", "last_name", "email", "password")
+                values
+                    ($1, $2, $3, $4, $5)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.USER),
+                    data.first_name,
+                    data.last_name,
+                    data.email,
+                    Utilities.hash(data.password),
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return User.deserialize(result.rows[0]);
     }
@@ -149,43 +149,38 @@ export class User
                 : this._password;
         }
 
-        const result = await Database.pool.query(
-            `
-            update "users"
-            set
-                "first_name" = $1,
-                "last_name" = $2,
-                "email" = $3,
-                "password" = $4
-            where
-                "id" = $5
-            `,
-            [
-                this.first_name,
-                this.last_name,
-                this.email,
-                this._password,
-                this.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        await Database.pool
+            .query(
+                `
+                update "users"
+                set
+                    "first_name" = $1,
+                    "last_name" = $2,
+                    "email" = $3,
+                    "password" = $4
+                where
+                    "id" = $5
+                `,
+                [
+                    this.first_name,
+                    this.last_name,
+                    this.email,
+                    this._password,
+                    this.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
     }
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "users" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
     }
 
     public serialize(): ISerializedUser

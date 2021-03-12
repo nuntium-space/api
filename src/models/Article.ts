@@ -85,26 +85,26 @@ export class Article
 
     public static async create(data: ICreateArticle, author: Author, expand?: string[]): Promise<Article>
     {
-        const result = await Database.pool.query(
-            `
-            insert into "articles"
-                ("id", "title", "content", "author")
-            values
-                ($1, $2, $3, $4)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.ARTICLE),
-                data.title,
-                data.content,
-                author.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "articles"
+                    ("id", "title", "content", "author")
+                values
+                    ($1, $2, $3, $4)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.ARTICLE),
+                    data.title,
+                    data.content,
+                    author.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return Article.deserialize(result.rows[0], expand);
     }
@@ -129,42 +129,37 @@ export class Article
         this._title = data.title ?? this.title;
         this._content = data.content ?? this.content;
 
-        const result = await Database.pool.query(
-            `
-            update "articles"
-            set
-                "title" = $1,
-                "content" = $2
-            where
-                "id" = $3
-            returning "updated_at"
-            `,
-            [
-                this.title,
-                this.content,
-                this.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                update "articles"
+                set
+                    "title" = $1,
+                    "content" = $2
+                where
+                    "id" = $3
+                returning "updated_at"
+                `,
+                [
+                    this.title,
+                    this.content,
+                    this.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         this._updated_at = result.rows[0].updated_at;
     }
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "articles" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Article[]>

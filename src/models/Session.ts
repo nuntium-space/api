@@ -61,25 +61,25 @@ export class Session
         const expires = new Date();
         expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
-        const result = await Database.pool.query(
-            `
-            insert into "sessions"
-                ("id", "user", "expires_at")
-            values
-                ($1, $2, $3)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.SESSION),
-                user.id,
-                expires.toISOString(),
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "sessions"
+                    ("id", "user", "expires_at")
+                values
+                    ($1, $2, $3)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.SESSION),
+                    user.id,
+                    expires.toISOString(),
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return Session.deserialize(result.rows[0]);
     }
@@ -101,15 +101,10 @@ export class Session
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "sessions" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
     }
 
     public hasExpired(): boolean

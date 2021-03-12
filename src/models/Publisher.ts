@@ -67,26 +67,26 @@ export class Publisher
 
     public static async create(data: ICreatePublisher): Promise<Publisher>
     {
-        const result = await Database.pool.query(
-            `
-            insert into "publishers"
-                ("id", "name", "url", "organization")
-            values
-                ($1, $2, $3, $4)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.PUBLISHER),
-                data.name,
-                data.url,
-                data.organization,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "publishers"
+                    ("id", "name", "url", "organization")
+                values
+                    ($1, $2, $3, $4)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.PUBLISHER),
+                    data.name,
+                    data.url,
+                    data.organization,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return Publisher.deserialize(result.rows[0]);
     }
@@ -111,39 +111,34 @@ export class Publisher
         this._name = data.name ?? this.name;
         this._url = data.url ?? this.url;
 
-        const result = await Database.pool.query(
-            `
-            update "publishers"
-            set
-                "name" = $1,
-                "url" = $2
-            where
-                "id" = $3
-            `,
-            [
-                this.name,
-                this.url,
-                this.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
+        await Database.pool
+            .query(
+                `
+                update "publishers"
+                set
+                    "name" = $1,
+                    "url" = $2
+                where
+                    "id" = $3
+                `,
+                [
+                    this.name,
+                    this.url,
+                    this.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
     }
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "publishers" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.badRequest();
-        }
     }
 
     public static async forOrganization(organization: Organization): Promise<Publisher[]>
