@@ -49,6 +49,7 @@ export class Bundle
         private readonly _organization: Organization | INotExpandedResource,
         private readonly _price: number,
         private readonly _stripe_product_id: string,
+        // @ts-ignore
         private readonly _stripe_price_id: string,
     )
     {}
@@ -162,8 +163,6 @@ export class Bundle
         }
 
         this._name = data.name ?? this.name;
-
-        console.log(this._stripe_price_id);
 
         const client = await Database.pool.connect();
 
