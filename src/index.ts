@@ -42,6 +42,7 @@ import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
+import Stripe from "stripe";
 
 const server = Hapi.server({
     port: 4000,
@@ -1302,6 +1303,51 @@ const init = async () =>
             await session.delete();
 
             return h.response();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/webhooks/stripe",
+        options: {
+            auth: false,
+        },
+        handler: async (request, h) =>
+        {
+            const stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
+
+            let event: Stripe.Event;
+
+            try
+            {
+                event = stripe.webhooks.constructEvent(
+                    request.payload as any,
+                    request.headers["stripe-signature"],
+                    process.env.STRIPE_WEBHOOK_SECRET ?? "",
+                );
+            }
+            catch (err)
+            {
+                throw Boom.badRequest();
+            }
+
+            switch (event.type)
+            {
+                case "product.created":
+                {
+                    break;
+                }
+                case "product.deleted":
+                {
+                    break;
+                }
+                case "product.updated":
+                {
+                    break;
+                }
+            }
+
+            return { received: true };
         }
     });
 
