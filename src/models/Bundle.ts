@@ -203,11 +203,10 @@ export class Bundle
 
     public static async existsWithNameAndOrganization(name: string, organization: Organization): Promise<boolean>
     {
-        const result = await Database.pool
-            .query(
-                `select id from "bundles" where "name" = $1 and "organization" = $2`,
-                [ name, organization.id ],
-            );
+        const result = await Database.pool.query(
+            `select id from "bundles" where "name" = $1 and "organization" = $2`,
+            [ name, organization.id ],
+        );
 
         return result.rowCount > 0;
     }
