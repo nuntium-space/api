@@ -54,7 +54,9 @@ export class Organization
 
     public static async create(data: ICreateOrganization, user: User): Promise<Organization>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             insert into "organizations"
                 ("id", "name", "user")
@@ -79,7 +81,9 @@ export class Organization
 
     public static async retrieve(id: string): Promise<Organization | null>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "organizations" where "id" = $1`,
             [ id ],
         );
@@ -96,7 +100,9 @@ export class Organization
     {
         this._name = data.name ?? this.name;
 
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             update "organizations"
             set
@@ -118,7 +124,9 @@ export class Organization
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `delete from "organizations" where "id" = $1`,
             [ this.id ],
         );
@@ -131,7 +139,9 @@ export class Organization
 
     public static async forUser(user: User): Promise<Organization[]>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "organizations" where "user" = $1`,
             [ user.id ],
         );

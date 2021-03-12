@@ -1341,7 +1341,9 @@ const init = async () =>
                 {
                     const price = event.data.object as Stripe.Price;
 
-                    const result = await Database.client.query(
+                    const client = await Database.pool.connect();
+
+        const result = await client.query(
                         `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
                         [
                             price.id,
@@ -1368,7 +1370,9 @@ const init = async () =>
                 {
                     const product = event.data.object as Stripe.Product;
 
-                    const result = await Database.client.query(
+                    const client = await Database.pool.connect();
+
+        const result = await client.query(
                         `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
                         [
                             product.id,

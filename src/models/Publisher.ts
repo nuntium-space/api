@@ -66,7 +66,9 @@ export class Publisher
 
     public static async create(data: ICreatePublisher): Promise<Publisher>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             insert into "publishers"
                 ("id", "name", "url", "organization")
@@ -92,7 +94,9 @@ export class Publisher
 
     public static async retrieve(id: string): Promise<Publisher | null>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "publishers" where "id" = $1`,
             [ id ],
         );
@@ -110,7 +114,9 @@ export class Publisher
         this._name = data.name ?? this.name;
         this._url = data.url ?? this.url;
 
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             update "publishers"
             set
@@ -134,7 +140,9 @@ export class Publisher
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `delete from "publishers" where "id" = $1`,
             [ this.id ],
         );
@@ -147,7 +155,9 @@ export class Publisher
 
     public static async forOrganization(organization: Organization): Promise<Publisher[]>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "publishers" where "organization" = $1`,
             [ organization.id ],
         );
@@ -157,7 +167,9 @@ export class Publisher
 
     public static async forUser(user: User): Promise<Publisher[]>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             select p.*
             from

@@ -50,17 +50,14 @@ export class Session
 
     public static async create(data: ICreateSession): Promise<Session>
     {
-        const user = await Database.client.query(
-            `select "id", "password" from "users" where "email" = $1`,
-            [ data.email ],
-        );
+        const user = await User.retrieveWithEmail(data.email);
 
-        if (user.rowCount === 0)
+        if (!user)
         {
             throw new Error(`"email" '${data.email}' does not exist`);
         }
 
-        if (!Utilities.verifyHash(data.password, user.rows[0].password))
+        if (!Utilities.verifyHash(data.password, user.password))
         {
             throw new Error(`"password" is wrong`);
         }
@@ -68,7 +65,9 @@ export class Session
         const expires = new Date();
         expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             insert into "sessions"
                 ("id", "user", "expires_at")
@@ -78,7 +77,7 @@ export class Session
             `,
             [
                 Utilities.id(Config.ID_PREFIXES.SESSION),
-                user.rows[0].id,
+                user.id,
                 expires.toISOString(),
             ],
         );
@@ -93,7 +92,9 @@ export class Session
 
     public static async retrieve(id: string): Promise<Session | null>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "sessions" where "id" = $1`,
             [ id ],
         );
@@ -108,7 +109,9 @@ export class Session
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `delete from "sessions" where "id" = $1`,
             [ this.id ],
         );

@@ -99,7 +99,9 @@ export class Comment
 
     public static async create(data: ICreateComment, expand?: string[]): Promise<Comment>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             insert into "comments"
                 ("id", "content", "user", "article", "parent")
@@ -126,7 +128,9 @@ export class Comment
 
     public static async retrieve(id: string, expand?: string[]): Promise<Comment | null>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "v_comments" where "id" = $1`,
             [ id ],
         );
@@ -143,7 +147,9 @@ export class Comment
     {
         this._content = data.content ?? this.content;
 
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             update "comments"
             set
@@ -168,7 +174,9 @@ export class Comment
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `delete from "comments" where "id" = $1`,
             [ this.id ],
         );
@@ -191,7 +199,9 @@ export class Comment
             params.push(options.parent);
         }
 
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             select *
             from "v_comments"

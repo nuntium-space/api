@@ -73,9 +73,11 @@ export class Bundle
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
     {
-        await Database.client.query("BEGIN");
+        const client = await Database.pool.connect();
 
-        const result = await Database.client.query(
+        await client.query("BEGIN");
+
+        const result = await client.query(
             `
             insert into "bundles"
                 ("id", "name", "organization", "price")
@@ -93,7 +95,7 @@ export class Bundle
 
         if (result.rowCount === 0)
         {
-            await Database.client.query("ROLLBACK");
+            await client.query("ROLLBACK");
 
             throw new Error("Cannot create bundle");
         }
@@ -112,19 +114,21 @@ export class Bundle
             })
             .catch(async () =>
             {
-                await Database.client.query("ROLLBACK");
+                await client.query("ROLLBACK");
 
                 throw new Error("Cannot create bundle");
             });
 
-        await Database.client.query("COMMIT");
+        await client.query("COMMIT");
 
         return Bundle.deserialize(result.rows[0], expand);
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Bundle | null>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "bundles" where "id" = $1`,
             [ id ],
         );
@@ -143,7 +147,9 @@ export class Bundle
 
         console.log(this._stripe_product_id, this._stripe_price_id);
 
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `
             update "bundles"
             set
@@ -165,7 +171,9 @@ export class Bundle
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `delete from "bundles" where "id" = $1`,
             [ this.id ],
         );
@@ -178,7 +186,9 @@ export class Bundle
 
     public static async forOrganization(organization: Organization, expand?: string[]): Promise<Bundle[]>
     {
-        const result = await Database.client.query(
+        const client = await Database.pool.connect();
+
+        const result = await client.query(
             `select * from "bundles" where "organization" = $1`,
             [ organization.id ],
         );
