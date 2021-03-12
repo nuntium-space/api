@@ -92,7 +92,7 @@ export class Bundle
                     insert into "bundles"
                         ("id", "name", "organization", "price", "stripe_product_id", "stripe_price_id")
                     values
-                        ($1, $2, $3, $4, $5)
+                        ($1, $2, $3, $4, $5, $6)
                     returning *
                     `,
                     [
@@ -105,7 +105,7 @@ export class Bundle
                     ],
                 );
             })
-            .then(async result =>
+            .then(result =>
             {
                 if (result.rowCount === 0)
                 {
@@ -114,7 +114,7 @@ export class Bundle
 
                 return result;
             })
-            .catch(async () =>
+            .catch(() =>
             {
                 throw new Error("Cannot create bundle");
             });
@@ -140,6 +140,8 @@ export class Bundle
     public async update(data: IUpdateBundle): Promise<void>
     {
         this._name = data.name ?? this.name;
+
+        console.log(this._stripe_product_id, this._stripe_price_id);
 
         const result = await Database.client.query(
             `

@@ -154,6 +154,8 @@ create table "bundles"
 
     primary key ("id"),
 
+    unique ("name", "organization"),
+
     foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
     check ("id" like 'bdl_%'),
