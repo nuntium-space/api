@@ -1217,14 +1217,6 @@ const init = async () =>
 
                     break;
                 }
-                case "price.deleted":
-                {
-                    break;
-                }
-                case "price.updated":
-                {
-                    break;
-                }
                 case "product.created":
                 {
                     const product = event.data.object as Stripe.Product;
@@ -1242,14 +1234,6 @@ const init = async () =>
                             throw Boom.badRequest();
                         });
 
-                    break;
-                }
-                case "product.deleted":
-                {
-                    break;
-                }
-                case "product.updated":
-                {
                     break;
                 }
             }
