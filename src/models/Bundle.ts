@@ -75,6 +75,11 @@ export class Bundle
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
     {
+        if (await Bundle.existsWithNameAndOrganization(data.name, organization))
+        {
+            throw Boom.conflict(`A bundle named '${data.name}' already exists for this organization`);
+        }
+
         const client = await Database.pool.connect();
 
         await client.query("begin");
@@ -199,6 +204,17 @@ export class Bundle
             {
                 throw new Error(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
             });
+    }
+
+    public static async existsWithNameAndOrganization(name: string, organization: Organization): Promise<boolean>
+    {
+        const result = await Database.pool
+            .query(
+                `select id from "bundles" where "name" = $1 and "organization" = $2`,
+                [ name, organization.id ],
+            );
+
+        return result.rowCount > 0;
     }
 
     public static async forOrganization(organization: Organization, expand?: string[]): Promise<Bundle[]>
