@@ -77,7 +77,7 @@ export class Bundle
     {
         const client = await Database.pool.connect();
 
-        await client.query("BEGIN");
+        await client.query("begin");
 
         const result = await client
             .query(
@@ -97,7 +97,7 @@ export class Bundle
             )
             .catch(async () =>
             {
-                await client.query("ROLLBACK");
+                await client.query("rollback");
 
                 throw Boom.badRequest();
             });
@@ -122,12 +122,12 @@ export class Bundle
             })
             .catch(async () =>
             {
-                await client.query("ROLLBACK");
+                await client.query("rollback");
 
                 throw Boom.badRequest();
             });
 
-        await client.query("COMMIT");
+        await client.query("commit");
 
         client.release();
 
