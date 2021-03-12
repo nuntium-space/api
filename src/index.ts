@@ -68,7 +68,7 @@ const server = Hapi.server({
 
 const init = async () =>
 {
-    await Database.init();
+    Database.init();
 
     server.auth.scheme("token", () =>
     {
@@ -1343,7 +1343,7 @@ const init = async () =>
 
                     const client = await Database.pool.connect();
 
-        const result = await client.query(
+                    const result = await client.query(
                         `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
                         [
                             price.id,
@@ -1372,7 +1372,7 @@ const init = async () =>
 
                     const client = await Database.pool.connect();
 
-        const result = await client.query(
+                    const result = await client.query(
                         `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
                         [
                             product.id,
