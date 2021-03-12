@@ -173,6 +173,17 @@ create table "bundles_publishers"
     foreign key ("publisher") references "publishers" on update cascade on delete cascade
 );
 
+create table "users_publishers"
+(
+    "user" id not null,
+    "publisher" id not null,
+
+    primary key ("user", "publisher"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+    foreign key ("publisher") references "publishers" on update cascade on delete cascade
+);
+
 /*
 -----
 VIEWS
