@@ -148,11 +148,6 @@ export class Organization
     {
         const owner = await User.retrieve(data.user);
 
-        if (!owner)
-        {
-            throw new Error(`The user '${data.user}' does not exist`);
-        }
-
         return new Organization(
             data.id,
             data.name,
