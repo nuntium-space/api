@@ -4,6 +4,7 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedOrganization, Organization } from "./Organization";
+import { Publisher } from "./Publisher";
 
 interface IDatabaseBundle
 {
@@ -182,6 +183,19 @@ export class Bundle
         {
             throw new Error("Cannot delete bundle");
         }
+    }
+
+    public async addPublisher(publisher: Publisher): Promise<void>
+    {
+        await Database.pool
+            .query(
+                `insert into "bundles_publishers" ("bundle", "publisher") values ($1, $2)`,
+                [ this.id, publisher.id ],
+            )
+            .catch(() =>
+            {
+                throw new Error(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
+            });
     }
 
     public static async forOrganization(organization: Organization, expand?: string[]): Promise<Bundle[]>
