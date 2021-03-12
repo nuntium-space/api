@@ -49,7 +49,6 @@ export class Bundle
         private readonly _organization: Organization | INotExpandedResource,
         private readonly _price: number,
         private readonly _stripe_product_id: string,
-        // @ts-ignore
         private readonly _stripe_price_id: string,
     )
     {}
@@ -201,10 +200,42 @@ export class Bundle
 
     public async delete(): Promise<void>
     {
-        await Database.pool.query(
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client.query(
             `delete from "bundles" where "id" = $1`,
             [ this.id ],
         );
+
+        await Bundle._stripe.prices
+            .update(
+                this._stripe_price_id,
+                {
+                    active: false,
+                },
+            )
+            .then(() =>
+            {
+                return Bundle._stripe.products
+                    .update(
+                        this._stripe_product_id,
+                        {
+                            active: false
+                        },
+                    );
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public async addPublisher(publisher: Publisher): Promise<void>
