@@ -210,23 +210,13 @@ export class Bundle
             [ this.id ],
         );
 
-        await Config.STRIPE.prices
+        await Config.STRIPE.products
             .update(
-                this._stripe_price_id,
+                this.stripe_product_id,
                 {
                     active: false,
                 },
             )
-            .then(() =>
-            {
-                return Config.STRIPE.products
-                    .update(
-                        this._stripe_product_id,
-                        {
-                            active: false
-                        },
-                    );
-            })
             .catch(async () =>
             {
                 await client.query("rollback");
