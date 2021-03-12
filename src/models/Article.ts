@@ -103,7 +103,7 @@ export class Article
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot create article");
+            throw Boom.badRequest();
         }
 
         return Article.deserialize(result.rows[0], expand);
@@ -148,7 +148,7 @@ export class Article
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot update article");
+            throw Boom.badRequest();
         }
 
         this._updated_at = result.rows[0].updated_at;
@@ -163,7 +163,7 @@ export class Article
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot delete article");
+            throw Boom.badRequest();
         }
     }
 

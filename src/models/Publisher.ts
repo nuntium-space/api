@@ -85,7 +85,7 @@ export class Publisher
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot create publisher");
+            throw Boom.badRequest();
         }
 
         return Publisher.deserialize(result.rows[0]);
@@ -129,7 +129,7 @@ export class Publisher
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot update publisher");
+            throw Boom.badRequest();
         }
     }
 
@@ -142,7 +142,7 @@ export class Publisher
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot delete publisher");
+            throw Boom.badRequest();
         }
     }
 

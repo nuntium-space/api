@@ -95,7 +95,7 @@ export class User
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot create user");
+            throw Boom.badRequest();
         }
 
         return User.deserialize(result.rows[0]);
@@ -141,7 +141,7 @@ export class User
         {
             if (!Utilities.verifyHash(data.old_password, this._password))
             {
-                throw new Error(`"old_password" is wrong`);
+                throw Boom.forbidden(`"old_password" is wrong`);
             }
 
             this._password = data.new_password
@@ -171,7 +171,7 @@ export class User
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot update user");
+            throw Boom.badRequest();
         }
     }
 
@@ -184,7 +184,7 @@ export class User
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot delete user");
+            throw Boom.badRequest();
         }
     }
 

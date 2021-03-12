@@ -119,7 +119,7 @@ export class Comment
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot create comment");
+            throw Boom.badRequest();
         }
 
         return Comment.deserialize(result.rows[0], expand);
@@ -161,7 +161,7 @@ export class Comment
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot update comment");
+            throw Boom.badRequest();
         }
 
         this._updated_at = result.rows[0].updated_at;
@@ -176,7 +176,7 @@ export class Comment
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot delete comment");
+            throw Boom.badRequest();
         }
     }
 

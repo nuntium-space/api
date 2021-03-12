@@ -55,7 +55,7 @@ export class Session
 
         if (!Utilities.verifyHash(data.password, user.password))
         {
-            throw new Error(`"password" is wrong`);
+            throw Boom.forbidden(`"password" is wrong`);
         }
 
         const expires = new Date();
@@ -78,7 +78,7 @@ export class Session
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot create Session");
+            throw Boom.badRequest();
         }
 
         return Session.deserialize(result.rows[0]);
@@ -108,7 +108,7 @@ export class Session
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot delete session");
+            throw Boom.badRequest();
         }
     }
 

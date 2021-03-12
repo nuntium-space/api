@@ -72,7 +72,7 @@ export class Author
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot create author");
+            throw Boom.badRequest();
         }
 
         return Author.deserialize(result.rows[0], expand);
@@ -117,7 +117,7 @@ export class Author
 
         if (result.rowCount === 0)
         {
-            throw new Error("Cannot delete author");
+            throw Boom.badRequest();
         }
     }
 
