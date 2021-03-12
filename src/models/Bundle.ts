@@ -73,7 +73,32 @@ export class Bundle
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
     {
-        const result = await Bundle._stripe.products
+        await Database.client.query("BEGIN");
+
+        const result = await Database.client.query(
+            `
+            insert into "bundles"
+                ("id", "name", "organization", "price")
+            values
+                ($1, $2, $3, $4)
+            returning *
+            `,
+            [
+                Utilities.id(Config.ID_PREFIXES.BUNDLE),
+                data.name,
+                organization.id,
+                data.price,
+            ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            await Database.client.query("ROLLBACK");
+
+            throw new Error("Cannot create bundle");
+        }
+
+        await Bundle._stripe.products
             .create({
                 name: data.name,
             })
@@ -85,39 +110,14 @@ export class Bundle
                     unit_amount: data.price,
                 });
             })
-            .then(price =>
+            .catch(async () =>
             {
-                return Database.client.query(
-                    `
-                    insert into "bundles"
-                        ("id", "name", "organization", "price", "stripe_product_id", "stripe_price_id")
-                    values
-                        ($1, $2, $3, $4, $5, $6)
-                    returning *
-                    `,
-                    [
-                        Utilities.id(Config.ID_PREFIXES.BUNDLE),
-                        data.name,
-                        organization.id,
-                        data.price,
-                        price.product,
-                        price.id,
-                    ],
-                );
-            })
-            .then(result =>
-            {
-                if (result.rowCount === 0)
-                {
-                    throw new Error("Cannot create bundle");
-                }
+                await Database.client.query("ROLLBACK");
 
-                return result;
-            })
-            .catch(() =>
-            {
                 throw new Error("Cannot create bundle");
             });
+
+        await Database.client.query("COMMIT");
 
         return Bundle.deserialize(result.rows[0], expand);
     }
