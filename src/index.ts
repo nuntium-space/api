@@ -1202,18 +1202,18 @@ const init = async () =>
                 {
                     const price = event.data.object as Stripe.Price;
 
-                    const result = await Database.pool.query(
-                        `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
-                        [
-                            price.id,
-                            price.metadata.bundle_id,
-                        ],
-                    );
-
-                    if (result.rowCount === 0)
-                    {
-                        throw Boom.badImplementation();
-                    }
+                    await Database.pool
+                        .query(
+                            `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
+                            [
+                                price.id,
+                                price.metadata.bundle_id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
 
                     break;
                 }
@@ -1229,18 +1229,18 @@ const init = async () =>
                 {
                     const product = event.data.object as Stripe.Product;
 
-                    const result = await Database.pool.query(
-                        `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
-                        [
-                            product.id,
-                            product.metadata.bundle_id,
-                        ],
-                    );
-
-                    if (result.rowCount === 0)
-                    {
-                        throw Boom.badImplementation();
-                    }
+                    await Database.pool
+                        .query(
+                            `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
+                            [
+                                product.id,
+                                product.metadata.bundle_id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
 
                     break;
                 }
