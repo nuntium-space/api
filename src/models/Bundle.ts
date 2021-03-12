@@ -156,28 +156,48 @@ export class Bundle
 
     public async update(data: IUpdateBundle): Promise<void>
     {
+        if (data.name && await Bundle.existsWithNameAndOrganization(data.name, this.organization.id))
+        {
+            throw Boom.conflict(`A bundle named '${data.name}' already exists for this organization`);
+        }
+
         this._name = data.name ?? this.name;
 
-        console.log(this._stripe_product_id, this._stripe_price_id);
+        console.log(this._stripe_price_id);
 
-        await Database.pool
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client
             .query(
-                `
-                update "bundles"
-                set
-                    "name" = $1
-                where
-                    "id" = $2
-                `,
-                [
-                    this.name,
-                    this.id,
-                ],
+                `update "bundles" set "name" = $1 where "id" = $2`,
+                [ this.name, this.id ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
+
+        await Bundle._stripe.products
+            .update(
+                this._stripe_product_id,
+                {
+                    name: this.name,
+                },
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public async delete(): Promise<void>
@@ -201,11 +221,16 @@ export class Bundle
             });
     }
 
-    public static async existsWithNameAndOrganization(name: string, organization: Organization): Promise<boolean>
+    public static async existsWithNameAndOrganization(name: string, organization: Organization | string): Promise<boolean>
     {
         const result = await Database.pool.query(
             `select id from "bundles" where "name" = $1 and "organization" = $2`,
-            [ name, organization.id ],
+            [
+                name,
+                organization instanceof Organization
+                    ? organization.id
+                    : organization,
+            ],
         );
 
         return result.rowCount > 0;
