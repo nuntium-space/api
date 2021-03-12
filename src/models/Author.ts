@@ -150,23 +150,9 @@ export class Author
             ? await User.retrieve(data.user)
             : { id: data.user };
 
-        let publisher: Publisher | INotExpandedResource;
-
-        if (expand?.includes("publisher"))
-        {
-            const temp = await Publisher.retrieve(data.publisher);
-
-            if (!temp)
-            {
-                throw new Error(`The publisher '${data.publisher}' does not exist`);
-            }
-
-            publisher = temp;
-        }
-        else
-        {
-            publisher = { id: data.publisher };
-        }
+        const publisher = expand?.includes("publisher")
+            ? await Publisher.retrieve(data.publisher)
+            : { id: data.publisher };
 
         return new Author(
             data.id,

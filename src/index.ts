@@ -708,11 +708,6 @@ const init = async () =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
-
             return publisher.serialize();
         }
     });
@@ -736,11 +731,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
-
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
 
             const articles = await Article.forPublisher(publisher, request.query.expand);
 
@@ -767,11 +757,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
-
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
@@ -829,11 +814,6 @@ const init = async () =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             const author = await Author.retrieveWithUserAndPublisher(authenticatedUser, publisher);
@@ -868,11 +848,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
-
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
@@ -911,11 +886,6 @@ const init = async () =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
             if (!publisher.isOwnedByUser(authenticatedUser))
@@ -942,11 +912,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const publisher = await Publisher.retrieve(request.params.id);
-
-            if (!publisher)
-            {
-                throw Boom.notFound();
-            }
 
             const authenticatedUser = request.auth.credentials.user as User;
 
