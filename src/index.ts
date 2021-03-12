@@ -1193,7 +1193,7 @@ const init = async () =>
             }
             catch (err)
             {
-                throw Boom.badRequest();
+                throw Boom.forbidden();
             }
 
             switch (event.type)
