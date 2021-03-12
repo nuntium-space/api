@@ -1311,6 +1311,10 @@ const init = async () =>
         path: "/webhooks/stripe",
         options: {
             auth: false,
+            payload: {
+                output: "data",
+                parse: false,
+            },
         },
         handler: async (request, h) =>
         {
@@ -1335,6 +1339,21 @@ const init = async () =>
             {
                 case "price.created":
                 {
+                    const price = event.data.object as Stripe.Price;
+
+                    const result = await Database.client.query(
+                        `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
+                        [
+                            price.id,
+                            price.metadata.bundle_id,
+                        ],
+                    );
+
+                    if (result.rowCount === 0)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
                     break;
                 }
                 case "price.deleted":
@@ -1347,6 +1366,21 @@ const init = async () =>
                 }
                 case "product.created":
                 {
+                    const product = event.data.object as Stripe.Product;
+
+                    const result = await Database.client.query(
+                        `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
+                        [
+                            product.id,
+                            product.metadata.bundle_id,
+                        ],
+                    );
+
+                    if (result.rowCount === 0)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
                     break;
                 }
                 case "product.deleted":
