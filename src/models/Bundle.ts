@@ -78,28 +78,28 @@ export class Bundle
 
         await client.query("BEGIN");
 
-        const result = await client.query(
-            `
-            insert into "bundles"
-                ("id", "name", "organization", "price")
-            values
-                ($1, $2, $3, $4)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.BUNDLE),
-                data.name,
-                organization.id,
-                data.price,
-            ],
-        );
+        const result = await client
+            .query(
+                `
+                insert into "bundles"
+                    ("id", "name", "organization", "price")
+                values
+                    ($1, $2, $3, $4)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.BUNDLE),
+                    data.name,
+                    organization.id,
+                    data.price,
+                ],
+            )
+            .catch(async () =>
+            {
+                await client.query("ROLLBACK");
 
-        if (result.rowCount === 0)
-        {
-            await client.query("ROLLBACK");
-
-            throw new Error("Cannot create bundle");
-        }
+                throw new Error("Cannot create bundle");
+            });
 
         await Bundle._stripe.products
             .create({
