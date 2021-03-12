@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import readingTime from "reading-time";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
@@ -108,7 +109,7 @@ export class Article
         return Article.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieve(id: string, expand?: string[]): Promise<Article | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Article>
     {
         const result = await Database.pool.query(
             `select * from "articles" where "id" = $1`,
@@ -117,7 +118,7 @@ export class Article
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Article.deserialize(result.rows[0], expand);

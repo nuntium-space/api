@@ -120,11 +120,6 @@ const init = async () =>
         {
             const article = await Article.retrieve(request.params.id, request.query.expand);
 
-            if (!article)
-            {
-                throw Boom.notFound();
-            }
-
             return article.serialize();
         }
     });
@@ -149,11 +144,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const article = await Article.retrieve(request.params.id);
-
-            if (!article)
-            {
-                throw Boom.notFound();
-            }
 
             const comments = await Comment.forArticle(article, {
                 parent: request.query.parent ?? null,
@@ -216,11 +206,6 @@ const init = async () =>
         {
             const article = await Article.retrieve(request.params.id, [ "author" ]);
 
-            if (!article)
-            {
-                throw Boom.notFound();
-            }
-
             if (!(article.author instanceof Author))
             {
                 throw Boom.badImplementation();
@@ -252,11 +237,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const article = await Article.retrieve(request.params.id, [ "author" ]);
-
-            if (!article)
-            {
-                throw Boom.notFound();
-            }
 
             if (!(article.author instanceof Author))
             {
