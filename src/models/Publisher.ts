@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -90,7 +91,7 @@ export class Publisher
         return Publisher.deserialize(result.rows[0]);
     }
 
-    public static async retrieve(id: string): Promise<Publisher | null>
+    public static async retrieve(id: string): Promise<Publisher>
     {
         const result = await Database.pool.query(
             `select * from "publishers" where "id" = $1`,
@@ -99,7 +100,7 @@ export class Publisher
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Publisher.deserialize(result.rows[0]);

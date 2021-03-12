@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
@@ -124,7 +125,7 @@ export class Comment
         return Comment.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieve(id: string, expand?: string[]): Promise<Comment | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Comment>
     {
         const result = await Database.pool.query(
             `select * from "v_comments" where "id" = $1`,
@@ -133,7 +134,7 @@ export class Comment
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Comment.deserialize(result.rows[0], expand);
@@ -228,33 +229,20 @@ export class Comment
 
     private static async deserialize(data: IDatabaseComment, expand?: string[]): Promise<Comment>
     {
-        let article: Article | INotExpandedResource;
+        const article = expand?.includes("article")
+            ? await Article.retrieve(
+                data.article,
+                expand
+                    .filter(e => e.startsWith("article."))
+                    .map(e => e.replace("article.", "")),
+              )
+            : { id: data.article };
+
         let parent: Comment | INotExpandedResource | null = null;
 
         const user = expand?.includes("user")
             ? await User.retrieve(data.user)
             : { id: data.user };
-
-        if (expand?.includes("article"))
-        {
-            const temp = await Article.retrieve(
-                data.article,
-                expand
-                    .filter(e => e.startsWith("article."))
-                    .map(e => e.replace("article.", "")),
-            );
-
-            if (!temp)
-            {
-                throw new Error(`The article '${data.article}' does not exist`);
-            }
-
-            article = temp;
-        }
-        else
-        {
-            article = { id: data.article };
-        }
 
         if (data.parent !== null)
         {

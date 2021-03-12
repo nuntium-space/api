@@ -206,28 +206,14 @@ export class Article
 
     private static async deserialize(data: IDatabaseArticle, expand?: string[]): Promise<Article>
     {
-        let author: Author | INotExpandedResource;
-
-        if (expand?.includes("author"))
-        {
-            const temp = await Author.retrieve(
+        const author = expand?.includes("author")
+            ? await Author.retrieve(
                 data.author,
                 expand
                     .filter(e => e.startsWith("author."))
                     .map(e => e.replace("author.", "")),
-            );
-
-            if (!temp)
-            {
-                throw new Error(`The author '${data.author}' does not exist`);
-            }
-
-            author = temp;
-        }
-        else
-        {
-            author = { id: data.author };
-        }
+              )
+            : { id: data.author };
 
         return new Article(
             data.id,

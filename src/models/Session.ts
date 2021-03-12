@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -83,7 +84,7 @@ export class Session
         return Session.deserialize(result.rows[0]);
     }
 
-    public static async retrieve(id: string): Promise<Session | null>
+    public static async retrieve(id: string): Promise<Session>
     {
         const result = await Database.pool.query(
             `select * from "sessions" where "id" = $1`,
@@ -92,7 +93,7 @@ export class Session
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Session.deserialize(result.rows[0]);

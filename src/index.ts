@@ -276,11 +276,6 @@ const init = async () =>
         {
             const author = await Author.retrieve(request.params.id, request.query.expand);
 
-            if (!author)
-            {
-                throw Boom.notFound();
-            }
-
             return author.serialize();
         }
     });
@@ -298,11 +293,6 @@ const init = async () =>
         handler: async (request, h) =>
         {
             const author = await Author.retrieve(request.params.id, [ "publisher" ]);
-
-            if (!author)
-            {
-                throw Boom.notFound();
-            }
 
             if (!(author.publisher instanceof Publisher))
             {
@@ -862,11 +852,6 @@ const init = async () =>
             const authenticatedUser = request.auth.credentials.user as User;
 
             const author = await Author.retrieveWithUserAndPublisher(authenticatedUser, publisher);
-
-            if (!author)
-            {
-                throw Boom.forbidden();
-            }
 
             const article = await Article.create(
                 request.payload as any,

@@ -1,3 +1,4 @@
+import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
@@ -77,7 +78,7 @@ export class Author
         return Author.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieve(id: string, expand?: string[]): Promise<Author | null>
+    public static async retrieve(id: string, expand?: string[]): Promise<Author>
     {
         const result = await Database.pool.query(
             `select * from "authors" where "id" = $1`,
@@ -86,13 +87,13 @@ export class Author
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Author.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieveWithUserAndPublisher(user: User, publisher: Publisher, expand?: string[]): Promise<Author | null>
+    public static async retrieveWithUserAndPublisher(user: User, publisher: Publisher, expand?: string[]): Promise<Author>
     {
         const result = await Database.pool.query(
             `select * from "authors" where "user" = $1 and "publisher" = $2`,
@@ -101,7 +102,7 @@ export class Author
 
         if (result.rowCount === 0)
         {
-            return null;
+            throw Boom.notFound();
         }
 
         return Author.deserialize(result.rows[0], expand);
