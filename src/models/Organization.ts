@@ -55,25 +55,25 @@ export class Organization
 
     public static async create(data: ICreateOrganization, user: User): Promise<Organization>
     {
-        const result = await Database.pool.query(
-            `
-            insert into "organizations"
-                ("id", "name", "user")
-            values
-                ($1, $2, $3)
-            returning *
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.ORGANIZATION),
-                data.name,
-                user.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw new Error("Cannot create organization");
-        }
+        const result = await Database.pool
+            .query(
+                `
+                insert into "organizations"
+                    ("id", "name", "user")
+                values
+                    ($1, $2, $3)
+                returning *
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.ORGANIZATION),
+                    data.name,
+                    user.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
 
         return Organization.deserialize(result.rows[0]);
     }
@@ -97,37 +97,32 @@ export class Organization
     {
         this._name = data.name ?? this.name;
 
-        const result = await Database.pool.query(
-            `
-            update "organizations"
-            set
-                "name" = $1
-            where
-                "id" = $2
-            `,
-            [
-                this.name,
-                this.id,
-            ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw new Error("Cannot update organization");
-        }
+        await Database.pool
+            .query(
+                `
+                update "organizations"
+                set
+                    "name" = $1
+                where
+                    "id" = $2
+                `,
+                [
+                    this.name,
+                    this.id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
     }
 
     public async delete(): Promise<void>
     {
-        const result = await Database.pool.query(
+        await Database.pool.query(
             `delete from "organizations" where "id" = $1`,
             [ this.id ],
         );
-
-        if (result.rowCount === 0)
-        {
-            throw new Error("Cannot delete organization");
-        }
     }
 
     public static async forUser(user: User): Promise<Organization[]>
