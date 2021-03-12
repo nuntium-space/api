@@ -84,7 +84,7 @@ export class Article
 
     public static async create(data: ICreateArticle, author: Author, expand?: string[]): Promise<Article>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `
             insert into "articles"
                 ("id", "title", "content", "author")
@@ -110,7 +110,7 @@ export class Article
 
     public static async retrieve(id: string, expand?: string[]): Promise<Article | null>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `select * from "articles" where "id" = $1`,
             [ id ],
         );
@@ -128,7 +128,7 @@ export class Article
         this._title = data.title ?? this.title;
         this._content = data.content ?? this.content;
 
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `
             update "articles"
             set
@@ -155,7 +155,7 @@ export class Article
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `delete from "articles" where "id" = $1`,
             [ this.id ],
         );
@@ -168,7 +168,7 @@ export class Article
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Article[]>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `
             select art.*
             from

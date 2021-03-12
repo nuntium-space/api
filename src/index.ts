@@ -1,6 +1,9 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import dotenv from "dotenv";
 import Joi from "joi";
 import qs from "qs";
 import { Config } from "./config/Config";
@@ -10,6 +13,9 @@ import {
     ARTICLE_UPDATE_SCHEMA,
     AUTHOR_CREATE_SCHEMA,
     AUTHOR_SCHEMA,
+    BUNDLE_CREATE_SCHEMA,
+    BUNDLE_SCHEMA,
+    BUNDLE_UPDATE_SCHEMA,
     COMMENT_CREATE_SCHEMA,
     COMMENT_SCHEMA,
     COMMENT_UPDATE_SCHEMA,
@@ -29,14 +35,14 @@ import {
 } from "./config/schemas";
 import { Article } from "./models/Article";
 import { Author } from "./models/Author";
+import { Bundle } from "./models/Bundle";
 import { Comment } from "./models/Comment";
 import { Organization } from "./models/Organization";
 import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
-
-dotenv.config();
+import Stripe from "stripe";
 
 const server = Hapi.server({
     port: 4000,
@@ -62,7 +68,7 @@ const server = Hapi.server({
 
 const init = async () =>
 {
-    await Database.init();
+    Database.init();
 
     server.auth.scheme("token", () =>
     {
@@ -93,18 +99,6 @@ const init = async () =>
     server.auth.strategy("session", "token");
 
     server.auth.default({ strategy: "session" });
-
-    server.ext("onPreResponse", (request, h) =>
-    {
-        const { response } = request;
-
-        if (response instanceof Boom.Boom)
-        {
-            response.output.payload.message = response.message;
-        }
-
-        return h.continue;
-    });
 
     server.route({
         method: "GET",
@@ -350,6 +344,98 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/bundles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: BUNDLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
+
+            return bundle.serialize();
+        }
+    });
+
+    server.route({
+        method: "PATCH",
+        path: "/bundles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+                payload: BUNDLE_UPDATE_SCHEMA,
+            },
+            response: {
+                schema: BUNDLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
+
+            if (!(bundle.organization instanceof Organization))
+            {
+                throw Boom.badImplementation();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (bundle.organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await bundle.update(request.payload as any);
+
+            return bundle.serialize();
+        }
+    });
+
+    server.route({
+        method: "DELETE",
+        path: "/bundles/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
+
+            if (!(bundle.organization instanceof Organization))
+            {
+                throw Boom.badImplementation();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (bundle.organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await bundle.delete();
+
+            return h.response();
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/comments/{id}",
         options: {
             validate: {
@@ -480,6 +566,44 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/organizations/{id}/bundles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const bundles = await Bundle.forOrganization(organization, request.query.expand);
+
+            return bundles.map(bundle => bundle.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/organizations/{id}/publishers",
         options: {
             validate: {
@@ -531,6 +655,46 @@ const init = async () =>
             const organization = await Organization.create(request.payload as any, authenticatedUser);
 
             return organization.serialize();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/organizations/{id}/bundles",
+        options: {
+            validate: {
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+                payload: BUNDLE_CREATE_SCHEMA,
+            },
+            response: {
+                schema: BUNDLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const bundle = await Bundle.create(
+                request.payload as any,
+                organization,
+                request.query.expand,
+            );
+
+            return bundle.serialize();
         }
     });
 
@@ -1150,6 +1314,97 @@ const init = async () =>
             await session.delete();
 
             return h.response();
+        }
+    });
+
+    server.route({
+        method: "POST",
+        path: "/webhooks/stripe",
+        options: {
+            auth: false,
+            payload: {
+                output: "data",
+                parse: false,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const stripe = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
+
+            let event: Stripe.Event;
+
+            try
+            {
+                event = stripe.webhooks.constructEvent(
+                    request.payload as any,
+                    request.headers["stripe-signature"],
+                    process.env.STRIPE_WEBHOOK_SECRET ?? "",
+                );
+            }
+            catch (err)
+            {
+                throw Boom.badRequest();
+            }
+
+            switch (event.type)
+            {
+                case "price.created":
+                {
+                    const price = event.data.object as Stripe.Price;
+
+                    const result = await Database.pool.query(
+                        `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
+                        [
+                            price.id,
+                            price.metadata.bundle_id,
+                        ],
+                    );
+
+                    if (result.rowCount === 0)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    break;
+                }
+                case "price.deleted":
+                {
+                    break;
+                }
+                case "price.updated":
+                {
+                    break;
+                }
+                case "product.created":
+                {
+                    const product = event.data.object as Stripe.Product;
+
+                    const result = await Database.pool.query(
+                        `update "bundles" set "stripe_product_id" = $1 where "id" = $2`,
+                        [
+                            product.id,
+                            product.metadata.bundle_id,
+                        ],
+                    );
+
+                    if (result.rowCount === 0)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    break;
+                }
+                case "product.deleted":
+                {
+                    break;
+                }
+                case "product.updated":
+                {
+                    break;
+                }
+            }
+
+            return { received: true };
         }
     });
 

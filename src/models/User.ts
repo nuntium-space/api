@@ -68,9 +68,14 @@ export class User
         return this._email;
     }
 
+    public get password(): string
+    {
+        return this._password;
+    }
+
     public static async create(data: ICreateUser): Promise<User>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `
             insert into "users"
                 ("id", "first_name", "last_name", "email", "password")
@@ -97,7 +102,7 @@ export class User
 
     public static async retrieve(id: string): Promise<User | null>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `select * from "users" where "id" = $1`,
             [ id ],
         );
@@ -112,7 +117,7 @@ export class User
 
     public static async retrieveWithEmail(email: string): Promise<User | null>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `select * from "users" where "email" = $1`,
             [ email ],
         );
@@ -143,7 +148,7 @@ export class User
                 : this._password;
         }
 
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `
             update "users"
             set
@@ -171,7 +176,7 @@ export class User
 
     public async delete(): Promise<void>
     {
-        const result = await Database.client.query(
+        const result = await Database.pool.query(
             `delete from "users" where "id" = $1`,
             [ this.id ],
         );

@@ -27,6 +27,8 @@ export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
+export const MONEY_SCHEMA = Joi.number().integer().min(0);
+
 export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: ID_SCHEMA(prefix).required() });
 
 export const EXPAND_QUERY_SCHEMA = Joi.array().items(STRING_SCHEMA);
@@ -135,6 +137,20 @@ export const COMMENT_SCHEMA = Joi
         updated_at: DATETIME_SCHEMA.required(),
     });
 
+export const BUNDLE_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+        name: STRING_SCHEMA.max(50).required(),
+        organization: Joi
+            .alternatives()
+            .try(
+                ORGANIZATION_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ORGANIZATION),
+            )
+            .required(),
+        price: MONEY_SCHEMA.required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
@@ -215,4 +231,15 @@ export const COMMENT_CREATE_SCHEMA = Joi
 export const COMMENT_UPDATE_SCHEMA = Joi
     .object({
         content: STRING_SCHEMA,
+    });
+
+export const BUNDLE_CREATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50).required(),
+        price: MONEY_SCHEMA.required(),
+    });
+
+export const BUNDLE_UPDATE_SCHEMA = Joi
+    .object({
+        name: STRING_SCHEMA.max(50),
     });
