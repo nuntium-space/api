@@ -593,6 +593,44 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/organizations/{id}/bundles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            if (!organization)
+            {
+                throw Boom.notFound();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const bundles = await Bundle.forOrganization(organization, request.query.expand);
+
+            return bundles.map(bundle => bundle.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/organizations/{id}/publishers",
         options: {
             validate: {
