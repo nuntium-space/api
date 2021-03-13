@@ -337,6 +337,55 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/bundles/{id}/stripe/checkout",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    id: Joi.string(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!authenticatedUser.stripe_customer_id || !bundle.stripe_price_id)
+            {
+                throw Boom.badImplementation();
+            }
+
+            const session = await Config.STRIPE.checkout
+                .sessions
+                .create({
+                    mode: "subscription",
+                    payment_method_types: [ "card" ],
+                    customer: authenticatedUser.stripe_customer_id,
+                    line_items: [
+                        {
+                            price: bundle.stripe_price_id,
+                        },
+                    ],
+                    success_url: "https://example.com/success",
+                    cancel_url: "https://example.com/cancel",
+                })
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return { id: session.id };
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/bundles/{bundle_id}/publishers/{publisher_id}",
         options: {

@@ -77,6 +77,11 @@ export class User
         return this._password;
     }
 
+    public get stripe_customer_id(): string | null
+    {
+        return this._stripe_customer_id;
+    }
+
     public static async create(data: ICreateUser): Promise<User>
     {
         const client = await Database.pool.connect();
