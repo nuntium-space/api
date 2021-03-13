@@ -371,6 +371,7 @@ const init = async () =>
                     line_items: [
                         {
                             price: bundle.stripe_price_id,
+                            quantity: 1,
                         },
                     ],
                     success_url: "https://example.com/success",
