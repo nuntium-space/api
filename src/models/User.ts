@@ -222,7 +222,7 @@ export class User
 
         await client.query("begin");
 
-        await Database.pool
+        await client
             .query(
                 `insert into "users_bundles" ("user", "bundle") values ($1, $2)`,
                 [ this.id, bundle.id ],
