@@ -122,6 +122,9 @@ export class Bundle
                     },
                 },
                 unit_amount: data.price,
+                recurring: {
+                    interval: "month",
+                },
                 metadata: {
                     bundle_id: result.rows[0].id,
                 },
