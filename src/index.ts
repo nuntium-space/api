@@ -337,6 +337,56 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/bundles/{id}/stripe/checkout",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    id: Joi.string(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!authenticatedUser.stripe_customer_id || !bundle.stripe_price_id)
+            {
+                throw Boom.badImplementation();
+            }
+
+            const session = await Config.STRIPE.checkout
+                .sessions
+                .create({
+                    mode: "subscription",
+                    payment_method_types: [ "card" ],
+                    customer: authenticatedUser.stripe_customer_id,
+                    line_items: [
+                        {
+                            price: bundle.stripe_price_id,
+                            quantity: 1,
+                        },
+                    ],
+                    success_url: "https://example.com/success",
+                    cancel_url: "https://example.com/cancel",
+                })
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return { id: session.id };
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/bundles/{bundle_id}/publishers/{publisher_id}",
         options: {
@@ -798,7 +848,14 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!await authenticatedUser.isSubscribedToPublisher(publisher))
+            {
+                throw Boom.paymentRequired();
+            }
 
             const articles = await Article.forPublisher(publisher, request.query.expand);
 
@@ -836,6 +893,32 @@ const init = async () =>
             const authors = await Author.forPublisher(publisher, request.query.expand);
 
             return authors.map(author => author.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
+        path: "/publishers/{id}/bundles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            const bundles = await Bundle.forPublisher(publisher, request.query.expand);
+
+            return bundles.map(bundle => bundle.serialize());
         }
     });
 
@@ -1074,36 +1157,6 @@ const init = async () =>
             const user = await User.create(request.payload as any);
 
             return user.serialize();
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/users/{user_id}/bundles/{bundle_id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    user_id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-                    bundle_id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const user = await User.retrieve(request.params.user_id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const bundle = await Bundle.retrieve(request.params.bundle_id);
-
-            await user.subscribeToBundle(bundle);
-
-            return h.response();
         }
     });
 
