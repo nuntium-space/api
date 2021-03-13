@@ -337,6 +337,46 @@ const init = async () =>
     });
 
     server.route({
+        method: "POST",
+        path: "/bundles/{bundle_id}/publishers/{publisher_id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    bundle_id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    publisher_id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.bundle_id, [ "organization" ]);
+
+            if (!(bundle.organization instanceof Organization))
+            {
+                throw Boom.badImplementation();
+            }
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (bundle.organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const publisher = await Publisher.retrieve(request.params.publisher_id);
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.badImplementation();
+            }
+
+            await bundle.addPublisher(publisher);
+
+            return h.response();
+        }
+    });
+
+    server.route({
         method: "PATCH",
         path: "/bundles/{id}",
         options: {
