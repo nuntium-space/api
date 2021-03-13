@@ -848,7 +848,14 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!await authenticatedUser.isSubscribedToPublisher(publisher))
+            {
+                throw Boom.paymentRequired();
+            }
 
             const articles = await Article.forPublisher(publisher, request.query.expand);
 

@@ -3,6 +3,7 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
+import { Publisher } from "./Publisher";
 
 interface IDatabaseUser
 {
@@ -258,6 +259,35 @@ export class User
         await client.query("commit");
 
         client.release();
+    }
+
+    public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>
+    {
+        /**
+         * The owner of the publisher is considered subscribed to it
+         */
+        if (publisher.isOwnedByUser(this))
+        {
+            return true;
+        }
+
+        const result = await Database.pool
+            .query(
+                `
+                select *
+                from
+                    users_bundles
+                    natural join
+                    bundles_publishers
+                where
+                    user = $1
+                    and
+                    publisher = $2
+                `,
+                [ this.id, publisher.id ],
+            );
+
+        return result.rowCount > 0;
     }
 
     public serialize(): ISerializedUser
