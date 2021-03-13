@@ -12,8 +12,8 @@ interface IDatabaseBundle
     name: string,
     organization: string,
     price: number,
-    stripe_product_id: string,
-    stripe_price_id: string,
+    stripe_product_id: string | null,
+    stripe_price_id: string | null,
 }
 
 interface ICreateBundle
@@ -43,8 +43,8 @@ export class Bundle
         private _name: string,
         private readonly _organization: Organization | INotExpandedResource,
         private readonly _price: number,
-        private readonly _stripe_product_id: string,
-        private readonly _stripe_price_id: string,
+        private readonly _stripe_product_id: string | null,
+        private readonly _stripe_price_id: string | null,
     )
     {}
 
@@ -68,12 +68,12 @@ export class Bundle
         return this._price;
     }
 
-    public get stripe_product_id(): string
+    public get stripe_product_id(): string | null
     {
         return this._stripe_product_id;
     }
 
-    public get stripe_price_id(): string
+    public get stripe_price_id(): string | null
     {
         return this._stripe_price_id;
     }
@@ -161,6 +161,10 @@ export class Bundle
         {
             throw Boom.conflict(`A bundle named '${data.name}' already exists for this organization`);
         }
+        else if (!this.stripe_product_id)
+        {
+            throw Boom.badImplementation();
+        }
 
         this._name = data.name ?? this.name;
 
@@ -182,7 +186,7 @@ export class Bundle
 
         await Config.STRIPE.products
             .update(
-                this._stripe_product_id,
+                this.stripe_product_id,
                 {
                     name: this.name,
                 },
@@ -201,6 +205,11 @@ export class Bundle
 
     public async delete(): Promise<void>
     {
+        if (!this.stripe_product_id)
+        {
+            throw Boom.badImplementation();
+        }
+
         const client = await Database.pool.connect();
 
         await client.query("begin");

@@ -11,6 +11,7 @@ interface IDatabaseUser
     last_name: string,
     email: string,
     password: string,
+    stripe_customer_id: string | null,
 }
 
 interface ICreateUser
@@ -47,6 +48,7 @@ export class User
         private  _last_name: string,
         private _email: string,
         private _password: string,
+        private _stripe_customer_id: string | null,
     )
     {}
 
@@ -77,7 +79,11 @@ export class User
 
     public static async create(data: ICreateUser): Promise<User>
     {
-        const result = await Database.pool
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        const result = await client
             .query(
                 `
                 insert into "users"
@@ -94,10 +100,28 @@ export class User
                     Utilities.hash(data.password),
                 ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
+
+        await Config.STRIPE.customers
+            .create({
+                name: `${data.first_name} ${data.last_name}`,
+                email: data.email,
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        await client.query("commit");
+
+        client.release();
 
         return User.deserialize(result.rows[0]);
     }
@@ -186,6 +210,11 @@ export class User
 
     public async subscribeToBundle(bundle: Bundle): Promise<void>
     {
+        if (!this._stripe_customer_id || !bundle.stripe_price_id)
+        {
+            throw Boom.badImplementation();
+        }
+
         const client = await Database.pool.connect();
 
         await client.query("begin");
@@ -204,7 +233,7 @@ export class User
 
         await Config.STRIPE.subscriptions
             .create({
-                customer: "TODO",
+                customer: this._stripe_customer_id,
                 items: [
                     {
                         price: bundle.stripe_price_id,
@@ -241,6 +270,7 @@ export class User
             data.last_name,
             data.email,
             data.password,
+            data.stripe_customer_id,
         );
     }
 }
