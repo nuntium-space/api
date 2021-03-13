@@ -634,6 +634,34 @@ const init = async () =>
     });
 
     server.route({
+        method: "POST",
+        path: "/organizations/{id}/publishers",
+        options: {
+            validate: {
+                payload: PUBLISHER_CREATE_SCHEMA,
+            },
+            response: {
+                schema: PUBLISHER_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const publisher = await Publisher.create(request.payload as any, organization);
+
+            return publisher.serialize();
+        }
+    });
+
+    server.route({
         method: "PATCH",
         path: "/organizations/{id}",
         options: {
@@ -768,31 +796,6 @@ const init = async () =>
             const authors = await Author.forPublisher(publisher, request.query.expand);
 
             return authors.map(author => author.serialize());
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/publishers",
-        options: {
-            validate: {
-                payload: PUBLISHER_CREATE_SCHEMA,
-            },
-            response: {
-                schema: PUBLISHER_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            /**
-             * @todo
-             * 
-             * Check that the organization in the payload is owned by the authenticated user
-             */
-
-            const publisher = await Publisher.create(request.payload as any);
-
-            return publisher.serialize();
         }
     });
 

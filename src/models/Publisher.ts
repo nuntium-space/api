@@ -17,7 +17,6 @@ interface ICreatePublisher
 {
     name: string,
     url: string,
-    organization: string,
 }
 
 interface IUpdatePublisher
@@ -65,7 +64,7 @@ export class Publisher
         return this._organization;
     }
 
-    public static async create(data: ICreatePublisher): Promise<Publisher>
+    public static async create(data: ICreatePublisher, organization: Organization): Promise<Publisher>
     {
         const result = await Database.pool
             .query(
@@ -80,7 +79,7 @@ export class Publisher
                     Utilities.id(Config.ID_PREFIXES.PUBLISHER),
                     data.name,
                     data.url,
-                    data.organization,
+                    organization.id,
                 ],
             )
             .catch(() =>

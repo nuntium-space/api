@@ -190,7 +190,6 @@ export const PUBLISHER_CREATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50).required(),
         url: URL_SCHEMA.required(),
-        organization: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
     });
 
 export const PUBLISHER_UPDATE_SCHEMA = Joi
