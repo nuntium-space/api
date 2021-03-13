@@ -279,6 +279,23 @@ export class Bundle
         return Promise.all(result.rows.map(row => Bundle.deserialize(row, expand)));
     }
 
+    public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Bundle[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select b.*
+            from
+                bundles_publishers as bp
+                inner join
+                bundles as b
+                on bp.bundle = b.id
+            where publisher = $1`,
+            [ publisher.id ],
+        );
+
+        return Promise.all(result.rows.map(row => Bundle.deserialize(row, expand)));
+    }
+
     public serialize(): ISerializedBundle
     {
         return {

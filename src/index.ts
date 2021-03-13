@@ -890,6 +890,32 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/publishers/{id}/bundles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            const bundles = await Bundle.forPublisher(publisher, request.query.expand);
+
+            return bundles.map(bundle => bundle.serialize());
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/publishers/{id}/articles",
         options: {
