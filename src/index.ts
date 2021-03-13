@@ -1127,36 +1127,6 @@ const init = async () =>
     });
 
     server.route({
-        method: "POST",
-        path: "/users/{user_id}/bundles/{bundle_id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    user_id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-                    bundle_id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const user = await User.retrieve(request.params.user_id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const bundle = await Bundle.retrieve(request.params.bundle_id);
-
-            await user.subscribeToBundle(bundle);
-
-            return h.response();
-        }
-    });
-
-    server.route({
         method: "PATCH",
         path: "/users/{id}",
         options: {
