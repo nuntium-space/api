@@ -111,6 +111,9 @@ export class User
             .create({
                 name: `${data.first_name} ${data.last_name}`,
                 email: data.email,
+                metadata: {
+                    user_id: result.rows[0].id,
+                },
             })
             .catch(async () =>
             {

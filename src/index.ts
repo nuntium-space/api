@@ -1196,6 +1196,25 @@ const init = async () =>
 
             switch (event.type)
             {
+                case "customer.created":
+                {
+                    const customer = event.data.object as Stripe.Customer;
+
+                    await Database.pool
+                        .query(
+                            `update "users" set "stripe_customer_id" = $1 where "id" = $2`,
+                            [
+                                customer.id,
+                                customer.metadata.user_id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
+
+                    break;
+                }
                 case "price.created":
                 {
                     const price = event.data.object as Stripe.Price;
