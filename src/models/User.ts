@@ -231,7 +231,7 @@ export class User
             {
                 await client.query("rollback");
 
-                throw Boom.badRequest(`Cannot subscribe user '${this.id}' to bundle ${bundle.id}`);
+                throw Boom.badRequest(`Cannot subscribe user '${this.id}' to bundle '${bundle.id}'`);
             });
 
         await Config.STRIPE.subscriptions
