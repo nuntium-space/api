@@ -224,7 +224,7 @@ export class User
 
         await Database.pool
             .query(
-                `insert into "users_bundle" ("user", "bundle") values ($1, $2)`,
+                `insert into "users_bundles" ("user", "bundle") values ($1, $2)`,
                 [ this.id, bundle.id ],
             )
             .catch(async () =>
