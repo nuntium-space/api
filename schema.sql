@@ -178,6 +178,9 @@ create table "users_bundles"
 (
     "user" id not null,
     "bundle" id not null,
+    "current_period_end" timestamp,
+    "cancel_at_period_end" boolean,
+    "stripe_subscription_id" text not null,
 
     primary key ("user", "bundle"),
 
