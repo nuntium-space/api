@@ -45,6 +45,7 @@ import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
 import Stripe from "stripe";
+import { Subscription } from "./models/Subscription";
 
 const server = Hapi.server({
     port: 4000,
@@ -1450,17 +1451,9 @@ const init = async () =>
                 }
                 case "customer.subscription.deleted":
                 {
-                    const subscription = event.data.object as Stripe.Subscription;
+                    const subscription = await Subscription.retrieveWithSubscriptionId((event.data.object as Stripe.Subscription).id);
 
-                    await Database.pool
-                        .query(
-                            `delete from "subscriptions" where "stripe_subscription_id" = $1`,
-                            [ subscription.id ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
+                    await subscription.delete();
 
                     break;
                 }
@@ -1547,20 +1540,14 @@ const init = async () =>
                 {
                     const invoice = event.data.object as Stripe.Invoice;
 
-                    if (!invoice.subscription)
+                    if (typeof invoice.subscription !== "string")
                     {
                         throw Boom.badImplementation();
                     }
 
-                    await Database.pool
-                        .query(
-                            `delete from "subscriptions" where "stripe_subscription_id" = $1`,
-                            [ invoice.subscription ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
+                    const subscription = await Subscription.retrieveWithSubscriptionId(invoice.subscription);
+
+                    await subscription.delete();
 
                     break;
                 }
