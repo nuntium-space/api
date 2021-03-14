@@ -29,6 +29,8 @@ import {
     PUBLISHER_UPDATE_SCHEMA,
     SESSION_CREATE_SCHEMA,
     SESSION_SCHEMA,
+    STRING_SCHEMA,
+    URL_SCHEMA,
     USER_CREATE_SCHEMA,
     USER_SCHEMA,
     USER_UPDATE_SCHEMA
@@ -370,7 +372,7 @@ const init = async () =>
             },
             response: {
                 schema: Joi.object({
-                    id: Joi.string(),
+                    id: STRING_SCHEMA,
                 }),
             },
         },
@@ -1174,6 +1176,49 @@ const init = async () =>
             const organizations = await Organization.forUser(user);
 
             return organizations.map(organization => organization.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
+        path: "/users/{id}/stripe/portal",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    url: URL_SCHEMA,
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            if (!authenticatedUser.stripe_customer_id)
+            {
+                throw Boom.badImplementation();
+            }
+
+            const { url } = await Config.STRIPE.billingPortal
+                .sessions
+                .create({
+                    customer: authenticatedUser.stripe_customer_id,
+                })
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return { url };
         }
     });
 
