@@ -1456,7 +1456,26 @@ const init = async () =>
                 }
                 case "customer.subscription.updated":
                 {
-                    // TODO: Update cancel_at_period_end
+                    const subscription = event.data.object as Stripe.Subscription;
+
+                    await Database.pool
+                        .query(
+                            `
+                            update "subscriptions"
+                            set
+                                "cancel_at_period_end" = $1
+                            where
+                                "stripe_subscription_id" = $2
+                            `,
+                            [
+                                subscription.cancel_at_period_end,
+                                subscription.id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
 
                     break;
                 }
@@ -1490,7 +1509,8 @@ const init = async () =>
                                 "current_period_end" = $1,
                                 "cancel_at_period_end" = $2
                             where
-                                "stripe_subscription_id" = $3`,
+                                "stripe_subscription_id" = $3
+                            `,
                             [
                                 new Date(subscription.current_period_end * 1000).toISOString(), // Date accepts the value in milliseconds
                                 subscription.cancel_at_period_end,
