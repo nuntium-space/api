@@ -158,12 +158,34 @@ export class Publisher
         return Promise.all(result.rows.map(row => Publisher.deserialize(row)));
     }
 
-    public static async forOrganization(organization: Organization): Promise<Publisher[]>
+    public static async forOrganization(organization: Organization, options: {
+        not_in_bundle: string,
+    }): Promise<Publisher[]>
     {
-        const result = await Database.pool.query(
-            `select * from "publishers" where "organization" = $1`,
-            [ organization.id ],
-        );
+        let query = `select * from "publishers" where "organization" = $1`;
+        let params = [ organization.id ];
+
+        if (options.not_in_bundle)
+        {
+            query =
+            `
+            select *
+            from publishers
+            where
+                id not in
+                (
+                    select publisher
+                    from bundles_publishers
+                    where bundle = $1
+                )
+                and
+                organization = $2
+            `;
+
+            params = [ options.not_in_bundle, organization.id ];
+        }
+
+        const result = await Database.pool.query(query, params);
 
         return Promise.all(result.rows.map(Publisher.deserialize));
     }

@@ -668,6 +668,9 @@ const init = async () =>
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
                 }),
+                query: Joi.object({
+                    not_in_bundle: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE),
+                }),
             },
             response: {
                 schema: Joi.array().items(PUBLISHER_SCHEMA).required(),
@@ -684,7 +687,9 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            const publishers = await Publisher.forOrganization(organization);
+            const publishers = await Publisher.forOrganization(organization, {
+                not_in_bundle: request.query.not_in_bundle,
+            });
 
             return publishers.map(publisher => publisher.serialize());
         }
