@@ -243,6 +243,11 @@ export class Bundle
 
     public async addPublisher(publisher: Publisher): Promise<void>
     {
+        if (publisher.organization.id !== this.organization.id)
+        {
+            throw Boom.forbidden(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
+        }
+
         await Database.pool
             .query(
                 `insert into "bundles_publishers" ("bundle", "publisher") values ($1, $2)`,
