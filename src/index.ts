@@ -1450,7 +1450,17 @@ const init = async () =>
                 }
                 case "customer.subscription.deleted":
                 {
-                    // Delete subscription from db
+                    const subscription = event.data.object as Stripe.Subscription;
+
+                    await Database.pool
+                        .query(
+                            `delete from "subscriptions" where "stripe_subscription_id" = $1`,
+                            [ subscription.id ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
 
                     break;
                 }
