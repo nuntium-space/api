@@ -338,6 +338,29 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/bundles/{id}/publishers",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(PUBLISHER_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const bundle = await Bundle.retrieve(request.params.id);
+
+            const publishers = await Publisher.forBundle(bundle);
+
+            return publishers.map(publisher => publisher.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/bundles/{id}/stripe/checkout",
         options: {
             validate: {

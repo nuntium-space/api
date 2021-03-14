@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
+import { Bundle } from "./Bundle";
 import { ISerializedOrganization, Organization } from "./Organization";
 import { User } from "./User";
 
@@ -138,6 +139,23 @@ export class Publisher
             `delete from "publishers" where "id" = $1`,
             [ this.id ],
         );
+    }
+
+    public static async forBundle(bundle: Bundle): Promise<Publisher[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select b.*
+            from
+                bundles_publishers as bp
+                inner join
+                bundles as b
+                on bp.bundle = b.id
+            where bundle = $1`,
+            [ bundle.id ],
+        );
+
+        return Promise.all(result.rows.map(row => Publisher.deserialize(row)));
     }
 
     public static async forOrganization(organization: Organization): Promise<Publisher[]>
