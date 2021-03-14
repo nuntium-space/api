@@ -217,48 +217,23 @@ export class User
         );
     }
 
-    public async subscribeToBundle(bundle: Bundle): Promise<void>
+    public async isSubscribedToBundle(bundle: Bundle): Promise<boolean>
     {
-        if (!this._stripe_customer_id || !bundle.stripe_price_id)
-        {
-            throw Boom.badImplementation();
-        }
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        await client
+        const result = await Database.pool
             .query(
-                `insert into "users_bundles" ("user", "bundle") values ($1, $2)`,
+                `
+                select *
+                from
+                    "users_bundles"
+                where
+                    "user" = $1
+                    and
+                    "bundle" = $2
+                `,
                 [ this.id, bundle.id ],
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
+            );
 
-                throw Boom.badRequest(`Cannot subscribe user '${this.id}' to bundle '${bundle.id}'`);
-            });
-
-        await Config.STRIPE.subscriptions
-            .create({
-                customer: this._stripe_customer_id,
-                items: [
-                    {
-                        price: bundle.stripe_price_id,
-                    },
-                ],
-            })
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badRequest();
-            });
-
-        await client.query("commit");
-
-        client.release();
+        return result.rowCount > 0;
     }
 
     public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>

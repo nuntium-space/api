@@ -385,6 +385,11 @@ const init = async () =>
                 throw Boom.badImplementation();
             }
 
+            if (authenticatedUser.isSubscribedToBundle(bundle))
+            {
+                throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
+            }
+
             const session = await Config.STRIPE.checkout
                 .sessions
                 .create({
