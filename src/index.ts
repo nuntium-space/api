@@ -1403,6 +1403,65 @@ const init = async () =>
 
                     break;
                 }
+                case "invoice.paid":
+                {
+                    const invoice = event.data.object as Stripe.Invoice;
+
+                    if (typeof invoice.subscription !== "string")
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    const subscription = await Config.STRIPE.subscriptions
+                        .retrieve(invoice.subscription)
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
+                    await Database.pool
+                        .query(
+                            `
+                            update "subscriptions"
+                            set
+                                "current_period_end" = $1,
+                                "cancel_at_period_end" = $2
+                            where
+                                "stripe_subscription_id" = $3`,
+                            [
+                                subscription.current_period_end,
+                                subscription.cancel_at_period_end,
+                                subscription.id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
+                    break;
+                }
+                case "invoice.payment_failed":
+                {
+                    const invoice = event.data.object as Stripe.Invoice;
+
+                    if (!invoice.subscription)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    await Database.pool
+                        .query(
+                            `delete from "subscriptions" where "stripe_subscription_id" = $1`,
+                            [ invoice.subscription ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
+                    break;
+                }
                 case "price.created":
                 {
                     const price = event.data.object as Stripe.Price;
