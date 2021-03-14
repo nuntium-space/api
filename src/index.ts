@@ -385,7 +385,7 @@ const init = async () =>
                 throw Boom.badImplementation();
             }
 
-            if (authenticatedUser.isSubscribedToBundle(bundle))
+            if (await authenticatedUser.isSubscribedToBundle(bundle))
             {
                 throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
             }
