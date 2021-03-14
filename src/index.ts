@@ -1363,8 +1363,6 @@ const init = async () =>
                         throw Boom.badImplementation();
                     }
 
-                    console.log(checkoutSession.metadata);
-
                     await Database.pool
                         .query(
                             `insert into "users_bundles" ("user", "bundle") values ($1, $2)`,
