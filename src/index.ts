@@ -1451,7 +1451,9 @@ const init = async () =>
                 }
                 case "customer.subscription.deleted":
                 {
-                    const subscription = await Subscription.retrieveWithSubscriptionId((event.data.object as Stripe.Subscription).id);
+                    const object = (event.data.object as Stripe.Subscription);
+
+                    const subscription = await Subscription.retrieveWithSubscriptionId(object.id);
 
                     await subscription.delete();
 
@@ -1459,26 +1461,13 @@ const init = async () =>
                 }
                 case "customer.subscription.updated":
                 {
-                    const subscription = event.data.object as Stripe.Subscription;
+                    const object = (event.data.object as Stripe.Subscription);
 
-                    await Database.pool
-                        .query(
-                            `
-                            update "subscriptions"
-                            set
-                                "cancel_at_period_end" = $1
-                            where
-                                "stripe_subscription_id" = $2
-                            `,
-                            [
-                                subscription.cancel_at_period_end,
-                                subscription.id,
-                            ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
+                    const subscription = await Subscription.retrieveWithSubscriptionId(object.id);
+
+                    await subscription.update({
+                        cancel_at_period_end: object.cancel_at_period_end,
+                    });
 
                     break;
                 }
