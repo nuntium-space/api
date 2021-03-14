@@ -145,13 +145,14 @@ export class Publisher
     {
         const result = await Database.pool.query(
             `
-            select b.*
+            select p.*
             from
                 bundles_publishers as bp
                 inner join
-                bundles as b
-                on bp.bundle = b.id
-            where bundle = $1`,
+                publishers as p
+                on bp.publisher = p.id
+            where bp.bundle = $1
+            `,
             [ bundle.id ],
         );
 

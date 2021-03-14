@@ -294,7 +294,7 @@ export class Bundle
                 inner join
                 bundles as b
                 on bp.bundle = b.id
-            where publisher = $1`,
+            where bp.publisher = $1`,
             [ publisher.id ],
         );
 
