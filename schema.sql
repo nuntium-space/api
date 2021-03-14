@@ -174,7 +174,7 @@ create table "bundles_publishers"
     foreign key ("publisher") references "publishers" on update cascade on delete cascade
 );
 
-create table "users_bundles"
+create table "subscriptions"
 (
     "user" id not null,
     "bundle" id not null,

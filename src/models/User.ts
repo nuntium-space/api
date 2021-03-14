@@ -224,7 +224,7 @@ export class User
                 `
                 select *
                 from
-                    "users_bundles"
+                    "subscriptions"
                 where
                     "user" = $1
                     and
@@ -251,7 +251,7 @@ export class User
                 `
                 select *
                 from
-                    users_bundles
+                    subscriptions
                     natural join
                     bundles_publishers
                 where

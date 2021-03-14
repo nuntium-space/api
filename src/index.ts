@@ -1370,7 +1370,7 @@ const init = async () =>
 
                     await Database.pool
                         .query(
-                            `insert into "users_bundles" ("user", "bundle", "stripe_subscription_id") values ($1, $2, $3)`,
+                            `insert into "subscriptions" ("user", "bundle", "stripe_subscription_id") values ($1, $2, $3)`,
                             [
                                 checkoutSession.metadata.user_id,
                                 checkoutSession.metadata.bundle_id,
