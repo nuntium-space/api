@@ -399,6 +399,10 @@ const init = async () =>
                     ],
                     success_url: "https://example.com/success",
                     cancel_url: "https://example.com/cancel",
+                    metadata: {
+                        user_id: authenticatedUser.id,
+                        bundle_id: bundle.id,
+                    },
                 })
                 .catch(() =>
                 {
@@ -1350,6 +1354,32 @@ const init = async () =>
 
             switch (event.type)
             {
+                case "checkout.session.completed":
+                {
+                    const checkoutSession = event.data.object as Stripe.Checkout.Session;
+
+                    if (!checkoutSession.metadata)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    console.log(checkoutSession.metadata);
+
+                    await Database.pool
+                        .query(
+                            `insert into "users_bundles" ("user", "bundle") values ($1, $2)`,
+                            [
+                                checkoutSession.metadata.user_id,
+                                checkoutSession.metadata.bundle_id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
+                    break;
+                }
                 case "customer.created":
                 {
                     const customer = event.data.object as Stripe.Customer;
@@ -1364,7 +1394,7 @@ const init = async () =>
                         )
                         .catch(() =>
                         {
-                            throw Boom.badRequest();
+                            throw Boom.badImplementation();
                         });
 
                     break;
@@ -1383,7 +1413,7 @@ const init = async () =>
                         )
                         .catch(() =>
                         {
-                            throw Boom.badRequest();
+                            throw Boom.badImplementation();
                         });
 
                     break;
@@ -1402,7 +1432,7 @@ const init = async () =>
                         )
                         .catch(() =>
                         {
-                            throw Boom.badRequest();
+                            throw Boom.badImplementation();
                         });
 
                     break;
