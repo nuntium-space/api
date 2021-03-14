@@ -1491,7 +1491,16 @@ const init = async () =>
                 }
                 case "customer.updated":
                 {
-                    // TODO: Update email
+                    const customer = event.data.object as Stripe.Customer;
+
+                    if (!customer.email)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    const user = await User.retrieveWithCustomerId(customer.id);
+
+                    await user.update({ email: customer.email });
 
                     break;
                 }

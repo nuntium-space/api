@@ -165,6 +165,21 @@ export class User
         return User.deserialize(result.rows[0]);
     }
 
+    public static async retrieveWithCustomerId(customerId: string): Promise<User>
+    {
+        const result = await Database.pool.query(
+            `select * from "users" where "stripe_customer_id" = $1`,
+            [ customerId ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            throw Boom.notFound();
+        }
+
+        return User.deserialize(result.rows[0]);
+    }
+
     public async update(data: IUpdateUser): Promise<void>
     {
         this._first_name = data.first_name ?? this.first_name;
