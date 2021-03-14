@@ -1448,6 +1448,24 @@ const init = async () =>
 
                     break;
                 }
+                case "customer.subscription.deleted":
+                {
+                    // Delete subscription from db
+
+                    break;
+                }
+                case "customer.subscription.updated":
+                {
+                    // TODO: Update cancel_at_period_end
+
+                    break;
+                }
+                case "customer.updated":
+                {
+                    // TODO: Update email
+
+                    break;
+                }
                 case "invoice.paid":
                 {
                     const invoice = event.data.object as Stripe.Invoice;
