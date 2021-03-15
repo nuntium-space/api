@@ -1141,7 +1141,9 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            // TODO
+            const articles = await Article.forFeed(authenticatedUser, request.query.expand);
+
+            return articles.map(article => article.serialize({ preview: true }));
         }
     });
 

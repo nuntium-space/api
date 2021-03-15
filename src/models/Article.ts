@@ -6,6 +6,7 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author, ISerializedAuthor } from "./Author";
 import { Publisher } from "./Publisher";
+import { User } from "./User";
 
 interface IDatabaseArticle
 {
@@ -160,6 +161,31 @@ export class Article
             `delete from "articles" where "id" = $1`,
             [ this.id ],
         );
+    }
+
+    public static async forFeed(user: User, expand?: string[]): Promise<Article[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select distinct art.*
+            from
+                subscriptions as s
+                inner join
+                bundles_publishers as bp
+                on s.bundle = bp.bundle
+                inner join
+                authors as aut
+                on aut.publisher = bp.publisher
+                inner join
+                articles as art
+                on art.author = aut.id
+            where
+                s.user = $1
+            `,
+            [ user.id ],
+        );
+
+        return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Article[]>
