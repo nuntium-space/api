@@ -1107,16 +1107,14 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const user = await User.retrieve(request.params.id);
-
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (user.id !== authenticatedUser.id)
+            if (request.params.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
 
-            return user.serialize();
+            return authenticatedUser.serialize();
         }
     });
 
@@ -1135,16 +1133,14 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const user = await User.retrieve(request.params.id);
-
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (user.id !== authenticatedUser.id)
+            if (request.params.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
 
-            const publishers = await Publisher.forUser(user);
+            const publishers = await Publisher.forUser(authenticatedUser);
 
             return publishers.map(publisher => publisher.serialize());
         }
@@ -1165,16 +1161,14 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const user = await User.retrieve(request.params.id);
-
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (user.id !== authenticatedUser.id)
+            if (request.params.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
 
-            const organizations = await Organization.forUser(user);
+            const organizations = await Organization.forUser(authenticatedUser);
 
             return organizations.map(organization => organization.serialize());
         }
