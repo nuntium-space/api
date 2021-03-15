@@ -1447,21 +1447,13 @@ const init = async () =>
 
                     const subscription = await Config.STRIPE.subscriptions.retrieve(checkoutSession.subscription);
 
-                    await Database.pool
-                        .query(
-                            `insert into "subscriptions" ("user", "bundle", "current_period_end", "cancel_at_period_end", "stripe_subscription_id") values ($1, $2, $3, $4, $5)`,
-                            [
-                                checkoutSession.metadata.user_id,
-                                checkoutSession.metadata.bundle_id,
-                                new Date(subscription.current_period_end * 1000).toISOString(), // Date accepts the value in milliseconds
-                                subscription.cancel_at_period_end,
-                                subscription.id,
-                            ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
+                    await Subscription.create({
+                        user: checkoutSession.metadata.user_id,
+                        bundle: checkoutSession.metadata.bundle_id,
+                        current_period_end: subscription.current_period_end,
+                        cancel_at_period_end: subscription.cancel_at_period_end,
+                        stripe_subscription_id: subscription.id,
+                    });
 
                     break;
                 }

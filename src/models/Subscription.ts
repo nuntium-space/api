@@ -13,6 +13,15 @@ interface IDatabaseSubscription
     stripe_subscription_id: string,
 }
 
+export interface ICreateSubscription
+{
+    user: string,
+    bundle: string,
+    current_period_end: number,
+    cancel_at_period_end: boolean,
+    stripe_subscription_id: string,
+}
+
 export interface IUpdateSubscription
 {
     cancel_at_period_end?: boolean,
@@ -61,6 +70,33 @@ export class Subscription
     public get stripe_subscription_id(): string
     {
         return this._stripe_subscription_id;
+    }
+
+    public static async create(data: ICreateSubscription): Promise<Subscription>
+    {
+        const result = await Database.pool
+            .query(
+                `
+                insert into "subscriptions"
+                    ("user", "bundle", "current_period_end", "cancel_at_period_end", "stripe_subscription_id")
+                values
+                    ($1, $2, $3, $4, $5)
+                returning *
+                `,
+                [
+                    data.user,
+                    data.bundle,
+                    new Date(data.current_period_end * 1000).toISOString(), // Date accepts the value in milliseconds
+                    data.cancel_at_period_end,
+                    data.stripe_subscription_id,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
+
+        return Subscription.deserialize(result.rows[0]);
     }
 
     public static async retrieveWithSubscriptionId(subscriptionId: string): Promise<Subscription>
