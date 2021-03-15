@@ -101,6 +101,16 @@ export class Subscription
         );
     }
 
+    public static async forUser(user: User, expand?: string[]): Promise<Subscription[]>
+    {
+        const result = await Database.pool.query(
+            `select * from "subscriptions" where "user" = $1`,
+            [ user.id ],
+        );
+
+        return Promise.all(result.rows.map(row => Subscription.deserialize(row, expand)));
+    }
+
     public serialize(): ISerializedSubscription
     {
         return {

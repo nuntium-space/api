@@ -1224,6 +1224,37 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/users/{id}/subscriptions",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(SUBSCRIPTION_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const subscriptions = await Subscription.forUser(authenticatedUser, request.query.expand);
+
+            return subscriptions.map(subscription => subscription.serialize());
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/users",
         options: {
