@@ -1522,33 +1522,16 @@ const init = async () =>
                         throw Boom.badImplementation();
                     }
 
-                    const subscription = await Config.STRIPE.subscriptions
+                    const { current_period_end, cancel_at_period_end } = await Config.STRIPE.subscriptions
                         .retrieve(invoice.subscription)
                         .catch(() =>
                         {
                             throw Boom.badImplementation();
                         });
 
-                    await Database.pool
-                        .query(
-                            `
-                            update "subscriptions"
-                            set
-                                "current_period_end" = $1,
-                                "cancel_at_period_end" = $2
-                            where
-                                "stripe_subscription_id" = $3
-                            `,
-                            [
-                                new Date(subscription.current_period_end * 1000).toISOString(), // Date accepts the value in milliseconds
-                                subscription.cancel_at_period_end,
-                                subscription.id,
-                            ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
+                    const subscription = await Subscription.retrieveWithSubscriptionId(invoice.subscription);
+
+                    await subscription.update({ current_period_end, cancel_at_period_end });
 
                     break;
                 }

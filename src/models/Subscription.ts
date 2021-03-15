@@ -24,6 +24,7 @@ export interface ICreateSubscription
 
 export interface IUpdateSubscription
 {
+    current_period_end?: number,
     cancel_at_period_end?: boolean,
 }
 
@@ -41,7 +42,7 @@ export class Subscription
     (
         private readonly _user: User | INotExpandedResource,
         private readonly _bundle: Bundle | INotExpandedResource,
-        private readonly _current_period_end: Date,
+        private _current_period_end: Date,
         private _cancel_at_period_end: boolean,
         private readonly _stripe_subscription_id: string,
     )
@@ -116,12 +117,26 @@ export class Subscription
 
     public async update(data: IUpdateSubscription): Promise<void>
     {
+        this._current_period_end = data.current_period_end
+            ? new Date(data.current_period_end * 1000)
+            : this.current_period_end;
         this._cancel_at_period_end = data.cancel_at_period_end ?? this.cancel_at_period_end;
 
         await Database.pool
             .query(
-                `update "subscriptions" set "cancel_at_period_end" = $1 where "stripe_subscription_id" = $2`,
-                [ this.cancel_at_period_end, this.stripe_subscription_id ],
+                `
+                update "subscriptions"
+                set
+                    "current_period_end" = $1,
+                    "cancel_at_period_end" = $2
+                where
+                    "stripe_subscription_id" = $3
+                `,
+                [
+                    this.current_period_end,
+                    this.cancel_at_period_end,
+                    this.stripe_subscription_id,
+                ],
             )
             .catch(() =>
             {
