@@ -1453,7 +1453,7 @@ const init = async () =>
                             [
                                 checkoutSession.metadata.user_id,
                                 checkoutSession.metadata.bundle_id,
-                                subscription.current_period_end,
+                                new Date(subscription.current_period_end * 1000).toISOString(), // Date accepts the value in milliseconds
                                 subscription.cancel_at_period_end,
                                 subscription.id,
                             ],
