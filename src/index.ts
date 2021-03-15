@@ -1121,6 +1121,32 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/users/{id}/feed",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            // TODO
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/users/{id}/publishers",
         options: {
             validate: {
