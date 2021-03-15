@@ -1440,13 +1440,22 @@ const init = async () =>
                         throw Boom.badImplementation();
                     }
 
+                    if (typeof checkoutSession.subscription !== "string")
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    const subscription = await Config.STRIPE.subscriptions.retrieve(checkoutSession.subscription);
+
                     await Database.pool
                         .query(
-                            `insert into "subscriptions" ("user", "bundle", "stripe_subscription_id") values ($1, $2, $3)`,
+                            `insert into "subscriptions" ("user", "bundle", "current_period_end", "cancel_at_period_end", "stripe_subscription_id") values ($1, $2, $3, $4, $5)`,
                             [
                                 checkoutSession.metadata.user_id,
                                 checkoutSession.metadata.bundle_id,
-                                checkoutSession.subscription,
+                                subscription.current_period_end,
+                                subscription.cancel_at_period_end,
+                                subscription.id,
                             ],
                         )
                         .catch(() =>
