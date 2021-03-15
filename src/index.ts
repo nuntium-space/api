@@ -737,6 +737,7 @@ const init = async () =>
             const { url } = await Config.STRIPE.accounts
                 .create({
                     type: "express",
+                    email: authenticatedUser.email,
                 })
                 .then(account =>
                 {
