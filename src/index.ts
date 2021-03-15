@@ -1128,6 +1128,8 @@ const init = async () =>
                     id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
                 }),
                 query: Joi.object({
+                    limit: Joi.number().integer().min(0).max(30).required(),
+                    offset: Joi.number().integer().min(0).required(),
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
             },
@@ -1144,7 +1146,11 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            const articles = await Article.forFeed(authenticatedUser, request.query.expand);
+            const articles = await Article.forFeed(authenticatedUser, {
+                limit: request.query.limit,
+                offset: request.query.offset,
+                expand: request.query.expand,
+            });
 
             return articles.map(article => article.serialize({ preview: true }));
         }

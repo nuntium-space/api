@@ -163,7 +163,11 @@ export class Article
         );
     }
 
-    public static async forFeed(user: User, expand?: string[]): Promise<Article[]>
+    public static async forFeed(user: User, options: {
+        limit: number,
+        offset: number,
+        expand?: string[],
+    }): Promise<Article[]>
     {
         const result = await Database.pool.query(
             `
@@ -181,11 +185,17 @@ export class Article
                 on art.author = aut.id
             where
                 s.user = $1
+            limit $2
+            offset $3
             `,
-            [ user.id ],
+            [
+                user.id,
+                options.limit,
+                options.offset,
+            ],
         );
 
-        return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
+        return Promise.all(result.rows.map(row => Article.deserialize(row, options.expand)));
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Article[]>
