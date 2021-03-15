@@ -151,6 +151,26 @@ export const BUNDLE_SCHEMA = Joi
         price: MONEY_SCHEMA.required(),
     });
 
+export const SUBSCRIPTION_SCHEMA = Joi
+    .object({
+        user: Joi
+            .alternatives()
+            .try(
+                USER_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+            )
+            .required(),
+        bundle: Joi
+            .alternatives()
+            .try(
+                BUNDLE_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.BUNDLE),
+            )
+            .required(),
+        current_period_end: DATETIME_SCHEMA.required(),
+        cancel_at_period_end: Joi.boolean().required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
