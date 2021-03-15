@@ -709,6 +709,55 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/organizations/{id}/stripe/connect",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    url: URL_SCHEMA,
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const { url } = await Config.STRIPE.accounts
+                .create({
+                    type: "express",
+                })
+                .then(account =>
+                {
+                    return Config.STRIPE.accountLinks
+                        .create({
+                            account: account.id,
+                            type: "account_onboarding",
+                            refresh_url: "https://example.com/refresh",
+                            return_url: "https://example.com/return",
+                        });
+                })
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return { url };
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/organizations",
         options: {
