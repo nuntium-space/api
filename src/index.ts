@@ -392,7 +392,6 @@ const init = async () =>
                 !authenticatedUser.stripe_customer_id
                 || !bundle.stripe_price_id
                 || !(bundle.organization instanceof Organization)
-                || !bundle.organization.stripe_account_id
             )
             {
                 throw Boom.badImplementation();
