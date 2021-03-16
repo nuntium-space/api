@@ -418,8 +418,8 @@ const init = async () =>
                         subscription_data: {
                             application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
                         },
-                        success_url: "https://example.com/success",
-                        cancel_url: "https://example.com/cancel",
+                        success_url: Config.CLIENT_HOST,
+                        cancel_url: Config.CLIENT_HOST,
                         metadata: {
                             user_id: authenticatedUser.id,
                             bundle_id: bundle.id,
@@ -754,8 +754,8 @@ const init = async () =>
                 .create({
                     account: organization.stripe_account_id,
                     type: "account_onboarding",
-                    refresh_url: "https://example.com/refresh",
-                    return_url: "https://example.com/return",
+                    refresh_url: `${Config.API_HOST}/organizations/${organization.id}`,
+                    return_url: `${Config.CLIENT_HOST}/organization/${organization.id}`,
                 })
                 .catch(() =>
                 {

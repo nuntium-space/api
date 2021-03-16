@@ -24,4 +24,12 @@ export class Config
     public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
+
+    public static readonly CLIENT_HOST = process.env.ENVIRONMENT === "production"
+        ? "https://example.com"
+        : "http://localhost:4200"
+
+    public static readonly API_HOST = process.env.ENVIRONMENT === "production"
+        ? "https://api.example.com"
+        : "http://localhost:4000"
 }
