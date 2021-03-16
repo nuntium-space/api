@@ -59,6 +59,7 @@ export const ORGANIZATION_SCHEMA = Joi
         id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
         name: STRING_SCHEMA.max(50).required(),
         owner: USER_SCHEMA.required(),
+        stripe_account_enabled: Joi.boolean().required(),
     });
 
 export const PUBLISHER_SCHEMA = Joi
