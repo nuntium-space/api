@@ -9,7 +9,7 @@ interface IDatabaseOrganization
     id: string,
     name: string,
     user: string,
-    stripe_account_id: string | null,
+    stripe_account_id: string,
 }
 
 interface ICreateOrganization
@@ -36,7 +36,7 @@ export class Organization
         private readonly _id: string,
         private _name: string,
         private  _owner: User,
-        private readonly _stripe_account_id: string | null,
+        private readonly _stripe_account_id: string,
     )
     {}
 
@@ -55,26 +55,37 @@ export class Organization
         return this._owner;
     }
 
-    public get stripe_account_id(): string | null
+    public get stripe_account_id(): string
     {
         return this._stripe_account_id;
     }
 
     public static async create(data: ICreateOrganization, user: User): Promise<Organization>
     {
+        const account = await Config.STRIPE.accounts
+            .create({
+                type: "express",
+                email: user.email,
+            })
+            .catch(() =>
+            {
+                throw Boom.badImplementation();
+            });
+
         const result = await Database.pool
             .query(
                 `
                 insert into "organizations"
-                    ("id", "name", "user")
+                    ("id", "name", "user", "stripe_account_id")
                 values
-                    ($1, $2, $3)
+                    ($1, $2, $3, $4)
                 returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.ORGANIZATION),
                     data.name,
                     user.id,
+                    account.id,
                 ],
             )
             .catch(() =>
