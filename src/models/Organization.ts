@@ -9,6 +9,7 @@ interface IDatabaseOrganization
     id: string,
     name: string,
     user: string,
+    stripe_account_id: string | null,
 }
 
 interface ICreateOrganization
@@ -35,6 +36,7 @@ export class Organization
         private readonly _id: string,
         private _name: string,
         private  _owner: User,
+        private readonly _stripe_account_id: string | null,
     )
     {}
 
@@ -51,6 +53,11 @@ export class Organization
     public get owner(): User
     {
         return this._owner;
+    }
+
+    public get stripe_account_id(): string | null
+    {
+        return this._stripe_account_id;
     }
 
     public static async create(data: ICreateOrganization, user: User): Promise<Organization>
@@ -152,6 +159,7 @@ export class Organization
             data.id,
             data.name,
             owner,
+            data.stripe_account_id,
         );
     }
 }

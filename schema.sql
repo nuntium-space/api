@@ -48,6 +48,7 @@ create table "organizations"
     "id" id not null,
     "name" varchar(50) not null,
     "user" id not null,
+    "stripe_account_id" text,
 
     primary key ("id"),
 

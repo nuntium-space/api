@@ -380,11 +380,20 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
+            const bundle = await Bundle.retrieve(request.params.id, [
+                ...request.query.expand,
+                "organization",
+            ]);
 
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (!authenticatedUser.stripe_customer_id || !bundle.stripe_price_id)
+            if
+            (
+                !authenticatedUser.stripe_customer_id
+                || !bundle.stripe_price_id
+                || !(bundle.organization instanceof Organization)
+                || !bundle.organization.stripe_account_id
+            )
             {
                 throw Boom.badImplementation();
             }
@@ -396,26 +405,31 @@ const init = async () =>
 
             const session = await Config.STRIPE.checkout
                 .sessions
-                .create({
-                    mode: "subscription",
-                    payment_method_types: [ "card" ],
-                    customer: authenticatedUser.stripe_customer_id,
-                    line_items: [
-                        {
-                            price: bundle.stripe_price_id,
-                            quantity: 1,
+                .create(
+                    {
+                        mode: "subscription",
+                        payment_method_types: [ "card" ],
+                        customer: authenticatedUser.stripe_customer_id,
+                        line_items: [
+                            {
+                                price: bundle.stripe_price_id,
+                                quantity: 1,
+                            },
+                        ],
+                        subscription_data: {
+                            application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
                         },
-                    ],
-                    subscription_data: {
-                        application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
+                        success_url: "https://example.com/success",
+                        cancel_url: "https://example.com/cancel",
+                        metadata: {
+                            user_id: authenticatedUser.id,
+                            bundle_id: bundle.id,
+                        },
                     },
-                    success_url: "https://example.com/success",
-                    cancel_url: "https://example.com/cancel",
-                    metadata: {
-                        user_id: authenticatedUser.id,
-                        bundle_id: bundle.id,
+                    {
+                        stripeAccount: bundle.organization.stripe_account_id,
                     },
-                })
+                )
                 .catch(() =>
                 {
                     throw Boom.badImplementation();
