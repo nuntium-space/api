@@ -767,6 +767,43 @@ const init = async () =>
     });
 
     server.route({
+        method: "GET",
+        path: "/organizations/{id}/stripe/dashboard",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    url: URL_SCHEMA,
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const organization = await Organization.retrieve(request.params.id);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (organization.owner.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const { url } = await Config.STRIPE.accounts
+                .createLoginLink(organization.stripe_account_id)
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return { url };
+        }
+    });
+
+    server.route({
         method: "POST",
         path: "/organizations",
         options: {
