@@ -750,20 +750,12 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            const { url } = await Config.STRIPE.accounts
+            const { url } = await Config.STRIPE.accountLinks
                 .create({
-                    type: "express",
-                    email: authenticatedUser.email,
-                })
-                .then(account =>
-                {
-                    return Config.STRIPE.accountLinks
-                        .create({
-                            account: account.id,
-                            type: "account_onboarding",
-                            refresh_url: "https://example.com/refresh",
-                            return_url: "https://example.com/return",
-                        });
+                    account: organization.stripe_account_id,
+                    type: "account_onboarding",
+                    refresh_url: "https://example.com/refresh",
+                    return_url: "https://example.com/return",
                 })
                 .catch(() =>
                 {
