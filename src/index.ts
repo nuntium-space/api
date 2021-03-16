@@ -406,6 +406,9 @@ const init = async () =>
                             quantity: 1,
                         },
                     ],
+                    subscription_data: {
+                        application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
+                    },
                     success_url: "https://example.com/success",
                     cancel_url: "https://example.com/cancel",
                     metadata: {
