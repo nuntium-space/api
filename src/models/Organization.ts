@@ -10,6 +10,7 @@ interface IDatabaseOrganization
     name: string,
     user: string,
     stripe_account_id: string,
+    stripe_account_enabled: boolean,
 }
 
 interface ICreateOrganization
@@ -20,6 +21,7 @@ interface ICreateOrganization
 interface IUpdateOrganization
 {
     name?: string,
+    stripe_account_enabled?: boolean,
 }
 
 export interface ISerializedOrganization
@@ -27,6 +29,7 @@ export interface ISerializedOrganization
     id: string,
     name: string,
     owner: ISerializedUser,
+    stripe_account_enabled: boolean,
 }
 
 export class Organization
@@ -37,6 +40,7 @@ export class Organization
         private _name: string,
         private  _owner: User,
         private readonly _stripe_account_id: string,
+        private _stripe_account_enabled: boolean,
     )
     {}
 
@@ -60,12 +64,22 @@ export class Organization
         return this._stripe_account_id;
     }
 
+    public get stripe_account_enabled(): boolean
+    {
+        return this._stripe_account_enabled;
+    }
+
     public static async create(data: ICreateOrganization, user: User): Promise<Organization>
     {
+        const id = Utilities.id(Config.ID_PREFIXES.ORGANIZATION);
+
         const account = await Config.STRIPE.accounts
             .create({
                 type: "express",
                 email: user.email,
+                metadata: {
+                    organization_id: id,
+                }
             })
             .catch(() =>
             {
@@ -82,7 +96,7 @@ export class Organization
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.ORGANIZATION),
+                    id,
                     data.name,
                     user.id,
                     account.id,
@@ -114,18 +128,21 @@ export class Organization
     public async update(data: IUpdateOrganization): Promise<void>
     {
         this._name = data.name ?? this.name;
+        this._stripe_account_enabled = data.stripe_account_enabled ?? this.stripe_account_enabled;
 
         await Database.pool
             .query(
                 `
                 update "organizations"
                 set
-                    "name" = $1
+                    "name" = $1,
+                    "stripe_account_enabled" = $2
                 where
-                    "id" = $2
+                    "id" = $3
                 `,
                 [
                     this.name,
+                    this.stripe_account_enabled,
                     this.id,
                 ],
             )
@@ -159,6 +176,7 @@ export class Organization
             id: this.id,
             name: this.name,
             owner: this.owner.serialize(),
+            stripe_account_enabled: this.stripe_account_enabled,
         };
     }
 
@@ -171,6 +189,7 @@ export class Organization
             data.name,
             owner,
             data.stripe_account_id,
+            data.stripe_account_enabled,
         );
     }
 }

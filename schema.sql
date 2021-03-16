@@ -49,6 +49,7 @@ create table "organizations"
     "name" varchar(50) not null,
     "user" id not null,
     "stripe_account_id" text not null,
+    "stripe_account_enabled" boolean not null default false,
 
     primary key ("id"),
 

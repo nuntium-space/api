@@ -1526,6 +1526,23 @@ const init = async () =>
 
             switch (event.type)
             {
+                case "account.updated":
+                {
+                    const account = event.data.object as Stripe.Account;
+
+                    if (!account.metadata)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    const organization = await Organization.retrieve(account.metadata.organization_id);
+
+                    await organization.update({
+                        stripe_account_enabled: account.charges_enabled,
+                    });
+
+                    break;
+                }
                 case "checkout.session.completed":
                 {
                     const checkoutSession = event.data.object as Stripe.Checkout.Session;
