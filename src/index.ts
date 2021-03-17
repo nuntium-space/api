@@ -1309,6 +1309,38 @@ const init = async () =>
 
     server.route({
         method: "GET",
+        path: "/users/{id}/search",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+                query: Joi.object({
+                    query: STRING_SCHEMA.required(),
+                    limit: Joi.number().integer().min(0).max(30).required(),
+                    offset: Joi.number().integer().min(0).required(),
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                // schema: TODO
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            // TODO
+        }
+    });
+
+    server.route({
+        method: "GET",
         path: "/users/{id}/stripe/portal",
         options: {
             validate: {
