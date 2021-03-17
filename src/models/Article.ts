@@ -217,10 +217,28 @@ export class Article
 
     public async delete(): Promise<void>
     {
-        await Database.pool.query(
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client.query(
             `delete from "articles" where "id" = $1`,
             [ this.id ],
         );
+
+        await Config.ELASTICSEARCH
+            .delete({
+                index: "articles",
+                id: this.id,
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
     }
 
     public static async forFeed(user: User, options: {
