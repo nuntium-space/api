@@ -1335,7 +1335,19 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            // TODO
+            const result = await Config.ELASTICSEARCH.search({
+                index: "articles",
+                body: {
+                    query: {
+                        multi_match: {
+                            query: request.query.query,
+                            fields: [ "title", "content" ],
+                        },
+                    },
+                },
+            });
+
+            return result;
         }
     });
 
