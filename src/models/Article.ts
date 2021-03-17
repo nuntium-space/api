@@ -151,6 +151,16 @@ export class Article
         return Article.deserialize(result.rows[0], expand);
     }
 
+    public static async retrieveMultiple(ids: string[], expand?: string[]): Promise<Article[]>
+    {
+        const result = await Database.pool.query(
+            `select * from "articles" where "id" = any ($1)`,
+            [ ids ],
+        );
+
+        return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
+    }
+
     public async update(data: IUpdateArticle): Promise<void>
     {
         this._title = data.title ?? this.title;

@@ -1326,7 +1326,7 @@ const init = async () =>
                 }),
             },
             response: {
-                // schema: TODO
+                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
@@ -1340,6 +1340,8 @@ const init = async () =>
 
             const result = await Config.ELASTICSEARCH.search({
                 index: "articles",
+                size: request.query.limit,
+                from: request.query.offset,
                 body: {
                     query: {
                         multi_match: {
@@ -1350,7 +1352,11 @@ const init = async () =>
                 },
             });
 
-            return result;
+            const ids = result.body.hits.hits.map((hit: any) => hit._id);
+
+            const articles = await Article.retrieveMultiple(ids, request.query.expand);
+
+            return articles.map(article => article.serialize({ preview: true }));
         }
     });
 
