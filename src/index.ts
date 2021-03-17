@@ -1349,6 +1349,7 @@ const init = async () =>
                             fields: [ "title", "content" ],
                         },
                     },
+                    stored_fields: [],
                 },
             });
 
