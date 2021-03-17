@@ -1,3 +1,4 @@
+import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
 import Stripe from "stripe";
 
 export class Config
@@ -27,9 +28,13 @@ export class Config
 
     public static readonly API_HOST = process.env.ENVIRONMENT === "production"
         ? "https://api.example.com"
-        : "http://localhost:4000"
+        : "http://localhost:4000";
 
     public static readonly CLIENT_HOST = process.env.ENVIRONMENT === "production"
         ? "https://example.com"
-        : "http://localhost:4200"
+        : "http://localhost:4200";
+
+    public static readonly ELASTICSEARCH = new ElasticSearchClient({
+        node: "http://localhost:9200",
+    });
 }
