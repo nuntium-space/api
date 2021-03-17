@@ -197,7 +197,7 @@ export class Article
                 index: "articles",
                 id: this.id,
                 body: {
-                    script: {
+                    doc: {
                         title: this.title,
                         content: this.content,
                     },
