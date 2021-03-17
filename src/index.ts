@@ -285,6 +285,41 @@ const init = async () =>
     });
 
     server.route({
+        method: "POST",
+        path: "/authors/{id}/articles",
+        options: {
+            validate: {
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+                payload: ARTICLE_CREATE_SCHEMA,
+            },
+            response: {
+                schema: ARTICLE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            const author = await Author.retrieve(request.params.id);
+
+            if (author.user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const article = await Article.create(
+                request.payload as any,
+                author,
+                request.query.expand,
+            );
+
+            return article.serialize();
+        }
+    });
+
+    server.route({
         method: "DELETE",
         path: "/authors/{id}",
         options: {
@@ -1055,38 +1090,6 @@ const init = async () =>
             const bundles = await Bundle.forPublisher(publisher, request.query.expand);
 
             return bundles.map(bundle => bundle.serialize());
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/publishers/{id}/articles",
-        options: {
-            validate: {
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-                payload: ARTICLE_CREATE_SCHEMA,
-            },
-            response: {
-                schema: ARTICLE_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const publisher = await Publisher.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            const author = await Author.retrieveWithUserAndPublisher(authenticatedUser, publisher);
-
-            const article = await Article.create(
-                request.payload as any,
-                author,
-                request.query.expand,
-            );
-
-            return article.serialize();
         }
     });
 

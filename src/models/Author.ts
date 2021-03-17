@@ -93,21 +93,6 @@ export class Author
         return Author.deserialize(result.rows[0], expand);
     }
 
-    public static async retrieveWithUserAndPublisher(user: User, publisher: Publisher, expand?: string[]): Promise<Author>
-    {
-        const result = await Database.pool.query(
-            `select * from "authors" where "user" = $1 and "publisher" = $2`,
-            [ user.id, publisher.id ],
-        );
-
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
-
-        return Author.deserialize(result.rows[0], expand);
-    }
-
     public async delete(): Promise<void>
     {
         await Database.pool.query(
