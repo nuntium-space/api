@@ -86,7 +86,13 @@ export class Article
 
     public static async create(data: ICreateArticle, author: Author, expand?: string[]): Promise<Article>
     {
-        const result = await Database.pool
+        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE);
+
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        const result = await client
             .query(
                 `
                 insert into "articles"
@@ -96,16 +102,36 @@ export class Article
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.ARTICLE),
+                    id,
                     data.title,
                     data.content,
                     author.id,
                 ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
+
+        await Config.ELASTICSEARCH
+            .index({
+                index: "articles",
+                id,
+                body: {
+                    title: data.title,
+                    content: data.content,
+                },
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
 
         return Article.deserialize(result.rows[0], expand);
     }
