@@ -166,7 +166,11 @@ export class Article
         this._title = data.title ?? this.title;
         this._content = data.content ?? this.content;
 
-        const result = await Database.pool
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        const result = await client
             .query(
                 `
                 update "articles"
@@ -187,6 +191,26 @@ export class Article
             {
                 throw Boom.badRequest();
             });
+
+        await Config.ELASTICSEARCH
+            .update({
+                index: "articles",
+                id: this.id,
+                body: {
+                    script: {
+                        title: this.title,
+                        content: this.content,
+                    },
+                },
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
 
         this._updated_at = result.rows[0].updated_at;
     }
