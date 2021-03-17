@@ -1191,6 +1191,54 @@ const init = async () =>
         }
     });
 
+    /**
+     * IMPORTANT:
+     * 
+     * RESULTS ARE NOT LIMITED TO WHAT USERS HAVE ACCESS TO.
+     * 
+     * ONLY A SHORT SNIPPET IS SENT TO THE USER.
+     */
+     server.route({
+        method: "GET",
+        path: "/search",
+        options: {
+            validate: {
+                query: Joi.object({
+                    query: STRING_SCHEMA.required(),
+                    limit: Joi.number().integer().min(0).max(30).required(),
+                    offset: Joi.number().integer().min(0).required(),
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const result = await Config.ELASTICSEARCH.search({
+                index: "articles",
+                size: request.query.limit,
+                from: request.query.offset,
+                body: {
+                    query: {
+                        multi_match: {
+                            query: request.query.query,
+                            fields: [ "title", "content" ],
+                        },
+                    },
+                    stored_fields: [],
+                },
+            });
+
+            const ids = result.body.hits.hits.map((hit: any) => hit._id);
+
+            const articles = await Article.retrieveMultiple(ids, request.query.expand);
+
+            return articles.map(article => article.serialize({ preview: true }));
+        }
+    });
+
     server.route({
         method: "GET",
         path: "/users/{id}",
@@ -1307,64 +1355,6 @@ const init = async () =>
             const organizations = await Organization.forUser(authenticatedUser);
 
             return organizations.map(organization => organization.serialize());
-        }
-    });
-
-    /**
-     * IMPORTANT:
-     * 
-     * RESULTS ARE NOT LIMITED TO WHAT USERS HAVE ACCESS TO.
-     * 
-     * ONLY A SHORT SNIPPET IS SENT TO THE USER.
-     */
-    server.route({
-        method: "GET",
-        path: "/users/{id}/search",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-                }),
-                query: Joi.object({
-                    query: STRING_SCHEMA.required(),
-                    limit: Joi.number().integer().min(0).max(30).required(),
-                    offset: Joi.number().integer().min(0).required(),
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-            },
-            response: {
-                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (request.params.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const result = await Config.ELASTICSEARCH.search({
-                index: "articles",
-                size: request.query.limit,
-                from: request.query.offset,
-                body: {
-                    query: {
-                        multi_match: {
-                            query: request.query.query,
-                            fields: [ "title", "content" ],
-                        },
-                    },
-                    stored_fields: [],
-                },
-            });
-
-            const ids = result.body.hits.hits.map((hit: any) => hit._id);
-
-            const articles = await Article.retrieveMultiple(ids, request.query.expand);
-
-            return articles.map(article => article.serialize({ preview: true }));
         }
     });
 
