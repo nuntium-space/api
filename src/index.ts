@@ -415,10 +415,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const bundle = await Bundle.retrieve(request.params.id, [
-                ...request.query.expand,
-                "organization",
-            ]);
+            const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
 
             const authenticatedUser = request.auth.credentials.user as User;
 
