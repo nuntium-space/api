@@ -111,7 +111,7 @@ export class Subscription
                 throw Boom.badRequest();
             });
 
-        const subscription = await Config.STRIPE.subscriptions
+        await Config.STRIPE.subscriptions
             .create({
                 customer: user.stripe_customer_id,
                 items: [
@@ -140,11 +140,7 @@ export class Subscription
 
         client.release();
 
-        return Subscription.deserialize({
-            ...result.rows[0],
-            current_period_end: new Date(subscription.current_period_end * 1000),
-            stripe_subscription_id: subscription.id,
-        }, expand);
+        return Subscription.deserialize(result.rows[0], expand);
     }
 
     public static async retrieveWithSubscriptionId(subscriptionId: string): Promise<Subscription>
