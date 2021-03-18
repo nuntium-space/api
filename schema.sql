@@ -178,6 +178,7 @@ create table "bundles_publishers"
 
 create table "subscriptions"
 (
+    "id" id not null,
     "user" id not null,
     "bundle" id not null,
     "current_period_end" timestamp not null,
@@ -189,7 +190,9 @@ create table "subscriptions"
     unique ("stripe_subscription_id"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("bundle") references "bundles" on update cascade on delete cascade
+    foreign key ("bundle") references "bundles" on update cascade on delete cascade,
+
+    check ("id" like 'sub_%'),
 );
 
 /*
