@@ -181,9 +181,9 @@ create table "subscriptions"
     "id" id not null,
     "user" id not null,
     "bundle" id not null,
-    "current_period_end" timestamp not null,
+    "current_period_end" timestamp,
     "cancel_at_period_end" boolean not null,
-    "stripe_subscription_id" text not null,
+    "stripe_subscription_id" text,
 
     primary key ("user", "bundle"),
 

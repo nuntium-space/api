@@ -11,9 +11,9 @@ interface IDatabaseSubscription
 {
     user: string,
     bundle: string,
-    current_period_end: Date,
+    current_period_end: Date | null,
     cancel_at_period_end: boolean,
-    stripe_subscription_id: string,
+    stripe_subscription_id: string | null,
 }
 
 export interface ICreateSubscription
@@ -31,7 +31,7 @@ export interface ISerializedSubscription
 {
     user: ISerializedUser | INotExpandedResource,
     bundle: ISerializedBundle | INotExpandedResource,
-    current_period_end: string,
+    current_period_end: string | null,
     cancel_at_period_end: boolean,
 }
 
@@ -41,9 +41,9 @@ export class Subscription
     (
         private readonly _user: User | INotExpandedResource,
         private readonly _bundle: Bundle | INotExpandedResource,
-        private _current_period_end: Date,
+        private _current_period_end: Date | null,
         private _cancel_at_period_end: boolean,
-        private readonly _stripe_subscription_id: string,
+        private readonly _stripe_subscription_id: string | null,
     )
     {}
 
@@ -57,7 +57,7 @@ export class Subscription
         return this._bundle;
     }
 
-    public get current_period_end(): Date
+    public get current_period_end(): Date | null
     {
         return this._current_period_end;
     }
@@ -67,7 +67,7 @@ export class Subscription
         return this._cancel_at_period_end;
     }
 
-    public get stripe_subscription_id(): string
+    public get stripe_subscription_id(): string | null
     {
         return this._stripe_subscription_id;
     }
@@ -218,7 +218,7 @@ export class Subscription
             bundle: this.bundle instanceof Bundle
                 ? this.bundle.serialize()
                 : this.bundle,
-            current_period_end: this.current_period_end.toISOString(),
+            current_period_end: this.current_period_end?.toISOString() ?? null,
             cancel_at_period_end: this.cancel_at_period_end,
         };
     }
