@@ -18,6 +18,7 @@ export class Config
         SESSION: "ses",
         COMMENT: "cmt",
         BUNDLE: "bdl",
+        SUBSCRIPTION: "sub",
     };
 
     public static readonly ARTICLE_PREVIEW_LENGTH = 200;
