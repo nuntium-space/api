@@ -1403,6 +1403,13 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
+            const bundle = await Bundle.retrieve((request.payload as any).bundle);
+
+            if (await authenticatedUser.isSubscribedToBundle(bundle))
+            {
+                throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
+            }
+
             const subscriptions = await Subscription.create(
                 request.payload as any,
                 authenticatedUser,
