@@ -1,7 +1,10 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { Config } from "../config/Config";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 import { Bundle, ISerializedBundle } from "./Bundle";
+import { Organization } from "./Organization";
 import { ISerializedUser, User } from "./User";
 
 interface IDatabaseSubscription
@@ -15,11 +18,7 @@ interface IDatabaseSubscription
 
 export interface ICreateSubscription
 {
-    user: string,
     bundle: string,
-    current_period_end: number,
-    cancel_at_period_end: boolean,
-    stripe_subscription_id: string,
 }
 
 export interface IUpdateSubscription
@@ -73,23 +72,38 @@ export class Subscription
         return this._stripe_subscription_id;
     }
 
-    public static async create(data: ICreateSubscription): Promise<Subscription>
+    public static async create(data: ICreateSubscription, user: User, expand?: string[]): Promise<Subscription>
     {
-        const result = await Database.pool
+        const bundle = await Bundle.retrieve(data.bundle, [ "organization" ]);
+
+        if
+        (
+            !user.stripe_customer_id
+            || !bundle.stripe_price_id
+            || !(bundle.organization instanceof Organization)
+        )
+        {
+            throw Boom.badImplementation();
+        }
+
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        const result = await client
             .query(
                 `
                 insert into "subscriptions"
-                    ("user", "bundle", "current_period_end", "cancel_at_period_end", "stripe_subscription_id")
+                    ("id", "user", "bundle", "cancel_at_period_end")
                 values
                     ($1, $2, $3, $4, $5)
                 returning *
                 `,
                 [
-                    data.user,
-                    data.bundle,
-                    new Date(data.current_period_end * 1000).toISOString(), // Date accepts the value in milliseconds
-                    data.cancel_at_period_end,
-                    data.stripe_subscription_id,
+                    Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
+                    user.id,
+                    bundle.id,
+                    false,
                 ],
             )
             .catch(() =>
@@ -97,7 +111,40 @@ export class Subscription
                 throw Boom.badRequest();
             });
 
-        return Subscription.deserialize(result.rows[0]);
+        const subscription = await Config.STRIPE.subscriptions
+            .create({
+                customer: user.stripe_customer_id,
+                items: [
+                    {
+                        price: bundle.stripe_price_id,
+                        quantity: 1,
+                    },
+                ],
+                transfer_data: {
+                    amount_percent: 100 - Config.STRIPE_CONNECT_FEE_PERCENT,
+                    destination: bundle.organization.stripe_account_id,
+                },
+                metadata: {
+                    user_id: user.id,
+                    bundle_id: bundle.id,
+                },
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        await client.query("commit");
+
+        client.release();
+
+        return Subscription.deserialize({
+            ...result.rows[0],
+            current_period_end: new Date(subscription.current_period_end * 1000),
+            stripe_subscription_id: subscription.id,
+        }, expand);
     }
 
     public static async retrieveWithSubscriptionId(subscriptionId: string): Promise<Subscription>

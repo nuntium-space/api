@@ -133,6 +133,8 @@ export class Article
 
         await client.query("commit");
 
+        client.release();
+
         return Article.deserialize(result.rows[0], expand);
     }
 
@@ -212,6 +214,8 @@ export class Article
 
         await client.query("commit");
 
+        client.release();
+
         this._updated_at = result.rows[0].updated_at;
     }
 
@@ -239,6 +243,8 @@ export class Article
             });
 
         await client.query("commit");
+
+        client.release();
     }
 
     public static async forFeed(user: User, options: {
