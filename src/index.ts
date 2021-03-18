@@ -1405,7 +1405,17 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
-            const bundle = await Bundle.retrieve((request.payload as any).bundle);
+            const bundle = await Bundle.retrieve((request.payload as any).bundle, [ "organization" ]);
+
+            if (!(bundle.organization instanceof Organization))
+            {
+                throw Boom.badImplementation();
+            }
+
+            if (!bundle.organization.stripe_account_enabled)
+            {
+                throw Boom.badRequest(`The organization that owns the bundle '${bundle.id}' hasn't enabled payments`);
+            }
 
             if (await authenticatedUser.isSubscribedToBundle(bundle))
             {
