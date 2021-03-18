@@ -1379,6 +1379,41 @@ const init = async () =>
     });
 
     server.route({
+        method: "POST",
+        path: "/users/{id}/subscriptions",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(SUBSCRIPTION_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const subscriptions = await Subscription.create(
+                request.payload as any,
+                authenticatedUser,
+                request.query.expand,
+            );
+
+            return subscriptions.serialize();
+        }
+    });
+
+    server.route({
         method: "PATCH",
         path: "/users/{id}",
         options: {
@@ -1553,32 +1588,6 @@ const init = async () =>
 
                     await organization.update({
                         stripe_account_enabled: account.charges_enabled,
-                    });
-
-                    break;
-                }
-                case "checkout.session.completed":
-                {
-                    const checkoutSession = event.data.object as Stripe.Checkout.Session;
-
-                    if (!checkoutSession.metadata)
-                    {
-                        throw Boom.badImplementation();
-                    }
-
-                    if (typeof checkoutSession.subscription !== "string")
-                    {
-                        throw Boom.badImplementation();
-                    }
-
-                    const subscription = await Config.STRIPE.subscriptions.retrieve(checkoutSession.subscription);
-
-                    await Subscription.create({
-                        user: checkoutSession.metadata.user_id,
-                        bundle: checkoutSession.metadata.bundle_id,
-                        current_period_end: subscription.current_period_end,
-                        cancel_at_period_end: subscription.cancel_at_period_end,
-                        stripe_subscription_id: subscription.id,
                     });
 
                     break;
