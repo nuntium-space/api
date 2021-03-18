@@ -120,8 +120,8 @@ export class Subscription
                         quantity: 1,
                     },
                 ],
+                application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
                 transfer_data: {
-                    amount_percent: 100 - Config.STRIPE_CONNECT_FEE_PERCENT,
                     destination: bundle.organization.stripe_account_id,
                 },
                 metadata: {
