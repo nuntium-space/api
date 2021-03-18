@@ -30,6 +30,7 @@ import {
     SESSION_CREATE_SCHEMA,
     SESSION_SCHEMA,
     STRING_SCHEMA,
+    SUBSCRIPTION_CREATE_SCHEMA,
     SUBSCRIPTION_SCHEMA,
     URL_SCHEMA,
     USER_CREATE_SCHEMA,
@@ -1389,6 +1390,7 @@ const init = async () =>
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
+                payload: SUBSCRIPTION_CREATE_SCHEMA,
             },
             response: {
                 schema: Joi.array().items(SUBSCRIPTION_SCHEMA).required(),

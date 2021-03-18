@@ -263,3 +263,8 @@ export const BUNDLE_UPDATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50),
     });
+
+export const SUBSCRIPTION_CREATE_SCHEMA = Joi
+    .object({
+        bundle: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+    });
