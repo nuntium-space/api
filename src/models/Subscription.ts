@@ -96,7 +96,7 @@ export class Subscription
                 insert into "subscriptions"
                     ("id", "user", "bundle", "cancel_at_period_end")
                 values
-                    ($1, $2, $3, $4, $5)
+                    ($1, $2, $3, $4)
                 returning *
                 `,
                 [
