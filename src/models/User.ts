@@ -103,7 +103,7 @@ export class User
                     data.first_name,
                     data.last_name,
                     data.email,
-                    Utilities.hash(data.password),
+                    await Utilities.hash(data.password),
                 ],
             )
             .catch(async () =>
@@ -188,13 +188,13 @@ export class User
 
         if (data.old_password)
         {
-            if (!Utilities.verifyHash(data.old_password, this._password))
+            if (!await Utilities.verifyHash(data.old_password, this._password))
             {
                 throw Boom.forbidden(`"old_password" is wrong`);
             }
 
             this._password = data.new_password
-                ? Utilities.hash(data.new_password)
+                ? await Utilities.hash(data.new_password)
                 : this._password;
         }
 

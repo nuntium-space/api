@@ -1,17 +1,17 @@
-import { hashSync, compareSync } from "bcrypt";
+import { compare, hash } from "bcrypt";
 import cuid from "cuid";
 import { Config } from "../config/Config";
 
 export default class Utilities
 {
-    public static hash(data: string): string
+    public static hash(data: string): Promise<string>
     {
-        return hashSync(data, Config.HASH_ROUNDS);
+        return hash(data, Config.HASH_ROUNDS);
     }
 
-    public static verifyHash(data: string, hash: string): boolean
+    public static verifyHash(data: string, hash: string): Promise<boolean>
     {
-        return compareSync(data, hash);
+        return compare(data, hash);
     }
 
     public static id(prefix: string): string

@@ -53,7 +53,7 @@ export class Session
     {
         const user = await User.retrieveWithEmail(data.email);
 
-        if (!Utilities.verifyHash(data.password, user.password))
+        if (!await Utilities.verifyHash(data.password, user.password))
         {
             throw Boom.forbidden(`"password" is wrong`);
         }
