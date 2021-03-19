@@ -1791,7 +1791,7 @@ const init = async () =>
                                 subscription.status,
                                 subscription.metadata.user_id,
                                 subscription.metadata.bundle_id,
-                                subscription.current_period_end,
+                                new Date(subscription.current_period_end * 1000),
                                 subscription.cancel_at_period_end,
                                 subscription.id,
                             ],
