@@ -169,7 +169,7 @@ export const SUBSCRIPTION_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.BUNDLE),
             )
             .required(),
-        current_period_end: DATETIME_SCHEMA.required(),
+        current_period_end: DATETIME_SCHEMA.allow(null).required(),
         cancel_at_period_end: Joi.boolean().required(),
     });
 
