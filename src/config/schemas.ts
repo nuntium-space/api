@@ -172,6 +172,20 @@ export const SUBSCRIPTION_SCHEMA = Joi
         cancel_at_period_end: Joi.boolean().required(),
     });
 
+export const PAYMENT_METHOD_SCHEMA = Joi
+    .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
+        type: STRING_SCHEMA.required(),
+        data: Joi.object().required(),
+        user: Joi
+            .alternatives()
+            .try(
+                USER_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+            )
+            .required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
