@@ -38,6 +38,7 @@ export interface ISerializedUser
     first_name: string,
     last_name: string,
     email: string,
+    has_payment_methods: boolean,
 }
 
 export class User
@@ -49,7 +50,8 @@ export class User
         private  _last_name: string,
         private _email: string,
         private _password: string,
-        private _stripe_customer_id: string | null,
+        private readonly _stripe_customer_id: string | null,
+        private readonly _has_payment_methods: boolean,
     )
     {}
 
@@ -287,11 +289,18 @@ export class User
             first_name: this.first_name,
             last_name: this.last_name,
             email: this.email,
+            has_payment_methods: this._has_payment_methods,
         };
     }
 
-    private static deserialize(data: IDatabaseUser): User
+    private static async deserialize(data: IDatabaseUser): Promise<User>
     {
+        const result = await Database.pool
+            .query(
+                `select count(id) as "count" from "payment_methods" where "user" = $1`,
+                [ data.id ],
+            );
+
         return new User(
             data.id,
             data.first_name,
@@ -299,6 +308,7 @@ export class User
             data.email,
             data.password,
             data.stripe_customer_id,
+            result.rows[0].count > 0,
         );
     }
 }
