@@ -1745,6 +1745,18 @@ const init = async () =>
                 }
                 case "payment_method.detached":
                 {
+                    const paymentMethod = event.data.object as Stripe.PaymentMethod;
+
+                    await Database.pool
+                        .query(
+                            `delete from "payment_methods" where "stripe_id" = $1`,
+                            [ paymentMethod.id ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
                     break;
                 }
                 case "payment_method.updated":
