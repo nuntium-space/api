@@ -108,14 +108,6 @@ export class Subscription
             });
     }
 
-    public async delete(): Promise<void>
-    {
-        await Database.pool.query(
-            `delete from "subscriptions" where "stripe_subscription_id" = $1`,
-            [ this.stripe_subscription_id ],
-        );
-    }
-
     public static async forUser(user: User, expand?: string[]): Promise<Subscription[]>
     {
         const result = await Database.pool.query(

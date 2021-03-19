@@ -1802,11 +1802,17 @@ const init = async () =>
                 }
                 case "customer.subscription.deleted":
                 {
-                    const object = event.data.object as Stripe.Subscription;
+                    const subscription = event.data.object as Stripe.Subscription;
 
-                    const subscription = await Subscription.retrieveWithSubscriptionId(object.id);
-
-                    await subscription.delete();
+                    await Database.pool
+                        .query(
+                            `update "subscriptions" set "status" = $1 where "stripe_subscription_id" = $2`,
+                            [ subscription.status, subscription.id ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
 
                     break;
                 }
@@ -1868,9 +1874,17 @@ const init = async () =>
                         throw Boom.badImplementation();
                     }
 
-                    const subscription = await Subscription.retrieveWithSubscriptionId(invoice.subscription);
+                    const subscription = await Config.STRIPE.subscriptions.retrieve(invoice.subscription);
 
-                    await subscription.delete();
+                    await Database.pool
+                        .query(
+                            `update "subscriptions" set "status" = $1 where "stripe_subscription_id" = $2`,
+                            [ subscription.status, subscription.id ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
 
                     break;
                 }
