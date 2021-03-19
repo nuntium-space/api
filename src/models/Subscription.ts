@@ -1,10 +1,7 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { Config } from "../config/Config";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import { Bundle, ISerializedBundle } from "./Bundle";
-import { Organization } from "./Organization";
 import { ISerializedUser, User } from "./User";
 
 interface IDatabaseSubscription
@@ -16,18 +13,13 @@ interface IDatabaseSubscription
     stripe_subscription_id: string | null,
 }
 
-export interface ICreateSubscription
-{
-    bundle: string,
-}
-
-export interface IUpdateSubscription
+interface IUpdateSubscription
 {
     current_period_end?: number,
     cancel_at_period_end?: boolean,
 }
 
-export interface ISerializedSubscription
+interface ISerializedSubscription
 {
     user: ISerializedUser | INotExpandedResource,
     bundle: ISerializedBundle | INotExpandedResource,
@@ -70,77 +62,6 @@ export class Subscription
     public get stripe_subscription_id(): string | null
     {
         return this._stripe_subscription_id;
-    }
-
-    public static async create(data: ICreateSubscription, user: User, expand?: string[]): Promise<Subscription>
-    {
-        const bundle = await Bundle.retrieve(data.bundle, [ "organization" ]);
-
-        if
-        (
-            !user.stripe_customer_id
-            || !bundle.stripe_price_id
-            || !(bundle.organization instanceof Organization)
-        )
-        {
-            throw Boom.badImplementation();
-        }
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        const result = await client
-            .query(
-                `
-                insert into "subscriptions"
-                    ("id", "user", "bundle", "cancel_at_period_end")
-                values
-                    ($1, $2, $3, $4)
-                returning *
-                `,
-                [
-                    Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
-                    user.id,
-                    bundle.id,
-                    false,
-                ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badRequest();
-            });
-
-        await Config.STRIPE.subscriptions
-            .create({
-                customer: user.stripe_customer_id,
-                items: [
-                    {
-                        price: bundle.stripe_price_id,
-                        quantity: 1,
-                    },
-                ],
-                application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
-                transfer_data: {
-                    destination: bundle.organization.stripe_account_id,
-                },
-                metadata: {
-                    user_id: user.id,
-                    bundle_id: bundle.id,
-                },
-            })
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badRequest();
-            });
-
-        await client.query("commit");
-
-        client.release();
-
-        return Subscription.deserialize(result.rows[0], expand);
     }
 
     public static async retrieveWithSubscriptionId(subscriptionId: string): Promise<Subscription>

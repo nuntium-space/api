@@ -179,11 +179,12 @@ create table "bundles_publishers"
 create table "subscriptions"
 (
     "id" id not null,
+    "status" text not null,
     "user" id not null,
     "bundle" id not null,
-    "current_period_end" timestamp,
+    "current_period_end" timestamp not null,
     "cancel_at_period_end" boolean not null,
-    "stripe_subscription_id" text,
+    "stripe_subscription_id" text not null,
 
     primary key ("id"),
 

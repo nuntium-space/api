@@ -1527,9 +1527,14 @@ const init = async () =>
                 throw Boom.forbidden();
             }
 
+            if (!authenticatedUser.stripe_customer_id)
+            {
+                throw Boom.badImplementation();
+            }
+
             const bundle = await Bundle.retrieve((request.payload as any).bundle, [ "organization" ]);
 
-            if (!(bundle.organization instanceof Organization))
+            if (!bundle.stripe_price_id || !(bundle.organization instanceof Organization))
             {
                 throw Boom.badImplementation();
             }
@@ -1544,13 +1549,30 @@ const init = async () =>
                 throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
             }
 
-            const subscriptions = await Subscription.create(
-                request.payload as any,
-                authenticatedUser,
-                request.query.expand,
-            );
+            await Config.STRIPE.subscriptions
+                .create({
+                    customer: authenticatedUser.stripe_customer_id,
+                    items: [
+                        {
+                            price: bundle.stripe_price_id,
+                            quantity: 1,
+                        },
+                    ],
+                    application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
+                    transfer_data: {
+                        destination: bundle.organization.stripe_account_id,
+                    },
+                    metadata: {
+                        user_id: authenticatedUser.id,
+                        bundle_id: bundle.id,
+                    },
+                })
+                .catch(async () =>
+                {
+                    throw Boom.badRequest();
+                });
 
-            return subscriptions.serialize();
+            return h.response();
         }
     });
 
@@ -1752,9 +1774,39 @@ const init = async () =>
 
                     break;
                 }
+                case "customer.subscription.created":
+                {
+                    const subscription = event.data.object as Stripe.Subscription;
+
+                    await Database.pool
+                        .query(
+                            `
+                            insert into "subscriptions"
+                                ("id", "status", "user", "bundle", "current_period_end", "cancel_at_period_end", "stripe_subscription_id")
+                            values
+                                ($1, $2, $3, $4, $5, $6, $7)
+                            returning *
+                            `,
+                            [
+                                Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
+                                subscription.status,
+                                subscription.metadata.user_id,
+                                subscription.metadata.bundle_id,
+                                subscription.current_period_end,
+                                subscription.cancel_at_period_end,
+                                subscription.id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
+
+                    break;
+                }
                 case "customer.subscription.deleted":
                 {
-                    const object = (event.data.object as Stripe.Subscription);
+                    const object = event.data.object as Stripe.Subscription;
 
                     const subscription = await Subscription.retrieveWithSubscriptionId(object.id);
 
@@ -1764,7 +1816,7 @@ const init = async () =>
                 }
                 case "customer.subscription.updated":
                 {
-                    const object = (event.data.object as Stripe.Subscription);
+                    const object = event.data.object as Stripe.Subscription;
 
                     const subscription = await Subscription.retrieveWithSubscriptionId(object.id);
 
