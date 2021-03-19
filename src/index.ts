@@ -1739,6 +1739,7 @@ const init = async () =>
 
                     break;
                 }
+                case "payment_method.updated":
                 case "payment_method.automatically_updated":
                 {
                     const paymentMethod = event.data.object as Stripe.PaymentMethod;
@@ -1763,22 +1764,6 @@ const init = async () =>
                         .query(
                             `delete from "payment_methods" where "stripe_id" = $1`,
                             [ paymentMethod.id ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
-
-                    break;
-                }
-                case "payment_method.updated":
-                {
-                    const paymentMethod = event.data.object as Stripe.PaymentMethod;
-
-                    await Database.pool
-                        .query(
-                            `update "payment_methods" set "data" = $1 where "stripe_id" = $1`,
-                            [ paymentMethod[paymentMethod.type], paymentMethod.id ],
                         )
                         .catch(() =>
                         {
