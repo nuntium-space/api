@@ -1412,6 +1412,48 @@ const init = async () =>
 
     server.route({
         method: "POST",
+        path: "/users/{id}/payment-methods",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+                payload: Joi.object({
+                    id: STRING_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            if (!authenticatedUser.stripe_customer_id)
+            {
+                throw Boom.badImplementation();
+            }
+
+            await Config.STRIPE.paymentMethods
+                .attach(
+                    (request.payload as any).id,
+                    {
+                        customer: authenticatedUser.stripe_customer_id,
+                    },
+                );
+
+            return h.response();
+        }
+    });
+
+    server.route({
+        method: "POST",
         path: "/users/{id}/subscriptions",
         options: {
             validate: {
@@ -1424,7 +1466,7 @@ const init = async () =>
                 payload: SUBSCRIPTION_CREATE_SCHEMA,
             },
             response: {
-                schema: Joi.array().items(SUBSCRIPTION_SCHEMA).required(),
+                schema: SUBSCRIPTION_SCHEMA,
             },
         },
         handler: async (request, h) =>
