@@ -1785,7 +1785,6 @@ const init = async () =>
                                 ("id", "status", "user", "bundle", "current_period_end", "cancel_at_period_end", "stripe_subscription_id")
                             values
                                 ($1, $2, $3, $4, $5, $6, $7)
-                            returning *
                             `,
                             [
                                 Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
