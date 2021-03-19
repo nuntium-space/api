@@ -19,6 +19,7 @@ export class Config
         COMMENT: "cmt",
         BUNDLE: "bdl",
         SUBSCRIPTION: "sub",
+        PAYMENT_METHOD: "pmt",
     };
 
     public static readonly ARTICLE_PREVIEW_LENGTH = 200;

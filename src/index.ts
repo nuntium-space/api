@@ -48,6 +48,7 @@ import { User } from "./models/User";
 import Database from "./utilities/Database";
 import Stripe from "stripe";
 import { Subscription } from "./models/Subscription";
+import Utilities from "./utilities/Utilities";
 
 const server = Hapi.server({
     port: 4000,
@@ -1702,6 +1703,52 @@ const init = async () =>
 
                     await subscription.delete();
 
+                    break;
+                }
+                case "payment_method.attached":
+                {
+                    const paymentMethod = event.data.object as Stripe.PaymentMethod;
+
+                    if (typeof paymentMethod.customer !== "string")
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    const user = await User.retrieveWithCustomerId(paymentMethod.customer);
+
+                    await Database.pool
+                        .query(
+                            `
+                            insert into "payment_methods"
+                                ("id, "type", "data", "user", "stripe_id")
+                            values
+                                ($1, $2, $3, $4, $5)
+                            `,
+                            [
+                                Utilities.id(Config.ID_PREFIXES.PAYMENT_METHOD),
+                                paymentMethod.type,
+                                paymentMethod[paymentMethod.type],
+                                user.id,
+                                paymentMethod.id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
+                    break;
+                }
+                case "payment_method.automatically_updated":
+                {
+                    break;
+                }
+                case "payment_method.detached":
+                {
+                    break;
+                }
+                case "payment_method.updated":
+                {
                     break;
                 }
                 case "price.created":
