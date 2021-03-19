@@ -185,14 +185,31 @@ create table "subscriptions"
     "cancel_at_period_end" boolean not null,
     "stripe_subscription_id" text,
 
-    primary key ("user", "bundle"),
+    primary key ("id"),
 
+    unique ("user", "bundle"),
     unique ("stripe_subscription_id"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
     foreign key ("bundle") references "bundles" on update cascade on delete cascade,
 
-    check ("id" like 'sub_%'),
+    check ("id" like 'sub_%')
+);
+
+create table "payment_methods"
+(
+    "id" id not null,
+    "user" id not null,
+    "data" json not null,
+    "stripe_id" text not null,
+
+    primary key ("id"),
+
+    unique ("stripe_id"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+
+    check ("id" like 'pmt_%')
 );
 
 /*
