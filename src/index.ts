@@ -1789,7 +1789,7 @@ const init = async () =>
                         .query(
                             `
                             insert into "payment_methods"
-                                ("id, "type", "data", "user", "stripe_id")
+                                ("id", "type", "data", "user", "stripe_id")
                             values
                                 ($1, $2, $3, $4, $5)
                             `,
