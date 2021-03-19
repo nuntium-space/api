@@ -24,6 +24,7 @@ import {
     ORGANIZATION_CREATE_SCHEMA,
     ORGANIZATION_SCHEMA,
     ORGANIZATION_UPDATE_SCHEMA,
+    PAYMENT_METHOD_SCHEMA,
     PUBLISHER_CREATE_SCHEMA,
     PUBLISHER_SCHEMA,
     PUBLISHER_UPDATE_SCHEMA,
@@ -49,6 +50,7 @@ import Database from "./utilities/Database";
 import Stripe from "stripe";
 import { Subscription } from "./models/Subscription";
 import Utilities from "./utilities/Utilities";
+import { PaymentMethod } from "./models/PaymentMethod";
 
 const server = Hapi.server({
     port: 4000,
@@ -1283,6 +1285,34 @@ const init = async () =>
             const organizations = await Organization.forUser(authenticatedUser);
 
             return organizations.map(organization => organization.serialize());
+        }
+    });
+
+    server.route({
+        method: "GET",
+        path: "/users/{id}/payment-methods",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+            },
+            response: {
+                schema: Joi.array().items(PAYMENT_METHOD_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const paymentMethods = await PaymentMethod.forUser(authenticatedUser);
+
+            return paymentMethods.map(paymentMethod => paymentMethod.serialize());
         }
     });
 
