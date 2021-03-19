@@ -1514,9 +1514,6 @@ const init = async () =>
                 }),
                 payload: SUBSCRIPTION_CREATE_SCHEMA,
             },
-            response: {
-                schema: SUBSCRIPTION_SCHEMA,
-            },
         },
         handler: async (request, h) =>
         {
