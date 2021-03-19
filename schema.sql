@@ -199,8 +199,9 @@ create table "subscriptions"
 create table "payment_methods"
 (
     "id" id not null,
-    "user" id not null,
+    "type" text not null,
     "data" json not null,
+    "user" id not null,
     "stripe_id" text not null,
 
     primary key ("id"),
