@@ -1469,13 +1469,33 @@ const init = async () =>
                 throw Boom.badImplementation();
             }
 
+            const paymentMethodId = (request.payload as any).id as string;
+
             await Config.STRIPE.paymentMethods
                 .attach(
-                    (request.payload as any).id,
+                    paymentMethodId,
                     {
                         customer: authenticatedUser.stripe_customer_id,
                     },
-                );
+                )
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            await Config.STRIPE.customers
+                .update(
+                    authenticatedUser.stripe_customer_id,
+                    {
+                        invoice_settings: {
+                            default_payment_method: paymentMethodId,
+                        },
+                    },
+                )
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
 
             return h.response();
         }
