@@ -72,14 +72,6 @@ export class PaymentMethod
         return PaymentMethod.deserialize(result.rows[0]);
     }
 
-    public async delete(): Promise<void>
-    {
-        await Database.pool.query(
-            `delete from "payment_methods" where "id" = $1`,
-            [ this.id ],
-        );
-    }
-
     public static async forUser(user: User, expand?: string[]): Promise<PaymentMethod[]>
     {
         const result = await Database.pool.query(

@@ -910,6 +910,38 @@ const init = async () =>
     });
 
     server.route({
+        method: "DELETE",
+        path: "/payment-methods/{id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const paymentMethod = await PaymentMethod.retrieve(request.params.id);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (paymentMethod.user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await Config.STRIPE.paymentMethods
+                .detach(paymentMethod.stripe_id)
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return h.response();
+        }
+    });
+
+    server.route({
         method: "GET",
         path: "/publishers/{id}",
         options: {
