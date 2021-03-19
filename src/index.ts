@@ -1741,6 +1741,18 @@ const init = async () =>
                 }
                 case "payment_method.automatically_updated":
                 {
+                    const paymentMethod = event.data.object as Stripe.PaymentMethod;
+
+                    await Database.pool
+                        .query(
+                            `update "payment_methods" set "data" = $1 where "stripe_id" = $1`,
+                            [ paymentMethod[paymentMethod.type], paymentMethod.id ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
                     break;
                 }
                 case "payment_method.detached":
@@ -1761,6 +1773,18 @@ const init = async () =>
                 }
                 case "payment_method.updated":
                 {
+                    const paymentMethod = event.data.object as Stripe.PaymentMethod;
+
+                    await Database.pool
+                        .query(
+                            `update "payment_methods" set "data" = $1 where "stripe_id" = $1`,
+                            [ paymentMethod[paymentMethod.type], paymentMethod.id ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
                     break;
                 }
                 case "price.created":
