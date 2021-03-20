@@ -11,7 +11,6 @@ import {
     ARTICLE_SCHEMA,
     EXPAND_QUERY_SCHEMA,
     ID_SCHEMA,
-    PAYMENT_METHOD_SCHEMA,
     PUBLISHER_CREATE_SCHEMA,
     PUBLISHER_SCHEMA,
     PUBLISHER_UPDATE_SCHEMA,
@@ -35,7 +34,6 @@ import Database from "./utilities/Database";
 import Stripe from "stripe";
 import { Subscription } from "./models/Subscription";
 import Utilities from "./utilities/Utilities";
-import { PaymentMethod } from "./models/PaymentMethod";
 import routes from "./routes";
 
 const server = Hapi.server({
@@ -219,38 +217,6 @@ const init = async () =>
             const publisher = await Publisher.create(request.payload as any, organization);
 
             return publisher.serialize();
-        }
-    });
-
-    server.route({
-        method: "DELETE",
-        path: "/payment-methods/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const paymentMethod = await PaymentMethod.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (paymentMethod.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await Config.STRIPE.paymentMethods
-                .detach(paymentMethod.stripe_id)
-                .catch(() =>
-                {
-                    throw Boom.badImplementation();
-                });
-
-            return h.response();
         }
     });
 
@@ -480,34 +446,6 @@ const init = async () =>
 
     server.route({
         method: "GET",
-        path: "/users/{id}/payment-methods",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-                }),
-            },
-            response: {
-                schema: Joi.array().items(PAYMENT_METHOD_SCHEMA).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (request.params.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const paymentMethods = await PaymentMethod.forUser(authenticatedUser);
-
-            return paymentMethods.map(paymentMethod => paymentMethod.serialize());
-        }
-    });
-
-    server.route({
-        method: "GET",
         path: "/users/{id}/publishers",
         options: {
             validate: {
@@ -625,65 +563,6 @@ const init = async () =>
             const user = await User.create(request.payload as any);
 
             return user.serialize();
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/users/{id}/payment-methods",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-                }),
-                payload: Joi.object({
-                    id: STRING_SCHEMA.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (request.params.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            if (!authenticatedUser.stripe_customer_id)
-            {
-                throw Boom.badImplementation();
-            }
-
-            const paymentMethodId = (request.payload as any).id as string;
-
-            await Config.STRIPE.paymentMethods
-                .attach(
-                    paymentMethodId,
-                    {
-                        customer: authenticatedUser.stripe_customer_id,
-                    },
-                )
-                .catch(() =>
-                {
-                    throw Boom.badImplementation();
-                });
-
-            await Config.STRIPE.customers
-                .update(
-                    authenticatedUser.stripe_customer_id,
-                    {
-                        invoice_settings: {
-                            default_payment_method: paymentMethodId,
-                        },
-                    },
-                )
-                .catch(() =>
-                {
-                    throw Boom.badImplementation();
-                });
-
-            return h.response();
         }
     });
 
