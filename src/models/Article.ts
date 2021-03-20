@@ -156,7 +156,7 @@ export class Article
     public static async retrieveMultiple(ids: string[], expand?: string[]): Promise<Article[]>
     {
         const result = await Database.pool.query(
-            `select * from "articles" where "id" = any ($1)`,
+            `select * from "articles" where "id" = any ($1) order by "created_at" desc`,
             [ ids ],
         );
 
@@ -269,6 +269,7 @@ export class Article
                 on art.author = aut.id
             where
                 s.user = $1
+            order by "created_at" desc
             limit $2
             offset $3
             `,
@@ -295,6 +296,7 @@ export class Article
                     art.author = aut.id
                     and
                     aut.publisher = $1
+            order by "created_at" desc
             `,
             [ publisher.id ],
         );
