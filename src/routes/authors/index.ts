@@ -88,7 +88,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const authors = await Author.forUser(authenticatedUser);
+            const authors = await Author.forUser(authenticatedUser, request.query.expand);
 
             return authors.map(author => author.serialize());
         },
