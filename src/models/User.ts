@@ -241,7 +241,7 @@ export class User
                 `
                 select *
                 from
-                    "subscriptions"
+                    "v_active_subscriptions"
                 where
                     "user" = $1
                     and
@@ -268,13 +268,13 @@ export class User
                 `
                 select *
                 from
-                    subscriptions
+                    "v_active_subscriptions"
                     natural join
-                    bundles_publishers
+                    "bundles_publishers"
                 where
-                    user = $1
+                    "user" = $1
                     and
-                    publisher = $2
+                    "publisher" = $2
                 `,
                 [ this.id, publisher.id ],
             );

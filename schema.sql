@@ -226,6 +226,9 @@ as
     select *, (select count(*) from "comments" where "parent" = "c"."id") as "reply_count"
     from "comments" as c;
 
+create view "v_active_subscriptions"
+as select * from "subscriptions" where "deleted" = false;
+
 /*
 ---------
 FUNCTIONS
