@@ -155,6 +155,8 @@ export const BUNDLE_SCHEMA = Joi
 
 export const SUBSCRIPTION_SCHEMA = Joi
     .object({
+        id: ID_SCHEMA(Config.ID_PREFIXES.SUBSCRIPTION).required(),
+        status: STRING_SCHEMA.required(),
         user: Joi
             .alternatives()
             .try(
