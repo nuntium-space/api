@@ -72,7 +72,7 @@ export const PUBLISHER_SCHEMA = Joi
         __metadata: Joi.object({
             is_author: Joi.boolean().required(),
             is_subscribed: Joi.boolean().required(),
-        }).required(),
+        }),
     });
 
 export const AUTHOR_SCHEMA = Joi
