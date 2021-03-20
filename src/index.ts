@@ -24,7 +24,6 @@ import {
 import { Article } from "./models/Article";
 import { Bundle } from "./models/Bundle";
 import { Organization } from "./models/Organization";
-import { Publisher } from "./models/Publisher";
 import { Session } from "./models/Session";
 import { User } from "./models/User";
 import Database from "./utilities/Database";
@@ -422,81 +421,6 @@ const init = async () =>
             }
 
             await user.delete();
-
-            return h.response();
-        }
-    });
-
-    server.route({
-        method: "GET",
-        path: "/sessions/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
-                }),
-            },
-            response: {
-                schema: SESSION_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const session = await Session.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (session.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            return session.serialize();
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/sessions",
-        options: {
-            auth: false,
-            validate: {
-                payload: SESSION_CREATE_SCHEMA,
-            },
-            response: {
-                schema: SESSION_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const session = await Session.create(request.payload as any);
-
-            return session.serialize();
-        }
-    });
-
-    server.route({
-        method: "DELETE",
-        path: "/sessions/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const session = await Session.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (session.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await session.delete();
 
             return h.response();
         }
