@@ -184,7 +184,7 @@ create table "subscriptions"
     "bundle" id not null,
     "current_period_end" timestamp not null,
     "cancel_at_period_end" boolean not null,
-    "canceled_at" timestamp,
+    "deleted" boolean not null,
     "stripe_subscription_id" text not null,
 
     primary key ("id"),

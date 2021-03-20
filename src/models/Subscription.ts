@@ -12,7 +12,7 @@ interface IDatabaseSubscription
     bundle: string,
     current_period_end: Date,
     cancel_at_period_end: boolean,
-    canceled_at: Date | null,
+    deleted: boolean,
     stripe_subscription_id: string,
 }
 
@@ -30,7 +30,7 @@ interface ISerializedSubscription
     bundle: ISerializedBundle | INotExpandedResource,
     current_period_end: string,
     cancel_at_period_end: boolean,
-    canceled_at: string | null,
+    deleted: boolean,
 }
 
 export class Subscription
@@ -43,7 +43,7 @@ export class Subscription
         public readonly bundle: Bundle | INotExpandedResource,
         private _current_period_end: Date,
         private _cancel_at_period_end: boolean,
-        public readonly canceled_at: Date | null,
+        public readonly deleted: boolean,
         public readonly stripe_subscription_id: string,
     )
     {}
@@ -125,7 +125,7 @@ export class Subscription
                 : this.bundle,
             current_period_end: this.current_period_end.toISOString(),
             cancel_at_period_end: this.cancel_at_period_end,
-            canceled_at: this.canceled_at?.toISOString() ?? null,
+            deleted: this.deleted,
         };
     }
 
@@ -146,7 +146,7 @@ export class Subscription
             bundle,
             data.current_period_end,
             data.cancel_at_period_end,
-            data.canceled_at,
+            data.deleted,
             data.stripe_subscription_id,
         );
     }
