@@ -24,6 +24,11 @@ export class Config
 
     public static readonly ARTICLE_PREVIEW_LENGTH = 200;
 
+    /**
+     * 1 USD
+     */
+    public static readonly BUNDLE_MIN_PRICE = 100;
+
     public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;

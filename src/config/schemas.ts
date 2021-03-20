@@ -150,7 +150,14 @@ export const BUNDLE_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ORGANIZATION),
             )
             .required(),
-        price: MONEY_SCHEMA.required(),
+        price: Joi
+            .alternatives()
+            .try(
+                // The `price` can be 0 (free) or at least `Config.BUNDLE_MIN_PRICE`
+                MONEY_SCHEMA.max(0),
+                MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE)
+            )
+            .required(),
     });
 
 export const SUBSCRIPTION_SCHEMA = Joi
