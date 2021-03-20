@@ -234,15 +234,16 @@ export class User
         );
     }
 
-    public async isSubscribedToBundle(bundle: Bundle): Promise<boolean>
+    public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
     {
         const result = await Database.pool
             .query(
                 `
                 select *
-                from
-                    "v_active_subscriptions"
+                from "subscriptions"
                 where
+                    "deleted" = false
+                    and
                     "user" = $1
                     and
                     "bundle" = $2
@@ -250,7 +251,7 @@ export class User
                 [ this.id, bundle.id ],
             );
 
-        return result.rowCount > 0;
+        return result.rowCount === 0;
     }
 
     public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>

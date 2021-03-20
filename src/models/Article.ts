@@ -257,15 +257,15 @@ export class Article
             `
             select distinct art.*
             from
-                subscriptions as s
+                "v_active_subscriptions" as s
                 inner join
-                bundles_publishers as bp
+                "bundles_publishers" as bp
                 on s.bundle = bp.bundle
                 inner join
-                authors as aut
+                "authors" as aut
                 on aut.publisher = bp.publisher
                 inner join
-                articles as art
+                "articles" as art
                 on art.author = aut.id
             where
                 s.user = $1
