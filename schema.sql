@@ -189,7 +189,6 @@ create table "subscriptions"
 
     primary key ("id"),
 
-    unique ("user", "bundle"),
     unique ("stripe_subscription_id"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
