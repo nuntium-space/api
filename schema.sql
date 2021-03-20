@@ -226,7 +226,7 @@ as
     from "comments" as c;
 
 create view "v_active_subscriptions"
-as select * from "subscriptions" where "deleted" = false;
+as select * from "subscriptions" where "status" = 'active';
 
 /*
 ---------
