@@ -242,7 +242,7 @@ const init = async () =>
                             insert into "subscriptions"
                                 ("id", "status", "user", "bundle", "current_period_end", "cancel_at_period_end", "deleted", "stripe_subscription_id")
                             values
-                                ($1, $2, $3, $4, $5, $6, $7)
+                                ($1, $2, $3, $4, $5, $6, $7, $8)
                             `,
                             [
                                 Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
