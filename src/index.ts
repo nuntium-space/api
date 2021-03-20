@@ -279,13 +279,28 @@ const init = async () =>
                 }
                 case "customer.subscription.updated":
                 {
-                    const object = event.data.object as Stripe.Subscription;
+                    const subscription = event.data.object as Stripe.Subscription;
 
-                    const subscription = await Subscription.retrieveWithSubscriptionId(object.id);
-
-                    await subscription.update({
-                        cancel_at_period_end: object.cancel_at_period_end,
-                    });
+                    await Database.pool
+                        .query(
+                            `
+                            update "subscriptions"
+                            set
+                                "status" = $1,
+                                "cancel_at_period_end" = $2
+                            where
+                                "stripe_subscription_id" = $3
+                            `,
+                            [
+                                subscription.status,
+                                subscription.cancel_at_period_end,
+                                subscription.id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badRequest();
+                        });
 
                     break;
                 }
