@@ -69,6 +69,9 @@ export default <ServerRoute[]>[
         path: "/authors/{id}/articles",
         options: {
             validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
+                }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
