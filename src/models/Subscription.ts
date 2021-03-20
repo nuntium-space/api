@@ -91,7 +91,7 @@ export class Subscription
                     "stripe_subscription_id" = $3
                 `,
                 [
-                    this.current_period_end,
+                    this.current_period_end.toISOString(),
                     this.cancel_at_period_end,
                     this.stripe_subscription_id,
                 ],
