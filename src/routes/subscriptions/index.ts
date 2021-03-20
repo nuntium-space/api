@@ -79,7 +79,7 @@ export default <ServerRoute[]>[
                 throw Boom.badRequest(`The organization that owns the bundle '${bundle.id}' hasn't enabled payments`);
             }
 
-            if (await authenticatedUser.isSubscribedToBundle(bundle))
+            if (!await authenticatedUser.canSubscribeToBundle(bundle))
             {
                 throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
             }
