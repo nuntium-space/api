@@ -303,7 +303,7 @@ const init = async () =>
                             update "subscriptions"
                             set
                                 "status" = $1,
-                                "cancel_at_period_end" = $2
+                                "cancel_at_period_end" = $2,
                                 "canceled_at" = $3
                             where
                                 "stripe_subscription_id" = $4
