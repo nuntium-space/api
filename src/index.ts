@@ -51,6 +51,7 @@ import Stripe from "stripe";
 import { Subscription } from "./models/Subscription";
 import Utilities from "./utilities/Utilities";
 import { PaymentMethod } from "./models/PaymentMethod";
+import routes from "./routes";
 
 const server = Hapi.server({
     port: 4000,
@@ -108,29 +109,7 @@ const init = async () =>
 
     server.auth.default({ strategy: "session" });
 
-    server.route({
-        method: "GET",
-        path: "/articles/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
-                }),
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-            },
-            response: {
-                schema: ARTICLE_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const article = await Article.retrieve(request.params.id, request.query.expand);
-
-            return article.serialize();
-        }
-    });
+    server.route(routes);
 
     server.route({
         method: "GET",
