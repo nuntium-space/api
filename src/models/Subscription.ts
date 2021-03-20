@@ -10,9 +10,10 @@ interface IDatabaseSubscription
     status: string,
     user: string,
     bundle: string,
-    current_period_end: Date | null,
+    current_period_end: Date,
     cancel_at_period_end: boolean,
-    stripe_subscription_id: string | null,
+    canceled_at: Date | null,
+    stripe_subscription_id: string,
 }
 
 interface IUpdateSubscription
@@ -27,8 +28,9 @@ interface ISerializedSubscription
     status: string,
     user: ISerializedUser | INotExpandedResource,
     bundle: ISerializedBundle | INotExpandedResource,
-    current_period_end: string | null,
+    current_period_end: string,
     cancel_at_period_end: boolean,
+    canceled_at: string | null,
 }
 
 export class Subscription
@@ -39,13 +41,14 @@ export class Subscription
         public readonly status: string,
         public readonly user: User | INotExpandedResource,
         public readonly bundle: Bundle | INotExpandedResource,
-        private _current_period_end: Date | null,
+        private _current_period_end: Date,
         private _cancel_at_period_end: boolean,
-        public readonly stripe_subscription_id: string | null,
+        public readonly canceled_at: Date | null,
+        public readonly stripe_subscription_id: string,
     )
     {}
 
-    public get current_period_end(): Date | null
+    public get current_period_end(): Date
     {
         return this._current_period_end;
     }
@@ -120,8 +123,9 @@ export class Subscription
             bundle: this.bundle instanceof Bundle
                 ? this.bundle.serialize()
                 : this.bundle,
-            current_period_end: this.current_period_end?.toISOString() ?? null,
+            current_period_end: this.current_period_end.toISOString(),
             cancel_at_period_end: this.cancel_at_period_end,
+            canceled_at: this.canceled_at?.toISOString() ?? null,
         };
     }
 
@@ -142,6 +146,7 @@ export class Subscription
             bundle,
             data.current_period_end,
             data.cancel_at_period_end,
+            data.canceled_at,
             data.stripe_subscription_id,
         );
     }

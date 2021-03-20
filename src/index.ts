@@ -265,10 +265,26 @@ const init = async () =>
                 {
                     const subscription = event.data.object as Stripe.Subscription;
 
+                    if (!subscription.canceled_at)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
                     await Database.pool
                         .query(
-                            `update "subscriptions" set "status" = $1 where "stripe_subscription_id" = $2`,
-                            [ subscription.status, subscription.id ],
+                            `
+                            update "subscriptions"
+                            set
+                                "status" = $1,
+                                "canceled_at" = $2
+                            where
+                                "stripe_subscription_id" = $3
+                            `,
+                            [
+                                subscription.status,
+                                new Date(subscription.canceled_at * 1000).toISOString(),
+                                subscription.id,
+                            ],
                         )
                         .catch(() =>
                         {
@@ -288,12 +304,16 @@ const init = async () =>
                             set
                                 "status" = $1,
                                 "cancel_at_period_end" = $2
+                                "canceled_at" = $3
                             where
-                                "stripe_subscription_id" = $3
+                                "stripe_subscription_id" = $4
                             `,
                             [
                                 subscription.status,
                                 subscription.cancel_at_period_end,
+                                subscription.canceled_at
+                                    ? new Date(subscription.canceled_at * 1000).toISOString()
+                                    : null,
                                 subscription.id,
                             ],
                         )
@@ -354,8 +374,21 @@ const init = async () =>
 
                     await Database.pool
                         .query(
-                            `update "subscriptions" set "status" = $1 where "stripe_subscription_id" = $2`,
-                            [ subscription.status, subscription.id ],
+                            `
+                            update "subscriptions"
+                            set
+                                "status" = $1,
+                                "canceled_at" = $2
+                            where
+                                "stripe_subscription_id" = $3
+                            `,
+                            [
+                                subscription.status,
+                                subscription.canceled_at
+                                    ? new Date(subscription.canceled_at * 1000).toISOString()
+                                    : null,
+                                subscription.id,
+                            ],
                         )
                         .catch(() =>
                         {
