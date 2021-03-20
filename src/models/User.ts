@@ -254,6 +254,32 @@ export class User
         return result.rowCount === 0;
     }
 
+    public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean>
+    {
+        /**
+         * The owner of the publisher is considered an author
+         */
+        if (publisher.isOwnedByUser(this))
+        {
+            return true;
+        }
+
+        const result = await Database.pool
+            .query(
+                `
+                select *
+                from "authors"
+                where
+                    "user" = $1
+                    and
+                    "publisher" = $2
+                `,
+                [ this.id, publisher.id ],
+            );
+
+        return result.rowCount > 0;
+    }
+
     public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>
     {
         /**

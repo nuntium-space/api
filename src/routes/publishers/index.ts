@@ -24,9 +24,17 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const publisher = await Publisher.retrieve(request.params.id);
 
-            return publisher.serialize();
+            return {
+                ...publisher.serialize(),
+                __metadata: {
+                    is_author: await authenticatedUser.isAuthorOfPublisher(publisher),
+                    is_subscribed: await authenticatedUser.isSubscribedToPublisher(publisher),
+                },
+            };
         },
     },
     {
