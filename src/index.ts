@@ -8,11 +8,7 @@ import Joi from "joi";
 import qs from "qs";
 import { Config } from "./config/Config";
 import {
-    ARTICLE_CREATE_SCHEMA,
     ARTICLE_SCHEMA,
-    ARTICLE_UPDATE_SCHEMA,
-    AUTHOR_CREATE_SCHEMA,
-    AUTHOR_SCHEMA,
     BUNDLE_CREATE_SCHEMA,
     BUNDLE_SCHEMA,
     BUNDLE_UPDATE_SCHEMA,
@@ -39,7 +35,6 @@ import {
     USER_UPDATE_SCHEMA
 } from "./config/schemas";
 import { Article } from "./models/Article";
-import { Author } from "./models/Author";
 import { Bundle } from "./models/Bundle";
 import { Comment } from "./models/Comment";
 import { Organization } from "./models/Organization";
@@ -172,62 +167,6 @@ const init = async () =>
             );
 
             return comment.serialize();
-        }
-    });
-
-    server.route({
-        method: "GET",
-        path: "/authors/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
-                }),
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-            },
-            response: {
-                schema: AUTHOR_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const author = await Author.retrieve(request.params.id, request.query.expand);
-
-            return author.serialize();
-        }
-    });
-
-    server.route({
-        method: "DELETE",
-        path: "/authors/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const author = await Author.retrieve(request.params.id, [ "publisher" ]);
-
-            if (!(author.publisher instanceof Publisher))
-            {
-                throw Boom.badImplementation();
-            }
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (!author.publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
-
-            await author.delete();
-
-            return h.response();
         }
     });
 
@@ -873,39 +812,6 @@ const init = async () =>
 
     server.route({
         method: "GET",
-        path: "/publishers/{id}/authors",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
-                }),
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-            },
-            response: {
-                schema: Joi.array().items(AUTHOR_SCHEMA).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const publisher = await Publisher.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (!publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
-
-            const authors = await Author.forPublisher(publisher, request.query.expand);
-
-            return authors.map(author => author.serialize());
-        }
-    });
-
-    server.route({
-        method: "GET",
         path: "/publishers/{id}/bundles",
         options: {
             validate: {
@@ -927,46 +833,6 @@ const init = async () =>
             const bundles = await Bundle.forPublisher(publisher, request.query.expand);
 
             return bundles.map(bundle => bundle.serialize());
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/publishers/{id}/authors",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
-                }),
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-                payload: AUTHOR_CREATE_SCHEMA,
-            },
-            response: {
-                schema: AUTHOR_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const publisher = await Publisher.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (!publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
-
-            const author = await Author.create(
-                {
-                    email: (request.payload as any).email,
-                    publisher: publisher.id,
-                },
-                request.query.expand,
-            );
-
-            return author.serialize();
         }
     });
 
