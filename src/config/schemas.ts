@@ -95,7 +95,7 @@ export const ARTICLE_SCHEMA = Joi
         id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
         title: STRING_SCHEMA.max(50).required(),
         content: STRING_SCHEMA.required(),
-        reading_time: Joi.number().min(0).required(),
+        reading_time: Joi.number().integer().min(0).required(),
         author: Joi
             .alternatives()
             .try(
