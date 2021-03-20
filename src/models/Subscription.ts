@@ -6,6 +6,8 @@ import { ISerializedUser, User } from "./User";
 
 interface IDatabaseSubscription
 {
+    id: string,
+    status: string,
     user: string,
     bundle: string,
     current_period_end: Date | null,
@@ -21,6 +23,8 @@ interface IUpdateSubscription
 
 interface ISerializedSubscription
 {
+    id: string,
+    status: string,
     user: ISerializedUser | INotExpandedResource,
     bundle: ISerializedBundle | INotExpandedResource,
     current_period_end: string | null,
@@ -31,23 +35,15 @@ export class Subscription
 {
     private constructor
     (
-        private readonly _user: User | INotExpandedResource,
-        private readonly _bundle: Bundle | INotExpandedResource,
+        public readonly id: string,
+        public readonly status: string,
+        public readonly user: User | INotExpandedResource,
+        public readonly bundle: Bundle | INotExpandedResource,
         private _current_period_end: Date | null,
         private _cancel_at_period_end: boolean,
-        private readonly _stripe_subscription_id: string | null,
+        public readonly stripe_subscription_id: string | null,
     )
     {}
-
-    public get user(): User | INotExpandedResource
-    {
-        return this._user;
-    }
-
-    public get bundle(): Bundle | INotExpandedResource
-    {
-        return this._bundle;
-    }
 
     public get current_period_end(): Date | null
     {
@@ -57,11 +53,6 @@ export class Subscription
     public get cancel_at_period_end(): boolean
     {
         return this._cancel_at_period_end;
-    }
-
-    public get stripe_subscription_id(): string | null
-    {
-        return this._stripe_subscription_id;
     }
 
     public static async retrieveWithSubscriptionId(subscriptionId: string): Promise<Subscription>
@@ -121,6 +112,8 @@ export class Subscription
     public serialize(): ISerializedSubscription
     {
         return {
+            id: this.id,
+            status: this.status,
             user: this.user instanceof User
                 ? this.user.serialize()
                 : this.user,
@@ -143,6 +136,8 @@ export class Subscription
             : { id: data.bundle };
 
         return new Subscription(
+            data.id,
+            data.status,
             user,
             bundle,
             data.current_period_end,
