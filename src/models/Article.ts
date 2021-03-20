@@ -310,7 +310,7 @@ export class Article
             content: options?.preview && this.content.length > Config.ARTICLE_PREVIEW_LENGTH
                 ? this.content.substr(0, Config.ARTICLE_PREVIEW_LENGTH) + "..."
                 : this.content,
-            reading_time: readingTime(this.content).minutes,
+            reading_time: Math.round(readingTime(this.content).minutes),
             author: this.author instanceof Author
                 ? this.author.serialize()
                 : this.author,
