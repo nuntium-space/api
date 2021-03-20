@@ -5,6 +5,7 @@ import { Config } from "../../config/Config";
 import { ARTICLE_CREATE_SCHEMA, ARTICLE_SCHEMA, ARTICLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
+import { Publisher } from "../../models/Publisher";
 import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
@@ -29,6 +30,38 @@ export default <ServerRoute[]>[
             const article = await Article.retrieve(request.params.id, request.query.expand);
     
             return article.serialize();
+        },
+    },
+    {
+        method: "GET",
+        path: "/publishers/{id}/articles",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                }),
+            },
+            response: {
+                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!await authenticatedUser.isSubscribedToPublisher(publisher))
+            {
+                throw Boom.paymentRequired();
+            }
+
+            const articles = await Article.forPublisher(publisher, request.query.expand);
+
+            return articles.map(article => article.serialize({ preview: true }));
         },
     },
     {
