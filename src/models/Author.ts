@@ -111,6 +111,16 @@ export class Author
         return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
     }
 
+    public static async forUser(user: User, expand?: string[]): Promise<Author[]>
+    {
+        const result = await Database.pool.query(
+            `select * from "authors" where "user" = $1`,
+            [ user.id ],
+        );
+
+        return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
+    }
+
     public serialize(): ISerializedAuthor
     {
         return {

@@ -86,33 +86,6 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "GET",
-        path: "/users/{id}/publishers",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-                }),
-            },
-            response: {
-                schema: Joi.array().items(PUBLISHER_SCHEMA).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (request.params.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const publishers = await Publisher.forUser(authenticatedUser);
-
-            return publishers.map(publisher => publisher.serialize());
-        },
-    },
-    {
         method: "POST",
         path: "/bundles/{bundle_id}/publishers/{publisher_id}",
         options: {
