@@ -176,74 +176,6 @@ const init = async () =>
     });
 
     server.route({
-        method: "PATCH",
-        path: "/articles/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
-                }),
-                payload: ARTICLE_UPDATE_SCHEMA,
-            },
-            response: {
-                schema: ARTICLE_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const article = await Article.retrieve(request.params.id, [ "author" ]);
-
-            if (!(article.author instanceof Author))
-            {
-                throw Boom.badImplementation();
-            }
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (article.author.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await article.update(request.payload as any);
-
-            return article.serialize();
-        }
-    });
-
-    server.route({
-        method: "DELETE",
-        path: "/articles/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const article = await Article.retrieve(request.params.id, [ "author" ]);
-
-            if (!(article.author instanceof Author))
-            {
-                throw Boom.badImplementation();
-            }
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (article.author.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await article.delete();
-
-            return h.response();
-        }
-    });
-
-    server.route({
         method: "GET",
         path: "/authors/{id}",
         options: {
@@ -264,41 +196,6 @@ const init = async () =>
             const author = await Author.retrieve(request.params.id, request.query.expand);
 
             return author.serialize();
-        }
-    });
-
-    server.route({
-        method: "POST",
-        path: "/authors/{id}/articles",
-        options: {
-            validate: {
-                query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
-                }),
-                payload: ARTICLE_CREATE_SCHEMA,
-            },
-            response: {
-                schema: ARTICLE_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            const author = await Author.retrieve(request.params.id);
-
-            if (author.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const article = await Article.create(
-                request.payload as any,
-                author,
-                request.query.expand,
-            );
-
-            return article.serialize();
         }
     });
 
