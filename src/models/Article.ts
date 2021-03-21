@@ -311,6 +311,7 @@ export class Article
     }): ISerializedArticle
     {
         options ??= {};
+        options.preview ??= true;
         options.format ??= "raw";
 
         const content = options.format === "raw"
@@ -320,9 +321,7 @@ export class Article
         return {
             id: this.id,
             title: this.title,
-            content: options?.preview && this.content.length > Config.ARTICLE_PREVIEW_LENGTH
-                ? this.content.substr(0, Config.ARTICLE_PREVIEW_LENGTH) + "..."
-                : content,
+            content: options.preview ? "" : content,
             reading_time: Math.round(readingTime(this.content).minutes),
             author: this.author instanceof Author
                 ? this.author.serialize()

@@ -22,8 +22,6 @@ export class Config
         PAYMENT_METHOD: "pmt",
     };
 
-    public static readonly ARTICLE_PREVIEW_LENGTH = 200;
-
     /**
      * 1 USD
      */
