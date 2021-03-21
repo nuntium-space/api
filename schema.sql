@@ -212,7 +212,7 @@ create table "users"
 
     unique ("email"),
 
-    foreign key ("default_payment_method") references "payment_methods" on update cascade,
+    foreign key ("default_payment_method") references "payment_methods"("stripe_id") on update cascade,
 
     check ("id" like 'usr_%')
 );
