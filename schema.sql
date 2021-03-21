@@ -27,22 +27,6 @@ TABLES
 ------
 */
 
-create table "users"
-(
-    "id" id not null,
-    "first_name" varchar(50) not null,
-    "last_name" varchar(50) not null,
-    "email" email_address not null,
-    "password" text not null,
-    "stripe_customer_id" text,
-
-    primary key ("id"),
-
-    unique ("email"),
-
-    check ("id" like 'usr_%')
-);
-
 create table "organizations"
 (
     "id" id not null,
@@ -212,6 +196,25 @@ create table "payment_methods"
     foreign key ("user") references "users" on update cascade on delete cascade,
 
     check ("id" like 'pmt_%')
+);
+
+create table "users"
+(
+    "id" id not null,
+    "first_name" varchar(50) not null,
+    "last_name" varchar(50) not null,
+    "email" email_address not null,
+    "password" text not null,
+    "default_payment_method" id,
+    "stripe_customer_id" text,
+
+    primary key ("id"),
+
+    unique ("email"),
+
+    foreign key ("default_payment_method") references "payment_methods" on update cascade,
+
+    check ("id" like 'usr_%')
 );
 
 /*
