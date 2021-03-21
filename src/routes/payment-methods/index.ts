@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, PAYMENT_METHOD_SCHEMA } from "../../config/schemas";
+import { ID_SCHEMA, PAYMENT_METHOD_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { PaymentMethod } from "../../models/PaymentMethod";
 import { User } from "../../models/User";
 
@@ -48,7 +48,8 @@ export default <ServerRoute[]>[
                     id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
                 }),
                 payload: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
+                    // ID of a Stripe Payment Method
+                    id: STRING_SCHEMA.required(),
                 }),
             },
         },
