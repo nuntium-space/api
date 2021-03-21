@@ -80,7 +80,7 @@ export class Bundle
                     data.name,
                     organization.id,
                     data.price,
-                    false,
+                    true,
                 ],
             )
             .catch(async () =>
