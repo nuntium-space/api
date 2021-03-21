@@ -176,7 +176,7 @@ create table "subscriptions"
     unique ("stripe_subscription_id"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("bundle") references "bundles" on update cascade on delete cascade,
+    foreign key ("bundle") references "bundles" on update cascade,
 
     check ("id" like 'sub_%')
 );
