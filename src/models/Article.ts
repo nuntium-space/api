@@ -306,12 +306,18 @@ export class Article
     }
 
     public serialize(options?: {
+        /**
+         * @default false
+         */
         includeContent?: boolean,
+        /**
+         * @default `raw`
+         */
         format?: "raw" | "html",
     }): ISerializedArticle
     {
         options ??= {};
-        options.includeContent ??= true;
+        options.includeContent ??= false;
         options.format ??= "raw";
 
         const content = options.format === "raw"
