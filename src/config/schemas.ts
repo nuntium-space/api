@@ -162,6 +162,7 @@ export const BUNDLE_SCHEMA = Joi
                 MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE)
             )
             .required(),
+        active: Joi.boolean().required(),
     });
 
 export const SUBSCRIPTION_SCHEMA = Joi

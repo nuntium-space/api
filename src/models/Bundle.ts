@@ -34,6 +34,7 @@ export interface ISerializedBundle
     name: string,
     organization: ISerializedOrganization | INotExpandedResource,
     price: number,
+    active: boolean,
 }
 
 export class Bundle
@@ -288,6 +289,7 @@ export class Bundle
                 ? this.organization.serialize()
                 : this.organization,
             price: this.price,
+            active: this.active,
         };
     }
 
