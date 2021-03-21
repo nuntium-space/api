@@ -270,7 +270,7 @@ export class Bundle
             from
                 bundles_publishers as bp
                 inner join
-                bundles as b
+                v_active_bundles as b
                 on bp.bundle = b.id
             where bp.publisher = $1`,
             [ publisher.id ],

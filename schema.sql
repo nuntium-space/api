@@ -224,6 +224,9 @@ VIEWS
 -----
 */
 
+create view "v_active_bundles"
+as select * from "bundles" where "active" = true;
+
 create view "v_comments"
 as
     select *, (select count(*) from "comments" where "parent" = "c"."id") as "reply_count"
