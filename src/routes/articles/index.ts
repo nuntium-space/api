@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ARTICLE_CREATE_SCHEMA, ARTICLE_SCHEMA, ARTICLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA } from "../../config/schemas";
+import { ARTICLE_CREATE_SCHEMA, ARTICLE_SCHEMA, ARTICLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
@@ -19,6 +19,7 @@ export default <ServerRoute[]>[
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
+                    format: STRING_SCHEMA.allow("raw", "html"),
                 }),
             },
             response: {
@@ -43,7 +44,7 @@ export default <ServerRoute[]>[
                 throw Boom.paymentRequired();
             }
     
-            return article.serialize();
+            return article.serialize({ format: request.query.format });
         },
     },
     {

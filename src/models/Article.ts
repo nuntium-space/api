@@ -304,8 +304,14 @@ export class Article
         return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
     }
 
-    public serialize(options?: { preview?: boolean }): ISerializedArticle
+    public serialize(options?: {
+        preview?: boolean,
+        format?: "raw" | "html",
+    }): ISerializedArticle
     {
+        options ??= {};
+        options.format ??= "raw";
+
         return {
             id: this.id,
             title: this.title,
