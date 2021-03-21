@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import marked from "marked";
 import readingTime from "reading-time";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
@@ -312,12 +313,16 @@ export class Article
         options ??= {};
         options.format ??= "raw";
 
+        const content = options.format === "raw"
+            ? this.content
+            : marked(this.content);
+
         return {
             id: this.id,
             title: this.title,
             content: options?.preview && this.content.length > Config.ARTICLE_PREVIEW_LENGTH
                 ? this.content.substr(0, Config.ARTICLE_PREVIEW_LENGTH) + "..."
-                : this.content,
+                : content,
             reading_time: Math.round(readingTime(this.content).minutes),
             author: this.author instanceof Author
                 ? this.author.serialize()
