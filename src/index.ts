@@ -232,6 +232,25 @@ const init = async () =>
 
                     break;
                 }
+                case "customer.updated":
+                {
+                    const customer = event.data.object as Stripe.Customer;
+
+                    await Database.pool
+                        .query(
+                            `update "users" set "default_payment_method" = $1 where "id" = $2`,
+                            [
+                                customer.invoice_settings.default_payment_method,
+                                customer.metadata.user_id,
+                            ],
+                        )
+                        .catch(() =>
+                        {
+                            throw Boom.badImplementation();
+                        });
+
+                    break;
+                }
                 case "customer.subscription.created":
                 {
                     const subscription = event.data.object as Stripe.Subscription;
