@@ -126,7 +126,7 @@ const init = async () =>
 
             const articles = await Article.retrieveMultiple(ids, request.query.expand);
 
-            return articles.map(article => article.serialize({ preview: true }));
+            return articles.map(article => article.serialize());
         }
     });
 
@@ -163,7 +163,7 @@ const init = async () =>
                 expand: request.query.expand,
             });
 
-            return articles.map(article => article.serialize({ preview: true }));
+            return articles.map(article => article.serialize());
         }
     });
 

@@ -44,7 +44,10 @@ export default <ServerRoute[]>[
                 throw Boom.paymentRequired();
             }
     
-            return article.serialize({ format: request.query.format });
+            return article.serialize({
+                includeContent: true,
+                format: request.query.format,
+            });
         },
     },
     {
@@ -76,7 +79,7 @@ export default <ServerRoute[]>[
 
             const articles = await Article.forPublisher(publisher, request.query.expand);
 
-            return articles.map(article => article.serialize({ preview: true }));
+            return articles.map(article => article.serialize());
         },
     },
     {
