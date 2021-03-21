@@ -31,7 +31,12 @@ export default <ServerRoute[]>[
 
             const paymentMethods = await PaymentMethod.forUser(authenticatedUser);
 
-            return paymentMethods.map(paymentMethod => paymentMethod.serialize());
+            return paymentMethods.map(paymentMethod => ({
+                ...paymentMethod.serialize(),
+                __metadata: {
+                    is_default: authenticatedUser.default_payment_method?.id === paymentMethod.id,
+                },
+            }));
         },
     },
     {

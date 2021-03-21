@@ -199,6 +199,9 @@ export const PAYMENT_METHOD_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
             )
             .required(),
+        __metadata: Joi.object({
+            is_default: Joi.boolean().required(),
+        }),
     });
 
 /*
