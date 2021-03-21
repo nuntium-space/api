@@ -306,12 +306,12 @@ export class Article
     }
 
     public serialize(options?: {
-        preview?: boolean,
+        includeContent?: boolean,
         format?: "raw" | "html",
     }): ISerializedArticle
     {
         options ??= {};
-        options.preview ??= true;
+        options.includeContent ??= true;
         options.format ??= "raw";
 
         const content = options.format === "raw"
@@ -321,7 +321,7 @@ export class Article
         return {
             id: this.id,
             title: this.title,
-            content: options.preview ? "" : content,
+            content: options.includeContent ? content : "",
             reading_time: Math.round(readingTime(this.content).minutes),
             author: this.author instanceof Author
                 ? this.author.serialize()
