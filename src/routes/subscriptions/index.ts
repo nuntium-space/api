@@ -84,6 +84,11 @@ export default <ServerRoute[]>[
                 throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
             }
 
+            if (!bundle.active)
+            {
+                throw Boom.forbidden(`The bundle '${bundle.id}' is not active`);
+            }
+
             await Config.STRIPE.subscriptions
                 .create({
                     customer: authenticatedUser.stripe_customer_id,
