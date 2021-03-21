@@ -193,7 +193,11 @@ export class User
                 : this._password;
         }
 
-        await Database.pool
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client
             .query(
                 `
                 update "users"
@@ -213,10 +217,31 @@ export class User
                     this.id,
                 ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
+
+        if (this.stripe_customer_id)
+        {
+            await Config.STRIPE.customers
+                .update(this.stripe_customer_id, {
+                    name: `${data.first_name} ${data.last_name}`,
+                    email: data.email,
+                })
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badRequest();
+                });
+        }
+    
+        await client.query("commit");
+    
+        client.release();
     }
 
     public async delete(): Promise<void>
