@@ -45,7 +45,7 @@ export const USER_SCHEMA = Joi
         first_name: STRING_SCHEMA.max(50).required(),
         last_name: STRING_SCHEMA.max(50).required(),
         email: EMAIL_SCHEMA.required(),
-        has_payment_methods: Joi.boolean().required(),
+        has_default_payment_method: Joi.boolean().required(),
     });
 
 export const SESSION_SCHEMA = Joi

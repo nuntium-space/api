@@ -1,8 +1,10 @@
 import Boom from "@hapi/boom";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
+import { PaymentMethod } from "./PaymentMethod";
 import { Publisher } from "./Publisher";
 
 interface IDatabaseUser
@@ -12,6 +14,7 @@ interface IDatabaseUser
     last_name: string,
     email: string,
     password: string,
+    default_payment_method: string | null,
     stripe_customer_id: string | null,
 }
 
@@ -38,27 +41,22 @@ export interface ISerializedUser
     first_name: string,
     last_name: string,
     email: string,
-    has_payment_methods: boolean,
+    has_default_payment_method: boolean,
 }
 
 export class User
 {
     private constructor
     (
-        private readonly _id: string,
+        public readonly id: string,
         private _first_name: string,
-        private  _last_name: string,
+        private _last_name: string,
         private _email: string,
         private _password: string,
-        private readonly _stripe_customer_id: string | null,
-        private readonly _has_payment_methods: boolean,
+        public readonly default_payment_method: PaymentMethod | INotExpandedResource | null,
+        public readonly stripe_customer_id: string | null,
     )
     {}
-
-    public get id(): string
-    {
-        return this._id;
-    }
 
     public get first_name(): string
     {
@@ -78,11 +76,6 @@ export class User
     public get password(): string
     {
         return this._password;
-    }
-
-    public get stripe_customer_id(): string | null
-    {
-        return this._stripe_customer_id;
     }
 
     public static async create(data: ICreateUser): Promise<User>
@@ -316,17 +309,20 @@ export class User
             first_name: this.first_name,
             last_name: this.last_name,
             email: this.email,
-            has_payment_methods: this._has_payment_methods,
+            has_default_payment_method: this.default_payment_method !== null,
         };
     }
 
-    private static async deserialize(data: IDatabaseUser): Promise<User>
+    private static async deserialize(data: IDatabaseUser, expand?: string[]): Promise<User>
     {
-        const result = await Database.pool
-            .query(
-                `select count(id) as "count" from "payment_methods" where "user" = $1`,
-                [ data.id ],
-            );
+        let paymentMethod: PaymentMethod | INotExpandedResource | null = null;
+
+        if (data.default_payment_method !== null)
+        {
+            paymentMethod = expand?.includes("default_payment_method")
+                ? await PaymentMethod.retrieve(data.default_payment_method)
+                : { id: data.default_payment_method };
+        }
 
         return new User(
             data.id,
@@ -334,8 +330,8 @@ export class User
             data.last_name,
             data.email,
             data.password,
+            paymentMethod,
             data.stripe_customer_id,
-            result.rows[0].count > 0,
         );
     }
 }
