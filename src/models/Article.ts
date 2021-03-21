@@ -311,7 +311,7 @@ export class Article
          */
         includeContent?: boolean,
         /**
-         * @default `raw`
+         * @default "raw"
          */
         format?: "raw" | "html",
     }): ISerializedArticle
