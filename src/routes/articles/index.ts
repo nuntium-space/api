@@ -29,18 +29,16 @@ export default <ServerRoute[]>[
         {
             const authenticatedUser = request.auth.credentials.user as User;
 
-            const article = await Article.retrieve(request.params.id, [
-                ...request.query.expand,
-                "author",
-                "author.publisher"
-            ]);
+            const article = await Article.retrieve(request.params.id, request.query.expand);
 
-            if (!(article.author instanceof Author) || !(article.author.publisher instanceof Publisher))
+            const author = await Author.retrieve(article.author.id, [ "publisher" ]);
+
+            if (!(author.publisher instanceof Publisher))
             {
                 throw Boom.badImplementation();
             }
 
-            if (!await authenticatedUser.isSubscribedToPublisher(article.author.publisher))
+            if (!await authenticatedUser.isSubscribedToPublisher(author.publisher))
             {
                 throw Boom.paymentRequired();
             }
