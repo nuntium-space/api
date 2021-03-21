@@ -221,10 +221,30 @@ export class User
 
     public async delete(): Promise<void>
     {
-        await Database.pool.query(
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client.query(
             `delete from "users" where "id" = $1`,
             [ this.id ],
         );
+
+        if (this.stripe_customer_id)
+        {
+            await Config.STRIPE.customers
+                .del(this.stripe_customer_id)
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badRequest();
+                });
+        }
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
