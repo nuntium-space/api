@@ -34,7 +34,7 @@ export default <ServerRoute[]>[
             return paymentMethods.map(paymentMethod => ({
                 ...paymentMethod.serialize(),
                 __metadata: {
-                    is_default: authenticatedUser.default_payment_method?.id === paymentMethod.id,
+                    is_default: authenticatedUser.default_payment_method?.id === paymentMethod.stripe_id,
                 },
             }));
         },
