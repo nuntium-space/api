@@ -12,6 +12,7 @@ interface IDatabaseBundle
     name: string,
     organization: string,
     price: number,
+    active: boolean,
     stripe_product_id: string | null,
     stripe_price_id: string | null,
 }
@@ -39,43 +40,19 @@ export class Bundle
 {
     private constructor
     (
-        private readonly _id: string,
+        public readonly id: string,
         private _name: string,
-        private readonly _organization: Organization | INotExpandedResource,
-        private readonly _price: number,
-        private readonly _stripe_product_id: string | null,
-        private readonly _stripe_price_id: string | null,
+        public readonly organization: Organization | INotExpandedResource,
+        public readonly price: number,
+        public readonly active: boolean,
+        public readonly stripe_product_id: string | null,
+        public readonly stripe_price_id: string | null,
     )
     {}
-
-    public get id(): string
-    {
-        return this._id;
-    }
 
     public get name(): string
     {
         return this._name;
-    }
-
-    public get organization(): Organization | INotExpandedResource
-    {
-        return this._organization;
-    }
-
-    public get price(): number
-    {
-        return this._price;
-    }
-
-    public get stripe_product_id(): string | null
-    {
-        return this._stripe_product_id;
-    }
-
-    public get stripe_price_id(): string | null
-    {
-        return this._stripe_price_id;
     }
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
@@ -93,9 +70,9 @@ export class Bundle
             .query(
                 `
                 insert into "bundles"
-                    ("id", "name", "organization", "price")
+                    ("id", "name", "organization", "price", "active")
                 values
-                    ($1, $2, $3, $4)
+                    ($1, $2, $3, $4, $5)
                 returning *
                 `,
                 [
@@ -103,6 +80,7 @@ export class Bundle
                     data.name,
                     organization.id,
                     data.price,
+                    false,
                 ],
             )
             .catch(async () =>
@@ -218,8 +196,8 @@ export class Bundle
         await client.query("begin");
 
         await client.query(
-            `delete from "bundles" where "id" = $1`,
-            [ this.id ],
+            `update "bundles" set "active" = $1 where "id" = $2`,
+            [ false, this.id ],
         );
 
         await Config.STRIPE.products
@@ -324,6 +302,7 @@ export class Bundle
             data.name,
             organization,
             parseInt(data.price.toString()),
+            data.active,
             data.stripe_product_id,
             data.stripe_price_id,
         );

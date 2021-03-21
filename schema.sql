@@ -136,6 +136,7 @@ create table "bundles"
     "name" varchar(50) not null,
     "organization" id not null,
     "price" int not null,
+    "active" boolean not null,
     "stripe_product_id" text,
     "stripe_price_id" text,
 
@@ -143,7 +144,7 @@ create table "bundles"
 
     unique ("name", "organization"),
 
-    foreign key ("organization") references "organizations" on update cascade on delete cascade,
+    foreign key ("organization") references "organizations" on update cascade,
 
     check ("id" like 'bdl_%'),
     check ("price" >= 0)
