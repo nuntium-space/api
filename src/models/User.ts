@@ -316,11 +316,15 @@ export class User
     {
         const authorCountResult = await Database.pool
             .query(
-                `select count(*) from "authors" where "user" = $1`,
+                `
+                select count(*) as "count"
+                from "authors"
+                where "user" = $1
+                `,
                 [ this.id ],
             );
 
-        if (authorCountResult.rowCount > 0)
+        if (authorCountResult.rows[0].count > 0)
         {
             return false;
         }
@@ -328,7 +332,7 @@ export class User
         const authorCountForOwnedPublishersResult = await Database.pool
             .query(
                 `
-                select count(*)
+                select count(*) as "count"
                 from
                     "publishers" as "p"
                     inner join
@@ -342,7 +346,7 @@ export class User
                 [ this.id ],
             );
 
-        return authorCountForOwnedPublishersResult.rowCount === 0;
+        return authorCountForOwnedPublishersResult.rows[0].count === 0;
     }
 
     public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
