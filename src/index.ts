@@ -236,14 +236,21 @@ const init = async () =>
                 {
                     const customer = event.data.object as Stripe.Customer;
 
-                    if (typeof customer.invoice_settings.default_payment_method !== "string")
-                    {
-                        throw Boom.badImplementation();
-                    }
-
                     const user = await User.retrieve(customer.metadata.user_id);
 
-                    await user.setDefaultPaymentMethod(customer.invoice_settings.default_payment_method);
+                    if (customer.invoice_settings.default_payment_method !== null)
+                    {
+                        if (typeof customer.invoice_settings.default_payment_method !== "string")
+                        {
+                            throw Boom.badImplementation();
+                        }
+
+                        await user.setDefaultPaymentMethod(customer.invoice_settings.default_payment_method);
+                    }
+                    else
+                    {
+                        await user.removeDefaultPaymentMethod();
+                    }
 
                     break;
                 }

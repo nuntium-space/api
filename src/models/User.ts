@@ -275,41 +275,34 @@ export class User
         client.release();
     }
 
-    public async setDefaultPaymentMethod(stripePaymentMethodId: string): Promise<void>
+    public async removeDefaultPaymentMethod(): Promise<void>
     {
-        const paymentMethod = await PaymentMethod.retrieveWithStripeId(stripePaymentMethodId);
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        await client
+        await Database.pool
             .query(
                 `delete from "default_payment_methods" where "user" = $1`,
                 [ this.id ],
             )
-            .catch(async () =>
+            .catch(() =>
             {
-                await client.query("rollback");
-
                 throw Boom.badImplementation();
             });
+    }
 
-        await client
+    public async setDefaultPaymentMethod(stripePaymentMethodId: string): Promise<void>
+    {
+        const paymentMethod = await PaymentMethod.retrieveWithStripeId(stripePaymentMethodId);
+
+        await this.removeDefaultPaymentMethod();
+
+        await Database.pool
             .query(
                 `insert into "default_payment_methods" ("user", "payment_method") values ($1, $2)`,
                 [ this.id, paymentMethod.id ],
             )
-            .catch(async () =>
+            .catch(() =>
             {
-                await client.query("rollback");
-
                 throw Boom.badImplementation();
             });
-
-        await client.query("commit");
-
-        client.release();
     }
 
     public async canBeDeleted(): Promise<boolean>
