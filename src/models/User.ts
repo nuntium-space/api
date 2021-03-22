@@ -246,6 +246,11 @@ export class User
 
     public async delete(): Promise<void>
     {
+        if (!await this.canBeDeleted())
+        {
+            throw Boom.forbidden(`Cannot delete user '${this.id}'`);
+        }
+
         const client = await Database.pool.connect();
 
         await client.query("begin");
@@ -270,6 +275,39 @@ export class User
         await client.query("commit");
 
         client.release();
+    }
+
+    public async canBeDeleted(): Promise<boolean>
+    {
+        const authorCountResult = await Database.pool
+            .query(
+                `select count(*) from "authors" where "user" = $1`,
+                [ this.id ],
+            );
+
+        if (authorCountResult.rowCount > 0)
+        {
+            return false;
+        }
+
+        const authorCountForOwnedPublishersResult = await Database.pool
+            .query(
+                `
+                select count(*)
+                from
+                    "publishers" as "p"
+                    inner join
+                    "organizations" as "o"
+                    on "p"."organization" = "o"."id"
+                    inner join
+                    "authors" as "a"
+                    on "a"."publisher" = "p"."id"
+                where "o"."user" = $1
+                `,
+                [ this.id ],
+            );
+
+        return authorCountForOwnedPublishersResult.rowCount === 0;
     }
 
     public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
