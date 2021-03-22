@@ -156,11 +156,20 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const paymentMethod = await PaymentMethod.retrieve(request.params.id);
-
             const authenticatedUser = request.auth.credentials.user as User;
 
+            const paymentMethod = await PaymentMethod.retrieve(request.params.id);
+
             if (paymentMethod.user.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            /**
+             * The default payment method cannot be deleted if
+             * the user has at least one active subscription
+             */
+            if (authenticatedUser.default_payment_method?.id === paymentMethod.id)
             {
                 throw Boom.forbidden();
             }

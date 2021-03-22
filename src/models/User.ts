@@ -420,6 +420,21 @@ export class User
         return result.rowCount > 0;
     }
 
+    public async hasActiveSubscriptions(): Promise<boolean>
+    {
+        const result = await Database.pool
+            .query(
+                `
+                select count(*) as "count"
+                from "v_active_subscriptions"
+                where "user" = $1
+                `,
+                [ this.id ],
+            );
+
+        return result.rows[0].count > 0;
+    }
+
     public serialize(): ISerializedUser
     {
         return {
