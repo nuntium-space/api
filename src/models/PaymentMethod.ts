@@ -87,6 +87,21 @@ export class PaymentMethod
         return PaymentMethod.retrieve(result.rows[0].payment_method);
     }
 
+    public static async retrieveWithStripeId(stripeId: string): Promise<PaymentMethod>
+    {
+        const result = await Database.pool.query(
+            `select * from "payment_methods" where "stripe_id" = $1`,
+            [ stripeId ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            throw Boom.notFound();
+        }
+
+        return PaymentMethod.deserialize(result.rows[0]);
+    }
+
     public static async forUser(user: User, expand?: string[]): Promise<PaymentMethod[]>
     {
         const result = await Database.pool.query(
