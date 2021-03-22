@@ -127,6 +127,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
                 }),
+                query: Joi.object({
+                    expand: EXPAND_QUERY_SCHEMA,
+                    format: STRING_SCHEMA.allow("raw", "html"),
+                }),
                 payload: ARTICLE_UPDATE_SCHEMA,
             },
             response: {
@@ -135,23 +139,23 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const article = await Article.retrieve(request.params.id, [ "author" ]);
-
-            if (!(article.author instanceof Author))
-            {
-                throw Boom.badImplementation();
-            }
-
             const authenticatedUser = request.auth.credentials.user as User;
 
-            if (article.author.user.id !== authenticatedUser.id)
+            const article = await Article.retrieve(request.params.id, request.query.expand);
+
+            const author = await Author.retrieve(article.author.id);
+
+            if (author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
 
             await article.update(request.payload as any);
 
-            return article.serialize();
+            return article.serialize({
+                includeContent: true,
+                format: request.query.format,
+            });
         },
     },
     {
