@@ -1,5 +1,4 @@
 import Boom from "@hapi/boom";
-import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -14,7 +13,6 @@ interface IDatabaseUser
     last_name: string,
     email: string,
     password: string,
-    default_payment_method: string | null,
     stripe_customer_id: string | null,
 }
 
@@ -53,7 +51,7 @@ export class User
         private _last_name: string,
         private _email: string,
         private _password: string,
-        public readonly default_payment_method: PaymentMethod | INotExpandedResource | null,
+        public readonly default_payment_method: PaymentMethod | null,
         public readonly stripe_customer_id: string | null,
     )
     {}
@@ -396,16 +394,9 @@ export class User
         };
     }
 
-    private static async deserialize(data: IDatabaseUser, expand?: string[]): Promise<User>
+    private static async deserialize(data: IDatabaseUser): Promise<User>
     {
-        let paymentMethod: PaymentMethod | INotExpandedResource | null = null;
-
-        if (data.default_payment_method !== null)
-        {
-            paymentMethod = expand?.includes("default_payment_method")
-                ? await PaymentMethod.retrieve(data.default_payment_method)
-                : { id: data.default_payment_method };
-        }
+        const paymentMethod = await PaymentMethod.retrieveDefaultForUser(data.id);
 
         return new User(
             data.id,

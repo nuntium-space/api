@@ -72,6 +72,21 @@ export class PaymentMethod
         return PaymentMethod.deserialize(result.rows[0]);
     }
 
+    public static async retrieveDefaultForUser(userId: string): Promise<PaymentMethod | null>
+    {
+        const result = await Database.pool.query(
+            `select * from "default_payment_methods" where "user" = $1`,
+            [ userId ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            return null;
+        }
+
+        return PaymentMethod.retrieve(result.rows[0].payment_method);
+    }
+
     public static async forUser(user: User, expand?: string[]): Promise<PaymentMethod[]>
     {
         const result = await Database.pool.query(
