@@ -236,18 +236,14 @@ const init = async () =>
                 {
                     const customer = event.data.object as Stripe.Customer;
 
-                    await Database.pool
-                        .query(
-                            `update "users" set "default_payment_method" = $1 where "id" = $2`,
-                            [
-                                customer.invoice_settings.default_payment_method,
-                                customer.metadata.user_id,
-                            ],
-                        )
-                        .catch(() =>
-                        {
-                            throw Boom.badImplementation();
-                        });
+                    if (typeof customer.invoice_settings.default_payment_method !== "string")
+                    {
+                        throw Boom.badImplementation();
+                    }
+
+                    const user = await User.retrieve(customer.metadata.user_id);
+
+                    await user.setDefaultPaymentMethod(customer.invoice_settings.default_payment_method);
 
                     break;
                 }
