@@ -99,6 +99,52 @@ export default <ServerRoute[]>[
         },
     },
     {
+        method: "PUT",
+        path: "/users/{id}/payment-methods/default",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+                payload: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            if (!authenticatedUser.stripe_customer_id)
+            {
+                throw Boom.badImplementation();
+            }
+
+            const paymentMethod = await PaymentMethod.retrieve((request.payload as any).id);
+
+            await Config.STRIPE.customers
+                .update(
+                    authenticatedUser.stripe_customer_id,
+                    {
+                        invoice_settings: {
+                            default_payment_method: paymentMethod.stripe_id,
+                        },
+                    },
+                )
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            return h.response();
+        },
+    },
+    {
         method: "DELETE",
         path: "/payment-methods/{id}",
         options: {
