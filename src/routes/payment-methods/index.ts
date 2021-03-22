@@ -169,7 +169,11 @@ export default <ServerRoute[]>[
              * The default payment method cannot be deleted if
              * the user has at least one active subscription
              */
-            if (authenticatedUser.default_payment_method?.id === paymentMethod.id)
+            if
+            (
+                authenticatedUser.default_payment_method?.id === paymentMethod.id
+                && await authenticatedUser.hasActiveSubscriptions()
+            )
             {
                 throw Boom.forbidden();
             }
