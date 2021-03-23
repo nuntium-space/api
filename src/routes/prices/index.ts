@@ -41,6 +41,7 @@ export default <ServerRoute[]>[
                     id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
                 }),
                 query: Joi.object({
+                    active: Joi.boolean(),
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
             },
@@ -52,7 +53,10 @@ export default <ServerRoute[]>[
         {
             const bundle = await Bundle.retrieve(request.params.id);
 
-            const prices = await Price.forBundle(bundle, request.query.expand);
+            const prices = await Price.forBundle(bundle, {
+                active: request.query.active,
+                expand: request.query.expand,
+            });
 
             return prices.map(price => price.serialize());
         },

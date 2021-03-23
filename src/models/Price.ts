@@ -166,14 +166,23 @@ export class Price
         client.release();
     }
 
-    public static async forBundle(bundle: Bundle, expand?: string[]): Promise<Price[]>
+    public static async forBundle(bundle: Bundle, options?: {
+        active?: boolean,
+        expand?: string[],
+    }): Promise<Price[]>
     {
-        const result = await Database.pool.query(
-            `select * from "prices" where "bundle" = $1`,
-            [ bundle.id ],
-        );
+        let query = `select * from "prices" where "bundle" = $1`;
+        const params: any[] = [ bundle.id ];
 
-        return Promise.all(result.rows.map(row => Price.deserialize(row, expand)));
+        if (options && "active" in options)
+        {
+            query += `and "active" = $2`;
+            params.push(options.active);
+        }
+
+        const result = await Database.pool.query(query, params);
+
+        return Promise.all(result.rows.map(row => Price.deserialize(row, options?.expand)));
     }
 
     public serialize(): ISerializedPrice
