@@ -4,6 +4,7 @@ import bundles from "./bundles";
 import comments from "./comments";
 import organizations from "./organizations";
 import paymentMethods from "./payment-methods";
+import prices from "./prices";
 import publishers from "./publishers";
 import sessions from "./sessions";
 import subscriptions from "./subscriptions";
@@ -16,6 +17,7 @@ export = [
     comments,
     organizations,
     paymentMethods,
+    prices,
     publishers,
     sessions,
     subscriptions,
