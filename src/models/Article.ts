@@ -260,8 +260,11 @@ export class Article
             from
                 "v_active_subscriptions" as s
                 inner join
+                "prices" as p
+				on s.price = p.id
+				inner join
                 "bundles_publishers" as bp
-                on s.bundle = bp.bundle
+                on p.bundle = bp.bundle
                 inner join
                 "authors" as aut
                 on aut.publisher = bp.publisher
