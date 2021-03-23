@@ -348,13 +348,17 @@ export class User
             .query(
                 `
                 select count(*) as "count"
-                from "subscriptions"
+                from
+                    "subscriptions" as s
+                    inner join
+                    "prices" as p
+                    on s.price = p.id
                 where
-                    "deleted" = false
+                    "s"."deleted" = false
                     and
-                    "user" = $1
+                    "s"."user" = $1
                     and
-                    "bundle" = $2
+                    "p"."bundle" = $2
                 `,
                 [ this.id, bundle.id ],
             );
