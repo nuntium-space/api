@@ -94,6 +94,9 @@ export default <ServerRoute[]>[
         path: "/organizations/{id}/bundles",
         options: {
             validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
