@@ -403,9 +403,13 @@ export class User
                 `
                 select count(*) as "count"
                 from
-                    "v_active_subscriptions"
-                    natural join
-                    "bundles_publishers"
+                    "v_active_subscriptions" as s
+                    inner join
+                    "prices" as p
+                    on s.price = p.id
+                    inner join
+                    "bundles_publishers" as bp
+                    on p.bundle = bp.bundle
                 where
                     "user" = $1
                     and
