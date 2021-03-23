@@ -151,10 +151,8 @@ create table "bundles"
     "id" id not null,
     "name" varchar(50) not null,
     "organization" id not null,
-    "price" int not null,
     "active" boolean not null,
     "stripe_product_id" text,
-    "stripe_price_id" text,
 
     primary key ("id"),
 
@@ -175,8 +173,6 @@ create table "prices"
     "stripe_price_id" text,
 
     primary key ("id"),
-
-    unique ("name", "organization"),
 
     foreign key ("bundle") references "bundles" on update cascade on delete cascade,
 
