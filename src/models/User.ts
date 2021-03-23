@@ -339,7 +339,7 @@ export class User
                 [ this.id ],
             );
 
-        return authorCountForOwnedPublishersResult.rows[0].count === 0;
+        return authorCountForOwnedPublishersResult.rows[0].count === BigInt(0);
     }
 
     public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
@@ -359,7 +359,7 @@ export class User
                 [ this.id, bundle.id ],
             );
 
-        return result.rows[0].count === 0;
+        return result.rows[0].count === BigInt(0);
     }
 
     public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean>
