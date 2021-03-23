@@ -238,7 +238,7 @@ create table "default_payment_methods"
     unique ("payment_method"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("payment_method") references "payment_methods" on update cascade on delete cascade,
+    foreign key ("payment_method") references "payment_methods" on update cascade on delete cascade
 );
 
 /*
