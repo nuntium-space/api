@@ -28,7 +28,7 @@ export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format(
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
 export const MONEY_SCHEMA = Joi.number().integer().min(0);
-export const CURRENCY_SCHEMA = STRING_SCHEMA.min(3).max(3).lowercase();
+export const CURRENCY_SCHEMA = STRING_SCHEMA.valid(...Config.CURRENCIES.map(c => c.name)).lowercase();
 
 export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: ID_SCHEMA(prefix).required() });
 
@@ -161,7 +161,7 @@ export const BUNDLE_SCHEMA = Joi
 export const PRICE_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
-        amount: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
+        amount: MONEY_SCHEMA.required(),
         currency: CURRENCY_SCHEMA.required(),
         bundle: Joi
             .alternatives()
@@ -305,7 +305,7 @@ export const BUNDLE_UPDATE_SCHEMA = Joi
 
 export const PRICE_CREATE_SCHEMA = Joi
     .object({
-        amount: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
+        amount: MONEY_SCHEMA.required(),
         currency: CURRENCY_SCHEMA.required(),
     });
 
