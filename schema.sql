@@ -169,6 +169,7 @@ create table "prices"
     "value" int not null,
     "currency" char(3) not null,
     "bundle" id not null,
+    "active" boolean not null,
     "stripe_price_id" text,
 
     primary key ("id"),
