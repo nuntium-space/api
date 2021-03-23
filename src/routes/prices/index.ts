@@ -38,7 +38,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PRICE).required(),
+                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
