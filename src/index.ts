@@ -480,7 +480,7 @@ const init = async () =>
 
                     await Database.pool
                         .query(
-                            `update "bundles" set "stripe_price_id" = $1 where "id" = $2`,
+                            `update "prices" set "stripe_price_id" = $1 where "id" = $2`,
                             [
                                 price.id,
                                 price.metadata.bundle_id,
