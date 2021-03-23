@@ -87,7 +87,7 @@ export class Price
                     interval: "month",
                 },
                 metadata: {
-                    bundle_id: result.rows[0].id,
+                    price_id: result.rows[0].id,
                 },
             })
             .catch(async () =>

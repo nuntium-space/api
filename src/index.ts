@@ -483,7 +483,7 @@ const init = async () =>
                             `update "prices" set "stripe_price_id" = $1 where "id" = $2`,
                             [
                                 price.id,
-                                price.metadata.bundle_id,
+                                price.metadata.price_id,
                             ],
                         )
                         .catch(() =>
