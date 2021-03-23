@@ -160,8 +160,7 @@ create table "bundles"
 
     foreign key ("organization") references "organizations" on update cascade,
 
-    check ("id" like 'bdl_%'),
-    check ("price" >= 0)
+    check ("id" like 'bdl_%')
 );
 
 create table "prices"
