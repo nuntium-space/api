@@ -226,8 +226,8 @@ export class User
         {
             await Config.STRIPE.customers
                 .update(this.stripe_customer_id, {
-                    name: `${data.first_name} ${data.last_name}`,
-                    email: data.email,
+                    name: `${this.first_name} ${this.last_name}`,
+                    email: this.email,
                 })
                 .catch(async () =>
                 {
