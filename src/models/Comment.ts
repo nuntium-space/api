@@ -258,7 +258,7 @@ export class Comment
             user,
             article,
             parent,
-            parseInt((data.reply_count ?? 0).toString()),
+            data.reply_count,
             data.created_at,
             data.updated_at,
         );

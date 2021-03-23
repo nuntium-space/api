@@ -347,7 +347,7 @@ export class User
         const result = await Database.pool
             .query(
                 `
-                select *
+                select count(*) as "count"
                 from "subscriptions"
                 where
                     "deleted" = false
@@ -359,7 +359,7 @@ export class User
                 [ this.id, bundle.id ],
             );
 
-        return result.rowCount === 0;
+        return result.rows[0].count === 0;
     }
 
     public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean>
@@ -401,7 +401,7 @@ export class User
         const result = await Database.pool
             .query(
                 `
-                select *
+                select count(*) as "count"
                 from
                     "v_active_subscriptions"
                     natural join
@@ -414,7 +414,7 @@ export class User
                 [ this.id, publisher.id ],
             );
 
-        return result.rowCount > 0;
+        return result.rows[0].count > 0;
     }
 
     public async hasActiveSubscriptions(): Promise<boolean>
