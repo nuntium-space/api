@@ -50,6 +50,18 @@ export class Price
             throw Boom.badImplementation();
         }
 
+        const currencyConfig = Config.CURRENCIES.find(c => c.name === data.currency);
+
+        if (!currencyConfig)
+        {
+            throw Boom.badData(`Unsupported currency: '${data.currency}'`);
+        }
+
+        if (data.amount < currencyConfig.min)
+        {
+            throw Boom.badData(`The amount must be equal to or greater than '${currencyConfig.min}' for currency '${data.currency}'`);
+        }
+
         const client = await Database.pool.connect();
 
         await client.query("begin");
