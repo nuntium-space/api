@@ -166,6 +166,24 @@ create table "bundles"
     check ("price" >= 0)
 );
 
+create table "prices"
+(
+    "id" id not null,
+    "value" int not null,
+    "currency" char(3) not null,
+    "bundle" id not null,
+    "stripe_price_id" text,
+
+    primary key ("id"),
+
+    unique ("name", "organization"),
+
+    foreign key ("bundle") references "bundles" on update cascade on delete cascade,
+
+    check ("id" like 'pri_%'),
+    check ("value" >= 0)
+);
+
 create table "bundles_publishers"
 (
     "bundle" id not null,
