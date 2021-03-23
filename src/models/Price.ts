@@ -192,7 +192,7 @@ export class Price
     private static async deserialize(data: IDatabasePrice, expand?: string[]): Promise<Price>
     {
         const bundle = expand?.includes("bundle")
-            ? await Bundle.retrieve(data.bundle)
+            ? await Bundle.retrieve(data.bundle, expand.filter(e => e.startsWith("bundle.")).map(e => e.replace("bundle.", "")))
             : { id: data.bundle };
 
         return new Price(
