@@ -184,11 +184,11 @@ export const SUBSCRIPTION_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
             )
             .required(),
-        bundle: Joi
+        price: Joi
             .alternatives()
             .try(
-                BUNDLE_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.BUNDLE),
+                PRICE_SCHEMA,
+                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.PRICE),
             )
             .required(),
         current_period_end: DATETIME_SCHEMA.required(),
