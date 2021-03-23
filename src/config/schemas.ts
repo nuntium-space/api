@@ -160,7 +160,7 @@ export const BUNDLE_SCHEMA = Joi
 
 export const PRICE_SCHEMA = Joi
     .object({
-        id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+        id: ID_SCHEMA(Config.ID_PREFIXES.PRICE).required(),
         amount: MONEY_SCHEMA.required(),
         currency: CURRENCY_SCHEMA.required(),
         bundle: Joi
