@@ -170,6 +170,7 @@ export const PRICE_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.BUNDLE),
             )
             .required(),
+        active: Joi.boolean().required(),
     });
 
 export const SUBSCRIPTION_SCHEMA = Joi
