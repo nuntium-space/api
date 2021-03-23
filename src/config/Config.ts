@@ -23,10 +23,16 @@ export class Config
         PRICE: "pri",
     };
 
-    /**
-     * 1 USD
-     */
-    public static readonly BUNDLE_MIN_PRICE = 100;
+    public static readonly CURRENCIES = [
+        {
+            name: "usd",
+            min: 100,
+        },
+        {
+            name: "eur",
+            min: 100,
+        },
+    ];
 
     public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 
