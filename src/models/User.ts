@@ -364,18 +364,10 @@ export class User
 
     public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean>
     {
-        /**
-         * The owner of the publisher is considered an author
-         */
-        if (publisher.isOwnedByUser(this))
-        {
-            return true;
-        }
-
         const result = await Database.pool
             .query(
                 `
-                select *
+                select count(*) as "count"
                 from "authors"
                 where
                     "user" = $1
@@ -385,7 +377,7 @@ export class User
                 [ this.id, publisher.id ],
             );
 
-        return result.rowCount > 0;
+        return result.rows[0].count > 0;
     }
 
     public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>
