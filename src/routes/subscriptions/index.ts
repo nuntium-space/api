@@ -5,6 +5,7 @@ import { Config } from "../../config/Config";
 import { EXPAND_QUERY_SCHEMA, ID_SCHEMA, SUBSCRIPTION_CREATE_SCHEMA, SUBSCRIPTION_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
+import { Price } from "../../models/Price";
 import { Subscription } from "../../models/Subscription";
 import { User } from "../../models/User";
 
@@ -67,26 +68,36 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const bundle = await Bundle.retrieve((request.payload as any).bundle, [ "organization" ]);
+            const price = await Price.retrieve((request.payload as any).price, [ "bundle", "bundle.organization" ]);
 
-            if (!bundle.stripe_price_id || !(bundle.organization instanceof Organization))
+            if
+            (
+                !price.stripe_price_id
+                || !(price.bundle instanceof Bundle)
+                || !(price.bundle.organization instanceof Organization)
+            )
             {
                 throw Boom.badImplementation();
             }
 
-            if (!bundle.organization.stripe_account_enabled)
+            if (!price.bundle.organization.stripe_account_enabled)
             {
-                throw Boom.badRequest(`The organization that owns the bundle '${bundle.id}' hasn't enabled payments`);
+                throw Boom.badRequest(`The organization that owns the bundle '${price.bundle.id}' hasn't enabled payments`);
             }
 
-            if (!await authenticatedUser.canSubscribeToBundle(bundle))
+            if (!await authenticatedUser.canSubscribeToBundle(price.bundle))
             {
-                throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${bundle.id}'`);
+                throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${price.bundle.id}'`);
             }
 
-            if (!bundle.active)
+            if (!price.active)
             {
-                throw Boom.forbidden(`The bundle '${bundle.id}' is not active`);
+                throw Boom.forbidden(`The price '${price.id}' is not active`);
+            }
+
+            if (!price.bundle.active)
+            {
+                throw Boom.forbidden(`The bundle '${price.bundle.id}' is not active`);
             }
 
             await Config.STRIPE.subscriptions
@@ -94,17 +105,17 @@ export default <ServerRoute[]>[
                     customer: authenticatedUser.stripe_customer_id,
                     items: [
                         {
-                            price: bundle.stripe_price_id,
+                            price: price.stripe_price_id,
                             quantity: 1,
                         },
                     ],
                     application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
                     transfer_data: {
-                        destination: bundle.organization.stripe_account_id,
+                        destination: price.bundle.organization.stripe_account_id,
                     },
                     metadata: {
                         user_id: authenticatedUser.id,
-                        bundle_id: bundle.id,
+                        price_id: price.id,
                     },
                 })
                 .catch(async () =>

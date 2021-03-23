@@ -262,7 +262,7 @@ const init = async () =>
                         .query(
                             `
                             insert into "subscriptions"
-                                ("id", "status", "user", "bundle", "current_period_end", "cancel_at_period_end", "deleted", "stripe_subscription_id")
+                                ("id", "status", "user", "price", "current_period_end", "cancel_at_period_end", "deleted", "stripe_subscription_id")
                             values
                                 ($1, $2, $3, $4, $5, $6, $7, $8)
                             `,
@@ -270,7 +270,7 @@ const init = async () =>
                                 Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
                                 subscription.status,
                                 subscription.metadata.user_id,
-                                subscription.metadata.bundle_id,
+                                subscription.metadata.price_id,
                                 new Date(subscription.current_period_end * 1000),
                                 subscription.cancel_at_period_end,
                                 false,

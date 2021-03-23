@@ -311,5 +311,5 @@ export const PRICE_CREATE_SCHEMA = Joi
 
 export const SUBSCRIPTION_CREATE_SCHEMA = Joi
     .object({
-        bundle: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+        price: ID_SCHEMA(Config.ID_PREFIXES.PRICE).required(),
     });

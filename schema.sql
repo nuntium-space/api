@@ -196,7 +196,7 @@ create table "subscriptions"
     "id" id not null,
     "status" text not null,
     "user" id not null,
-    "bundle" id not null,
+    "price" id not null,
     "current_period_end" timestamp not null,
     "cancel_at_period_end" boolean not null,
     "deleted" boolean not null,
@@ -207,7 +207,7 @@ create table "subscriptions"
     unique ("stripe_subscription_id"),
 
     foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("bundle") references "bundles" on update cascade,
+    foreign key ("price") references "prices" on update cascade,
 
     check ("id" like 'sub_%')
 );

@@ -1,7 +1,7 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import Database from "../utilities/Database";
-import { Bundle, ISerializedBundle } from "./Bundle";
+import { ISerializedPrice, Price } from "./Price";
 import { ISerializedUser, User } from "./User";
 
 interface IDatabaseSubscription
@@ -9,7 +9,7 @@ interface IDatabaseSubscription
     id: string,
     status: string,
     user: string,
-    bundle: string,
+    price: string,
     current_period_end: Date,
     cancel_at_period_end: boolean,
     deleted: boolean,
@@ -27,7 +27,7 @@ interface ISerializedSubscription
     id: string,
     status: string,
     user: ISerializedUser | INotExpandedResource,
-    bundle: ISerializedBundle | INotExpandedResource,
+    price: ISerializedPrice | INotExpandedResource,
     current_period_end: string,
     cancel_at_period_end: boolean,
     deleted: boolean,
@@ -40,7 +40,7 @@ export class Subscription
         public readonly id: string,
         public readonly status: string,
         public readonly user: User | INotExpandedResource,
-        public readonly bundle: Bundle | INotExpandedResource,
+        public readonly price: Price | INotExpandedResource,
         private _current_period_end: Date,
         private _cancel_at_period_end: boolean,
         public readonly deleted: boolean,
@@ -120,9 +120,9 @@ export class Subscription
             user: this.user instanceof User
                 ? this.user.serialize()
                 : this.user,
-            bundle: this.bundle instanceof Bundle
-                ? this.bundle.serialize()
-                : this.bundle,
+            price: this.price instanceof Price
+                ? this.price.serialize()
+                : this.price,
             current_period_end: this.current_period_end.toISOString(),
             cancel_at_period_end: this.cancel_at_period_end,
             deleted: this.deleted,
@@ -135,15 +135,15 @@ export class Subscription
             ? await User.retrieve(data.user)
             : { id: data.user };
 
-        const bundle = expand?.includes("bundle")
-            ? await Bundle.retrieve(data.bundle, expand.filter(e => e.startsWith("bundle.")).map(e => e.replace("bundle.", "")))
-            : { id: data.bundle };
+        const price = expand?.includes("price")
+            ? await Price.retrieve(data.price, expand.filter(e => e.startsWith("price.")).map(e => e.replace("price.", "")))
+            : { id: data.price };
 
         return new Subscription(
             data.id,
             data.status,
             user,
-            bundle,
+            price,
             data.current_period_end,
             data.cancel_at_period_end,
             data.deleted,
