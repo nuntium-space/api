@@ -296,13 +296,6 @@ export const COMMENT_UPDATE_SCHEMA = Joi
 export const BUNDLE_CREATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50).required(),
-        price: MONEY_SCHEMA
-            .min(Config.BUNDLE_MIN_PRICE)
-            .allow(0)
-            .messages({
-                "number.min": `"price" must be either 0 or greater than or equal to ${Config.BUNDLE_MIN_PRICE / 100} USD`,
-            })
-            .required(),
     });
 
 export const BUNDLE_UPDATE_SCHEMA = Joi
