@@ -154,14 +154,7 @@ export const BUNDLE_SCHEMA = Joi
                 NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ORGANIZATION),
             )
             .required(),
-        price: Joi
-            .alternatives()
-            .try(
-                // The `price` can be 0 (free) or at least `Config.BUNDLE_MIN_PRICE`
-                MONEY_SCHEMA.max(0),
-                MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE)
-            )
-            .required(),
+        price: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
         active: Joi.boolean().required(),
     });
 
@@ -289,7 +282,13 @@ export const COMMENT_UPDATE_SCHEMA = Joi
 export const BUNDLE_CREATE_SCHEMA = Joi
     .object({
         name: STRING_SCHEMA.max(50).required(),
-        price: MONEY_SCHEMA.required(),
+        price: MONEY_SCHEMA
+            .min(Config.BUNDLE_MIN_PRICE)
+            .allow(0)
+            .messages({
+                "number.min": `"price" must be either 0 or greater than or equal to ${Config.BUNDLE_MIN_PRICE / 100} USD`,
+            })
+            .required(),
     });
 
 export const BUNDLE_UPDATE_SCHEMA = Joi
