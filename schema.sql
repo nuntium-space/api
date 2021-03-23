@@ -166,7 +166,7 @@ create table "bundles"
 create table "prices"
 (
     "id" id not null,
-    "value" int not null,
+    "amount" int not null,
     "currency" char(3) not null,
     "bundle" id not null,
     "active" boolean not null,

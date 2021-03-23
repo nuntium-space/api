@@ -8,7 +8,7 @@ import { Bundle, ISerializedBundle } from "./Bundle";
 interface IDatabasePrice
 {
     id: string,
-    value: number,
+    amount: number,
     currency: string,
     bundle: string,
     active: boolean,
@@ -17,14 +17,14 @@ interface IDatabasePrice
 
 interface ICreatePrice
 {
-    value: number,
+    amount: number,
     currency: string,
 }
 
 export interface ISerializedPrice
 {
     id: string,
-    value: number,
+    amount: number,
     currency: string,
     bundle: ISerializedBundle | INotExpandedResource,
     active: boolean,
@@ -35,7 +35,7 @@ export class Price
     private constructor
     (
         public readonly id: string,
-        public readonly value: number,
+        public readonly amount: number,
         public readonly currency: string,
         public readonly bundle: Bundle | INotExpandedResource,
         public readonly active: boolean,
@@ -58,14 +58,14 @@ export class Price
             .query(
                 `
                 insert into "prices"
-                    ("id", "value", "currency", "bundle", "active")
+                    ("id", "amount", "currency", "bundle", "active")
                 values
                     ($1, $2, $3, $4, $5)
                 returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.PRICE),
-                    data.value,
+                    data.amount,
                     data.currency,
                     bundle.id,
                     true,
@@ -81,7 +81,7 @@ export class Price
         await Config.STRIPE.prices
             .create({
                 product: bundle.stripe_product_id,
-                unit_amount: data.value,
+                unit_amount: data.amount,
                 currency: data.currency,
                 recurring: {
                     interval: "month",
@@ -168,7 +168,7 @@ export class Price
     {
         return {
             id: this.id,
-            value: this.value,
+            amount: this.amount,
             currency: this.currency,
             bundle: this.bundle instanceof Bundle
                 ? this.bundle.serialize()
@@ -185,7 +185,7 @@ export class Price
 
         return new Price(
             data.id,
-            data.value,
+            data.amount,
             data.currency,
             bundle,
             data.active,

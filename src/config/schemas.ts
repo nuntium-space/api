@@ -161,7 +161,7 @@ export const BUNDLE_SCHEMA = Joi
 export const PRICE_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
-        value: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
+        amount: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
         currency: CURRENCY_SCHEMA.required(),
         bundle: Joi
             .alternatives()
@@ -305,7 +305,7 @@ export const BUNDLE_UPDATE_SCHEMA = Joi
 
 export const PRICE_CREATE_SCHEMA = Joi
     .object({
-        value: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
+        amount: MONEY_SCHEMA.min(Config.BUNDLE_MIN_PRICE).allow(0).required(),
         currency: CURRENCY_SCHEMA.required(),
     });
 
