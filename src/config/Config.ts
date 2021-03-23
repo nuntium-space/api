@@ -20,6 +20,7 @@ export class Config
         BUNDLE: "bdl",
         SUBSCRIPTION: "sub",
         PAYMENT_METHOD: "pmt",
+        PRICE: "pri",
     };
 
     /**
