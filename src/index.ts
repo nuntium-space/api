@@ -236,7 +236,14 @@ const init = async () =>
                 {
                     const customer = event.data.object as Stripe.Customer;
 
+                    if (!customer.email)
+                    {
+                        throw Boom.badImplementation();
+                    }
+
                     const user = await User.retrieve(customer.metadata.user_id);
+
+                    await user.update({ email: customer.email });
 
                     if (customer.invoice_settings.default_payment_method !== null)
                     {
@@ -335,21 +342,6 @@ const init = async () =>
                         {
                             throw Boom.badRequest();
                         });
-
-                    break;
-                }
-                case "customer.updated":
-                {
-                    const customer = event.data.object as Stripe.Customer;
-
-                    if (!customer.email)
-                    {
-                        throw Boom.badImplementation();
-                    }
-
-                    const user = await User.retrieveWithCustomerId(customer.id);
-
-                    await user.update({ email: customer.email });
 
                     break;
                 }
