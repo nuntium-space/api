@@ -238,6 +238,15 @@ export class Bundle
             });
     }
 
+    public async removePublisher(publisher: Publisher): Promise<void>
+    {
+        await Database.pool
+            .query(
+                `delete from "bundles_publishers" where "bundle" = $1 and "publisher" = $2`,
+                [ this.id, publisher.id ],
+            );
+    }
+
     public static async existsWithNameAndOrganization(name: string, organization: Organization | string): Promise<boolean>
     {
         const result = await Database.pool.query(
