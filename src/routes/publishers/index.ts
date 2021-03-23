@@ -216,7 +216,7 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "POST",
+        method: "DELETE",
         path: "/bundles/{bundle_id}/publishers/{publisher_id}",
         options: {
             validate: {
