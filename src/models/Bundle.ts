@@ -11,16 +11,13 @@ interface IDatabaseBundle
     id: string,
     name: string,
     organization: string,
-    price: number,
     active: boolean,
     stripe_product_id: string | null,
-    stripe_price_id: string | null,
 }
 
 interface ICreateBundle
 {
     name: string,
-    price: number,
 }
 
 interface IUpdateBundle
@@ -33,7 +30,6 @@ export interface ISerializedBundle
     id: string,
     name: string,
     organization: ISerializedOrganization | INotExpandedResource,
-    price: number,
     active: boolean,
 }
 
@@ -44,10 +40,8 @@ export class Bundle
         public readonly id: string,
         private _name: string,
         public readonly organization: Organization | INotExpandedResource,
-        public readonly price: number,
         public readonly active: boolean,
         public readonly stripe_product_id: string | null,
-        public readonly stripe_price_id: string | null,
     )
     {}
 
@@ -71,16 +65,15 @@ export class Bundle
             .query(
                 `
                 insert into "bundles"
-                    ("id", "name", "organization", "price", "active")
+                    ("id", "name", "organization", "active")
                 values
-                    ($1, $2, $3, $4, $5)
+                    ($1, $2, $3, $4)
                 returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.BUNDLE),
                     data.name,
                     organization.id,
-                    data.price,
                     true,
                 ],
             )
@@ -91,19 +84,9 @@ export class Bundle
                 throw Boom.badRequest();
             });
 
-        await Config.STRIPE.prices
+        await Config.STRIPE.products
             .create({
-                currency: "usd",
-                product_data: {
-                    name: data.name,
-                    metadata: {
-                        bundle_id: result.rows[0].id,
-                    },
-                },
-                unit_amount: data.price,
-                recurring: {
-                    interval: "month",
-                },
+                name: data.name,
                 metadata: {
                     bundle_id: result.rows[0].id,
                 },
@@ -297,7 +280,6 @@ export class Bundle
             organization: this.organization instanceof Organization
                 ? this.organization.serialize()
                 : this.organization,
-            price: this.price,
             active: this.active,
         };
     }
@@ -312,10 +294,8 @@ export class Bundle
             data.id,
             data.name,
             organization,
-            parseInt(data.price.toString()),
             data.active,
             data.stripe_product_id,
-            data.stripe_price_id,
         );
     }
 }
