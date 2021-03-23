@@ -174,7 +174,7 @@ export class Price
         let query = `select * from "prices" where "bundle" = $1`;
         const params: any[] = [ bundle.id ];
 
-        if (options && "active" in options)
+        if (options && typeof options.active === "boolean")
         {
             query += `and "active" = $2`;
             params.push(options.active);
