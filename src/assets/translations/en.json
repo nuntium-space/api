@@ -1,4 +1,16 @@
 {
+    "components": {
+        "add_comment": {
+            "__title": "Add a comment",
+            "submit": "Add comment"
+        },
+        "comment_list": {
+            "comment": {
+                "updated_on": "Updated on",
+                "replies": "Replies"
+            }
+        }
+    },
     "explore": {
         "search": {
             "empty": "No results for <b>{{ QUERY }}</b>"
