@@ -30,6 +30,8 @@ export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().for
 export const MONEY_SCHEMA = Joi.number().integer().min(0);
 export const CURRENCY_SCHEMA = STRING_SCHEMA.valid(...Config.CURRENCIES.map(c => c.name)).lowercase();
 
+export const LANGUAGE_SCHEMA = STRING_SCHEMA.valid(...Config.LANGUAGES.map(c => c.id));
+
 export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: ID_SCHEMA(prefix).required() });
 
 export const EXPAND_QUERY_SCHEMA = Joi.array().items(STRING_SCHEMA);

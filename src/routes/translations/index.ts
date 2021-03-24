@@ -2,6 +2,8 @@ import fs from "fs/promises";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import path from "path";
+import Joi from "joi";
+import { LANGUAGE_SCHEMA } from "../../config/schemas";
 
 export default <ServerRoute[]>[
     {
@@ -9,6 +11,11 @@ export default <ServerRoute[]>[
         path: "/translations/{lang}",
         options: {
             auth: false,
+            validate: {
+                params: Joi.object({
+                    lang: LANGUAGE_SCHEMA.required(),
+                }),
+            },
         },
         handler: async (request, h) =>
         {
