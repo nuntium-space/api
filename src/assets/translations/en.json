@@ -14,13 +14,6 @@
             "advanced": {
                 "__title": "Advanced",
                 "delete_account": {
-                    "meaning": {
-                        "__title": "Deleting your account means",
-                        "items": [
-                            "Any PII will be removed immediately",
-                            "Any active subscription will be canceled without refunds"
-                        ]
-                    },
                     "conditions": {
                         "__title": "Note that you cannot delete your account if you match any of these conditions",
                         "items": [
@@ -28,7 +21,14 @@
                             "You are the owner of a publisher with one or more authors"
                         ]
                     },
-                    "delete": "Delete Account"
+                    "delete": "Delete Account",
+                    "meaning": {
+                        "__title": "Deleting your account means",
+                        "items": [
+                            "Any PII will be removed immediately",
+                            "Any active subscription will be canceled without refunds"
+                        ]
+                    }
                 }
             },
             "details": {
@@ -36,21 +36,22 @@
             },
             "organizations": {
                 "__title": "Organizations",
-                "empty": "You haven't created any organization",
                 "create": {
                     "__title": "Create new organization",
                     "name": "Name"
-                }
+                },
+                "empty": "You haven't created any organization"
             },
             "payment_methods": {
                 "__title": "Payment Methods",
-                "default": "Default",
-                "make_default": "Make default",
-                "remove": "Remove",
                 "add": {
                     "__title": "Add Payment Method",
                     "card": "Card"
-                }
+                },
+                "default": "Default",
+                "empty": "You haven't added any payment method",
+                "make_default": "Make default",
+                "remove": "Remove"
             },
             "security": {
                 "__title": "Security",
