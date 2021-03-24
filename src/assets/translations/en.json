@@ -20,6 +20,20 @@
             "subheadline": "The reliability of newspapers with the scale of the Internet"
         }
     },
+    "publisher": {
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "authors": {
+            "__title": "Authors",
+            "empty": "You haven't invited any author",
+            "invite": "Invite",
+            "invite_author": {
+                "__title": "Invite author"
+            }
+        }
+    },
     "publisher_public_page": {
         "actions": {
             "__title": "Actions",
