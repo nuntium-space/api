@@ -1,4 +1,25 @@
 {
+    "article": {
+        "actions": {
+            "__title": "Actions"
+        },
+        "author": {
+            "__title": "Author"
+        },
+        "info": {
+            "__title": "Info",
+            "published": "Published",
+            "reading_time": {
+                "__title": "Reading Time",
+                "less_than_a_minute": "less than a minute",
+                "minutes": "minutes"
+            },
+            "updated": "Updated"
+        },
+        "publisher": {
+            "__title": "Publisher"
+        }
+    },
     "components": {
         "add_comment": {
             "__title": "Add a comment",
@@ -9,7 +30,7 @@
                 "for": "for",
                 "reading_time": {
                     "less_than_a_minute": "less than a minute",
-                    "minues": "minutes"
+                    "minutes": "minutes"
                 }
             }
         },
@@ -51,6 +72,7 @@
     },
     "generic": {
         "add": "Add",
+        "cancel": "Cancel",
         "create": "Create",
         "delete": "Delete",
         "email": "Email",
