@@ -20,6 +20,10 @@
             "subheadline": "The reliability of newspapers with the scale of the Internet"
         }
     },
+    "page_not_found": {
+        "__title": "Page Not Found",
+        "subtitle": "The specified file was not found on this website. Please check the URL for mistakes and try again"
+    },
     "publisher": {
         "details": {
             "__title": "Details",
