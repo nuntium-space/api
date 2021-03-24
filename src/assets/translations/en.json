@@ -6,8 +6,12 @@
         },
         "comment_list": {
             "comment": {
-                "updated_on": "Updated on",
-                "replies": "Replies"
+                "actions": {
+                    "cancel": "Cancel",
+                    "reply": "Reply"
+                },
+                "replies": "Replies",
+                "updated_on": "Updated on"
             }
         }
     },
