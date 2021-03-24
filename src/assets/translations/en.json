@@ -8,6 +8,13 @@
         "last_name": "Last name",
         "update": "Update"
     },
+    "home": {
+        "hero": {
+            "headline": "A fact-checked news-only social network",
+            "subheadline": "The reliability of newspapers with the scale of the Internet",
+            "create_account": "Create an account"
+        }
+    },
     "settings": {
         "__title": "Settings",
         "account": {
