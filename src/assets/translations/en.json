@@ -1,4 +1,10 @@
 {
+    "feed": {
+        "empty": {
+            "title": "Congratulations, <b>{{ USER_FIRST_NAME }}</b>",
+            "subtitle": "You are just a few seconds away from starting to read news you love from sources you can trust"
+        }
+    },
     "generic": {
         "add": "Add",
         "create": "Create",
