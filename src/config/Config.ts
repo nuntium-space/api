@@ -23,6 +23,17 @@ export class Config
         PRICE: "pri",
     };
 
+    public static readonly LANGUAGES = [
+        {
+            id: "en",
+            display_name: "English",
+        },
+        {
+            id: "it",
+            display_name: "Italiano",
+        },
+    ];
+
     public static readonly CURRENCIES = [
         {
             name: "usd",
