@@ -6,6 +6,10 @@
         "email": "Email",
         "first_name": "First name",
         "last_name": "Last name",
+        "password": "Password",
+        "sign_in": "Sign In",
+        "sign_out": "Sign Out",
+        "sign_up": "Sign Up",
         "update": "Update"
     },
     "home": {
@@ -91,5 +95,12 @@
                 "empty": "You are not an author of any publisher"
             }
         }
+    },
+    "sign_in": {
+        "no_account": "Don't have an account yet?"
+    },
+    "sign_up": {
+        "__title": "Create an account",
+        "have_account": "Already have an account?"
     }
 }
