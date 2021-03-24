@@ -2,6 +2,7 @@
     "generic": {
         "add": "Add",
         "create": "Create",
+        "delete": "Delete",
         "email": "Email",
         "first_name": "First name",
         "last_name": "Last name",
@@ -14,6 +15,7 @@
             "advanced": {
                 "__title": "Advanced",
                 "delete_account": {
+                    "__title": "Delete account",
                     "conditions": {
                         "__title": "Note that you cannot delete your account if you match any of these conditions",
                         "items": [
@@ -21,7 +23,6 @@
                             "You are the owner of a publisher with one or more authors"
                         ]
                     },
-                    "delete": "Delete Account",
                     "meaning": {
                         "__title": "Deleting your account means",
                         "items": [
@@ -79,7 +80,8 @@
         "author": {
             "__title": "Author",
             "publishers": {
-                "__title": "Publishers"
+                "__title": "Publishers",
+                "empty": "You are not an author of any publisher"
             }
         }
     }
