@@ -7,6 +7,9 @@ export default <ServerRoute[]>[
     {
         method: "GET",
         path: "/translations/{lang}",
+        options: {
+            auth: false,
+        },
         handler: async (request, h) =>
         {
             const translationFilePath = path.resolve(__dirname, "..", "..", "assets", "translations", `${request.params.lang}.json`);
