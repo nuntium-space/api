@@ -27,6 +27,33 @@
         },
         "title": "Title"
     },
+    "bundle": {
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "prices": {
+            "__title": "Prices",
+            "add": {
+                "__title": "Add price",
+                "amount": "Amount",
+                "currency": "Currency",
+                "fee_msg": "We take a <b>20%</b> cut on every transaction"
+            },
+            "archive": "Archive",
+            "archived": "Archived",
+            "billing_period": {
+                "month": "month"
+            },
+            "empty": "You haven't added any price"
+        },
+        "publishers": {
+            "__title": "Publishers"
+        },
+        "subscribe": {
+            "__title": "Subscribe"
+        }
+    },
     "components": {
         "add_comment": {
             "__title": "Add a comment",
