@@ -48,10 +48,25 @@
             "empty": "You haven't added any price"
         },
         "publishers": {
-            "__title": "Publishers"
+            "__title": "Publishers",
+            "add": {
+                "__title": "Add publisher",
+                "empty": "You don't have any publisher to add"
+            },
+            "empty": "You haven't added any publisher",
+            "remove": "Remove"
         },
         "subscribe": {
-            "__title": "Subscribe"
+            "__title": "Subscribe",
+            "billing_period": {
+                "month": "month"
+            },
+            "choose_option": "Choose an option",
+            "no_pm": {
+                "msg": "Before subscribing to <b>{{ BUNDLE_NAME }}</b> you need to set a default payment method",
+                "go_to_settings": "Go to Settings"
+            },
+            "submit": "Subscribe"
         }
     },
     "components": {
