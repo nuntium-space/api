@@ -122,7 +122,13 @@ export class Comment
                 throw Boom.badRequest();
             });
 
-        return Comment.deserialize(result.rows[0], expand);
+        return Comment.deserialize(
+            {
+                ...result.rows[0],
+                reply_count: 0,
+            },
+            expand,
+        );
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Comment>
