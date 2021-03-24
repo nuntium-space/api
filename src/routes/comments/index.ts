@@ -129,7 +129,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                    id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
                 }),
             },
         },

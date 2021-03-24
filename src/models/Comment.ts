@@ -13,7 +13,7 @@ interface IDatabaseComment
     user: string,
     article: string,
     parent: string,
-    reply_count: number,
+    reply_count: BigInt,
     created_at: Date,
     updated_at: Date,
 }
@@ -52,7 +52,7 @@ export class Comment
         private _user: User | INotExpandedResource,
         private _article: Article | INotExpandedResource,
         private _parent: Comment | INotExpandedResource | null,
-        private _reply_count: number,
+        private _reply_count: BigInt,
         private _created_at: Date,
         private _updated_at: Date,
     )
@@ -83,7 +83,7 @@ export class Comment
         return this._parent;
     }
 
-    public get reply_count(): number
+    public get reply_count(): BigInt
     {
         return this._reply_count;
     }
@@ -216,7 +216,8 @@ export class Comment
             parent: this.parent instanceof Comment
                 ? this.parent.serialize()
                 : this.parent,
-            reply_count: this.reply_count,
+            // I think I'll never reach a point where this breaks, right?
+            reply_count: parseInt(this.reply_count.toString()),
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
         };
