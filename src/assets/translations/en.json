@@ -23,6 +23,11 @@
                 "updated_on": "Updated on"
             }
         },
+        "header": {
+            "search": {
+                "placeholder": "Search articles"
+            }
+        },
         "stripe": {
             "connect_button": {
                 "connect": "Connect with",
