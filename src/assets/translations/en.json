@@ -1,5 +1,6 @@
 {
     "generic": {
+        "add": "Add",
         "create": "Create",
         "email": "Email",
         "first_name": "First name",
@@ -32,7 +33,14 @@
                 "__title": "Organizations"
             },
             "payment_methods": {
-                "__title": "Payment Methods"
+                "__title": "Payment Methods",
+                "default": "Default",
+                "make_default": "Make default",
+                "remove": "Remove",
+                "add": {
+                    "__title": "Add Payment Method",
+                    "card": "Card"
+                }
             },
             "security": {
                 "__title": "Security",
