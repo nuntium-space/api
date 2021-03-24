@@ -10,14 +10,27 @@
         "sign_in": "Sign In",
         "sign_out": "Sign Out",
         "sign_up": "Sign Up",
+        "submit": "Submit",
         "update": "Update"
     },
     "home": {
         "hero": {
+            "create_account": "Create an account",
             "headline": "A fact-checked news-only social network",
-            "subheadline": "The reliability of newspapers with the scale of the Internet",
-            "create_account": "Create an account"
+            "subheadline": "The reliability of newspapers with the scale of the Internet"
         }
+    },
+    "publisher_public_page": {
+        "actions": {
+            "__title": "Actions",
+            "new_article": "Write new article"
+        },
+        "subscribe": {
+            "__title": "Subscribe",
+            "empty": "There are no bundles for this publisher"
+        },
+        "not_subscribed": "You are not subscribed to <b>{{ PUBLISHER_NAME }}</b>",
+        "how_to_subscribe": "In order to see the articles of <b>{{ PUBLISHER_NAME }}</b> you need to subscribe a bundle that includes this publisher"
     },
     "settings": {
         "__title": "Settings",
@@ -37,7 +50,7 @@
                     "meaning": {
                         "__title": "Deleting your account means",
                         "items": [
-                            "Any PII will be removed immediately",
+                            "Any <abbr title=\"Personally Identifiable Information\">PII</abbr> will be removed immediately",
                             "Any active subscription will be canceled without refunds"
                         ]
                     }
