@@ -16,14 +16,19 @@
                 "delete_account": {
                     "meaning": {
                         "__title": "Deleting your account means",
-                        "pii": "Any PII will be removed immediately",
-                        "subscriptions": "Any active subscription will be canceled without refunds"
+                        "items": [
+                            "Any PII will be removed immediately",
+                            "Any active subscription will be canceled without refunds"
+                        ]
                     },
                     "conditions": {
                         "__title": "Note that you cannot delete your account if you match any of these conditions",
-                        "author": "You are an author for at least one publisher",
-                        "publisher_owner": "You are the owner of a publisher with one or more authors"
-                    }
+                        "items": [
+                            "You are an author for at least one publisher",
+                            "You are the owner of a publisher with one or more authors"
+                        ]
+                    },
+                    "delete": "Delete Account"
                 }
             },
             "details": {
