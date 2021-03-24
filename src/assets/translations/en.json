@@ -1,5 +1,6 @@
 {
     "generic": {
+        "create": "Create",
         "email": "Email",
         "first_name": "First name",
         "last_name": "Last name",
@@ -9,23 +10,50 @@
         "__title": "Settings",
         "account": {
             "__title": "Account",
+            "advanced": {
+                "__title": "Advanced",
+                "delete_account": {
+                    "meaning": {
+                        "__title": "Deleting your account means",
+                        "pii": "Any PII will be removed immediately",
+                        "subscriptions": "Any active subscription will be canceled without refunds"
+                    },
+                    "conditions": {
+                        "__title": "Note that you cannot delete your account if you match any of these conditions",
+                        "author": "You are an author for at least one publisher",
+                        "publisher_owner": "You are the owner of a publisher with one or more authors"
+                    }
+                }
+            },
             "details": {
                 "__title": "Details"
-            },
-            "security": {
-                "__title": "Security"
-            },
-            "advanced": {
-                "__title": "Advanced"
             },
             "organizations": {
                 "__title": "Organizations"
             },
-            "subscriptions": {
-                "__title": "Subscriptions"
-            },
             "payment_methods": {
                 "__title": "Payment Methods"
+            },
+            "security": {
+                "__title": "Security",
+                "change_password": {
+                    "__title": "Change password",
+                    "new_password": "New password",
+                    "old_password": "Old password"
+                }
+            },
+            "subscriptions": {
+                "__title": "Subscriptions",
+                "details": {
+                    "cancels_on": "Cancels on",
+                    "billing_period": {
+                        "month": "month"
+                    },
+                    "renews_on": "Renews on"
+                },
+                "inactive": "Inactive",
+                "manage": "Manage",
+                "old": "Old"
             }
         },
         "author": {
