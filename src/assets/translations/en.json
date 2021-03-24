@@ -18,6 +18,10 @@
             },
             "updated": "Updated"
         },
+        "payment_required": {
+            "title": "You can't see this article",
+            "subtitle": "In order to see it you need to subscribe to a bundle that includes the publisher of this article"
+        },
         "publisher": {
             "__title": "Publisher"
         },
