@@ -30,7 +30,7 @@ export default <ServerRoute[]>[
                 },
             );
 
-            return file;
+            return JSON.stringify(JSON.parse(file));
         },
     },
 ];
