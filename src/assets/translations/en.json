@@ -1,4 +1,9 @@
 {
+    "explore": {
+        "search": {
+            "empty": "No results for <b>{{ QUERY }}</b>"
+        }
+    },
     "feed": {
         "empty": {
             "title": "Congratulations, <b>{{ USER_FIRST_NAME }}</b>",
