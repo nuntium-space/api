@@ -22,6 +22,15 @@
                 "replies": "Replies",
                 "updated_on": "Updated on"
             }
+        },
+        "stripe": {
+            "connect_button": {
+                "connect": "Connect with",
+                "go_to_dashboard": {
+                    "after_img": "Dashboard",
+                    "before_img": "Go to"
+                }
+            }
         }
     },
     "explore": {
