@@ -6,6 +6,8 @@
         "author": {
             "__title": "Author"
         },
+        "comments": "Comments",
+        "content": "Content",
         "info": {
             "__title": "Info",
             "published": "Published",
@@ -18,7 +20,8 @@
         },
         "publisher": {
             "__title": "Publisher"
-        }
+        },
+        "title": "Title"
     },
     "components": {
         "add_comment": {
