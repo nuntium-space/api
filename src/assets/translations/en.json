@@ -35,7 +35,12 @@
                 "__title": "Details"
             },
             "organizations": {
-                "__title": "Organizations"
+                "__title": "Organizations",
+                "empty": "You haven't created any organization",
+                "create": {
+                    "__title": "Create new organization",
+                    "name": "Name"
+                }
             },
             "payment_methods": {
                 "__title": "Payment Methods",
