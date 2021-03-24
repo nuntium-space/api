@@ -9,10 +9,8 @@ import qs from "qs";
 import { Config } from "./config/Config";
 import {
     ARTICLE_SCHEMA,
-    CURRENCY_SCHEMA,
     EXPAND_QUERY_SCHEMA,
     ID_SCHEMA,
-    MONEY_SCHEMA,
     STRING_SCHEMA,
 } from "./config/schemas";
 import { Article } from "./models/Article";
@@ -82,23 +80,6 @@ const init = async () =>
     server.auth.default({ strategy: "session" });
 
     server.route(routes);
-
-    server.route({
-        method: "GET",
-        path: "/config/currencies",
-        options: {
-            response: {
-                schema: Joi.array().items(Joi.object({
-                    name: CURRENCY_SCHEMA.required(),
-                    min: MONEY_SCHEMA.required(),
-                })).required(),
-            },
-        },
-        handler: (request, h) =>
-        {
-            return Config.CURRENCIES;
-        },
-    });
 
     /**
      * IMPORTANT:
