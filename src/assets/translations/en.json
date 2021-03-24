@@ -20,6 +20,29 @@
             "subheadline": "The reliability of newspapers with the scale of the Internet"
         }
     },
+    "organization": {
+        "bundles": {
+            "__title": "Bundles",
+            "archived": "Archived",
+            "create": {
+                "__title": "Create new bundle",
+                "name": "Name"
+            },
+            "empty": "You haven't created any bundle"
+        },
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "publishers": {
+            "__title": "Publishers",
+            "create": {
+                "__title": "Create new publisher",
+                "name": "Name"
+            },
+            "empty": "You haven't created any publisher"
+        }
+    },
     "page_not_found": {
         "__title": "Page Not Found",
         "subtitle": "The specified file was not found on this website. Please check the URL for mistakes and try again"
