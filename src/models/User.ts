@@ -336,22 +336,63 @@ export class User
         };
     }
 
+    public async hasSettings(): Promise<boolean>
+    {
+        const { rowCount } = await Database.pool
+            .query(
+                `
+                select "user"
+                from "user_settings"
+                where "user" = $1
+                limit 1
+                `,
+                [ this.id ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badImplementation();
+            });
+
+        return rowCount > 0;
+    }
+
     public async updateSettings(data: IUpdateUserSettings): Promise<void>
     {
+        const settings = await this.retrieveSettings();
+
+        settings.language = data.language ?? settings.language;
+
         if (!Config.LANGUAGES.find(l => l.id === settings.language))
         {
             throw Boom.badData(`Unsupported language: '${data.language}'`);
         }
 
-        const settings = await this.retrieveSettings();
-
-        settings.language = data.language ?? settings.language;
-
-        // TODO: Insert if not exists
-
         const client = await Database.pool.connect();
 
         await client.query("begin");
+
+        if (!await this.hasSettings())
+        {
+            await client
+                .query(
+                    `
+                    insert into "user_settings"
+                        ("user", "language")
+                    values
+                        ($1, $2)
+                    `,
+                    [
+                        this.id,
+                        settings.language,
+                    ],
+                )
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badImplementation();
+                });
+        }
 
         await client
             .query(
