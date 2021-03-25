@@ -1,0 +1,292 @@
+{
+    "article": {
+        "actions": {
+            "__title": "Azioni"
+        },
+        "author": {
+            "__title": "Autore"
+        },
+        "comments": "Commenti",
+        "content": "Contenuto",
+        "info": {
+            "__title": "Info",
+            "published": "Pubblicato",
+            "reading_time": {
+                "__title": "Tempo di lettura",
+                "less_than_a_minute": "meno di un minuto",
+                "minutes": "minuti"
+            },
+            "updated": "Aggiornato"
+        },
+        "payment_required": {
+            "title": "You can't see this article",
+            "subtitle": "In order to see it you need to subscribe to a bundle that includes the publisher of this article"
+        },
+        "publisher": {
+            "__title": "Publisher"
+        },
+        "title": "Titolo"
+    },
+    "bundle": {
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "prices": {
+            "__title": "Prices",
+            "add": {
+                "__title": "Add price",
+                "amount": "Amount",
+                "currency": "Currency",
+                "fee_msg": "We take a <b>20%</b> cut on every transaction"
+            },
+            "archive": "Archive",
+            "archived": "Archived",
+            "billing_period": {
+                "month": "month"
+            },
+            "empty": "You haven't added any price"
+        },
+        "publishers": {
+            "__title": "Publishers",
+            "add": {
+                "__title": "Add publisher",
+                "empty": "You don't have any publisher to add"
+            },
+            "empty": "You haven't added any publisher",
+            "remove": "Remove"
+        },
+        "subscribe": {
+            "__title": "Subscribe",
+            "billing_period": {
+                "month": "month"
+            },
+            "choose_option": "Choose an option",
+            "no_pm": {
+                "msg": "Before subscribing to <b>{{ BUNDLE_NAME }}</b> you need to set a default payment method",
+                "go_to_settings": "Go to Settings"
+            },
+            "submit": "Subscribe"
+        }
+    },
+    "components": {
+        "add_comment": {
+            "__title": "Add a comment",
+            "submit": "Add comment"
+        },
+        "article_list": {
+            "article": {
+                "for": "for",
+                "reading_time": {
+                    "less_than_a_minute": "less than a minute",
+                    "minutes": "minutes"
+                }
+            }
+        },
+        "comment_list": {
+            "comment": {
+                "actions": {
+                    "cancel": "Cancel",
+                    "reply": "Reply"
+                },
+                "replies": "Replies",
+                "updated_on": "Updated on"
+            }
+        },
+        "header": {
+            "search": {
+                "placeholder": "Search articles"
+            }
+        },
+        "stripe": {
+            "connect_button": {
+                "connect": "Connect with",
+                "go_to_dashboard": {
+                    "after_img": "Dashboard",
+                    "before_img": "Go to"
+                }
+            }
+        }
+    },
+    "explore": {
+        "search": {
+            "empty": "No results for <b>{{ QUERY }}</b>"
+        }
+    },
+    "feed": {
+        "empty": {
+            "title": "Congratulations, <b>{{ USER_FIRST_NAME }}</b>",
+            "subtitle": "You are just a few seconds away from starting to read news you love from sources you can trust"
+        }
+    },
+    "generic": {
+        "add": "Add",
+        "cancel": "Cancel",
+        "create": "Create",
+        "delete": "Delete",
+        "email": "Email",
+        "first_name": "First name",
+        "last_name": "Last name",
+        "password": "Password",
+        "sign_in": "Sign In",
+        "sign_out": "Sign Out",
+        "sign_up": "Sign Up",
+        "submit": "Submit",
+        "update": "Update"
+    },
+    "home": {
+        "hero": {
+            "create_account": "Create an account",
+            "headline": "A fact-checked news-only social network",
+            "subheadline": "The reliability of newspapers with the scale of the Internet"
+        }
+    },
+    "organization": {
+        "bundles": {
+            "__title": "Bundles",
+            "archived": "Archived",
+            "create": {
+                "__title": "Create new bundle",
+                "name": "Name"
+            },
+            "empty": "You haven't created any bundle"
+        },
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "publishers": {
+            "__title": "Publishers",
+            "create": {
+                "__title": "Create new publisher",
+                "name": "Name"
+            },
+            "empty": "You haven't created any publisher"
+        }
+    },
+    "page_not_found": {
+        "__title": "Page Not Found",
+        "subtitle": "The specified file was not found on this website. Please check the URL for mistakes and try again"
+    },
+    "publisher": {
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "authors": {
+            "__title": "Authors",
+            "empty": "You haven't invited any author",
+            "invite": "Invite",
+            "invite_author": {
+                "__title": "Invite author"
+            }
+        }
+    },
+    "publisher_public_page": {
+        "actions": {
+            "__title": "Actions",
+            "new_article": "Write new article"
+        },
+        "how_to_subscribe": "In order to see the articles of <b>{{ PUBLISHER_NAME }}</b> you need to subscribe a bundle that includes this publisher",
+        "new_article": {
+            "title": "Title",
+            "content": "Content"
+        },
+        "not_subscribed": "You are not subscribed to <b>{{ PUBLISHER_NAME }}</b>",
+        "subscribe": {
+            "__title": "Subscribe",
+            "empty": "There are no bundles for this publisher"
+        }
+    },
+    "settings": {
+        "__title": "Settings",
+        "account": {
+            "__title": "Account",
+            "advanced": {
+                "__title": "Advanced",
+                "delete_account": {
+                    "__title": "Delete account",
+                    "conditions": {
+                        "__title": "Note that you cannot delete your account if you match any of these conditions",
+                        "items": [
+                            "You are an author for at least one publisher",
+                            "You are the owner of a publisher with one or more authors"
+                        ]
+                    },
+                    "meaning": {
+                        "__title": "Deleting your account means",
+                        "items": [
+                            "Any <abbr title=\"Personally Identifiable Information\">PII</abbr> will be removed immediately",
+                            "Any active subscription will be canceled without refunds"
+                        ]
+                    }
+                }
+            },
+            "details": {
+                "__title": "Details"
+            },
+            "organizations": {
+                "__title": "Organizations",
+                "create": {
+                    "__title": "Create new organization",
+                    "name": "Name"
+                },
+                "empty": "You haven't created any organization"
+            },
+            "payment_methods": {
+                "__title": "Payment Methods",
+                "add": {
+                    "__title": "Add Payment Method",
+                    "card": "Card"
+                },
+                "default": "Default",
+                "empty": "You haven't added any payment method",
+                "make_default": "Make default",
+                "remove": "Remove"
+            },
+            "preferences": {
+                "__title": "Preferences",
+                "language": {
+                    "__title": "Language",
+                    "choose_option": "Choose an option"
+                }
+            },
+            "security": {
+                "__title": "Security",
+                "change_password": {
+                    "__title": "Change password",
+                    "new_password": "New password",
+                    "old_password": "Old password"
+                }
+            },
+            "subscriptions": {
+                "__title": "Subscriptions",
+                "empty": "You are not subscribed to any bundle",
+                "details": {
+                    "cancels_on": "Cancels on",
+                    "billing_period": {
+                        "month": "month"
+                    },
+                    "renews_on": "Renews on"
+                },
+                "inactive": "Inactive",
+                "manage": "Manage",
+                "old": "Old"
+            }
+        },
+        "author": {
+            "__title": "Author",
+            "publishers": {
+                "__title": "Publishers",
+                "empty": "You are not an author of any publisher"
+            }
+        }
+    },
+    "sign_in": {
+        "no_account": "Don't have an account yet?"
+    },
+    "sign_up": {
+        "__title": "Create an account",
+        "have_account": "Already have an account?"
+    }
+}
