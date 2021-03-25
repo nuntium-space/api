@@ -20,7 +20,7 @@
         },
         "payment_required": {
             "title": "Non puoi vedere questo articolo",
-            "subtitle": "In order to see it you need to subscribe to a bundle that includes the publisher of this article"
+            "subtitle": "Per vederlo devi abbonarti ad un bundle che include questo editore"
         },
         "publisher": {
             "__title": "Editore"
@@ -37,7 +37,7 @@
             "add": {
                 "__title": "Aggiungi prezzo",
                 "amount": "Importo",
-                "currency": "Moneta",
+                "currency": "Valuta",
                 "fee_msg": "Noi ci teniamo il <b>20%</b> di ogni transazione"
             },
             "archive": "Archivia",
@@ -63,7 +63,7 @@
             },
             "choose_option": "Scegli un'opzione",
             "no_pm": {
-                "msg": "Before subscribing to <b>{{ BUNDLE_NAME }}</b> you need to set a default payment method",
+                "msg": "Prima di abbonarti a <b>{{ BUNDLE_NAME }}</b> devi impostare un metodo di pagamento predefinito",
                 "go_to_settings": "Vai alle Impostazioni"
             },
             "submit": "Abbonati"
@@ -116,7 +116,7 @@
     "feed": {
         "empty": {
             "title": "Congratulazioni, <b>{{ USER_FIRST_NAME }}</b>",
-            "subtitle": "You are just a few seconds away from starting to read news you love from sources you can trust"
+            "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piaccioni da fonti di cui ti puoi fidare"
         }
     },
     "generic": {
@@ -137,7 +137,7 @@
     "home": {
         "hero": {
             "create_account": "Crea un account",
-            "headline": "A fact-checked news-only social network",
+            "headline": "Un social network di sole notizie controllate",
             "subheadline": "L'affidabilità dei giornali con le dimensioni di Internet"
         }
     },
@@ -187,12 +187,12 @@
             "__title": "Azioni",
             "new_article": "Scrivi nuovo articolo"
         },
-        "how_to_subscribe": "In order to see the articles of <b>{{ PUBLISHER_NAME }}</b> you need to subscribe a bundle that includes this publisher",
+        "how_to_subscribe": "Per vedere gli articoli di <b>{{ PUBLISHER_NAME }}</b> devi abbonarti ad un bundle che include questo editore",
         "new_article": {
             "title": "Titolo",
             "content": "Contenuto"
         },
-        "not_subscribed": "You are not subscribed to <b>{{ PUBLISHER_NAME }}</b>",
+        "not_subscribed": "Non sei abbonato a <b>{{ PUBLISHER_NAME }}</b>",
         "subscribe": {
             "__title": "Abbonati",
             "empty": "Non ci sono bundle per questo editore"
@@ -207,17 +207,17 @@
                 "delete_account": {
                     "__title": "Elimina account",
                     "conditions": {
-                        "__title": "Note that you cannot delete your account if you match any of these conditions",
+                        "__title": "Non puoi cancellare il tuo account se almeno una di queste condizioni è verificata",
                         "items": [
-                            "You are an author for at least one publisher",
-                            "You are the owner of a publisher with one or more authors"
+                            "Sei un autore per almeno un editore",
+                            "Sei il proprietario di un editore con uno o più autori"
                         ]
                     },
                     "meaning": {
-                        "__title": "Deleting your account means",
+                        "__title": "Cancellare il tuo account significa",
                         "items": [
-                            "Any <abbr title=\"Personally Identifiable Information\">PII</abbr> will be removed immediately",
-                            "Any active subscription will be canceled without refunds"
+                            "Tutte le informazioni personali (<abbr title=\"Personally Identifiable Information\">PII</abbr>) verranno rimosse immediatamente",
+                            "Tutti gli abbonamenti attivi verranno cancellati senza rimborsi"
                         ]
                     }
                 }
@@ -228,19 +228,19 @@
             "organizations": {
                 "__title": "Organizzazioni",
                 "create": {
-                    "__title": "Create new organization",
+                    "__title": "Crea nuova organizzazione",
                     "name": "Nome"
                 },
-                "empty": "You haven't created any organization"
+                "empty": "Non hai ancora creato nessuna organizzazione"
             },
             "payment_methods": {
                 "__title": "Metodi di Pagamento",
                 "add": {
-                    "__title": "Add Payment Method",
+                    "__title": "Aggiungi metodo di pagamento",
                     "card": "Carta"
                 },
                 "default": "Predefinito",
-                "empty": "You haven't added any payment method",
+                "empty": "Non hai ancora aggiunto nessun metodo di pagamento",
                 "make_default": "Imposta come predefinito",
                 "remove": "Rimuovi"
             },
