@@ -242,6 +242,16 @@ create table "default_payment_methods"
     foreign key ("payment_method") references "payment_methods" on update cascade on delete cascade
 );
 
+create table "user_settings"
+(
+    "user" id not null,
+    "language" text not null,
+
+    primary key ("user"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade
+);
+
 /*
 -----
 VIEWS
