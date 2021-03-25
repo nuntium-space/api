@@ -367,47 +367,35 @@ export class User
             throw Boom.badData(`Unsupported language: '${data.language}'`);
         }
 
+        const hasSettings = await this.hasSettings();
+
         const client = await Database.pool.connect();
 
         await client.query("begin");
 
-        if (!await this.hasSettings())
-        {
-            await client
-                .query(
-                    `
-                    insert into "user_settings"
-                        ("user", "language")
-                    values
-                        ($1, $2)
-                    `,
-                    [
-                        this.id,
-                        settings.language,
-                    ],
-                )
-                .catch(async () =>
-                {
-                    await client.query("rollback");
-
-                    throw Boom.badImplementation();
-                });
-        }
-
-        await client
-            .query(
+        const query = hasSettings
+            ?
                 `
                 update "user_settings"
                 set
                     "language" = $1
                 where
                     "user" = $2
-                `,
-                [
-                    settings.language,
-                    this.id,
-                ],
-            )
+                `
+            :
+                `
+                insert into "user_settings"
+                    ("user", "language")
+                values
+                    ($1, $2)
+                `;
+        
+        const params = hasSettings
+            ? [ settings.language, this.id ]
+            : [ this.id, settings.language ];
+
+        await client
+            .query(query, params)
             .catch(async () =>
             {
                 await client.query("rollback");
