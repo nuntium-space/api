@@ -19,47 +19,47 @@
             "updated": "Aggiornato"
         },
         "payment_required": {
-            "title": "You can't see this article",
+            "title": "Non puoi vedere questo articolo",
             "subtitle": "In order to see it you need to subscribe to a bundle that includes the publisher of this article"
         },
         "publisher": {
-            "__title": "Publisher"
+            "__title": "Editore"
         },
         "title": "Titolo"
     },
     "bundle": {
         "details": {
-            "__title": "Details",
-            "name": "Name"
+            "__title": "Dettagli",
+            "name": "Nome"
         },
         "prices": {
-            "__title": "Prices",
+            "__title": "Prezzi",
             "add": {
-                "__title": "Add price",
-                "amount": "Amount",
-                "currency": "Currency",
-                "fee_msg": "We take a <b>20%</b> cut on every transaction"
+                "__title": "Aggiungi prezzo",
+                "amount": "Importo",
+                "currency": "Moneta",
+                "fee_msg": "Noi ci teniamo il <b>20%</b> di ogni transazione"
             },
-            "archive": "Archive",
-            "archived": "Archived",
+            "archive": "Archivia",
+            "archived": "Archiviato",
             "billing_period": {
-                "month": "month"
+                "month": "mese"
             },
-            "empty": "You haven't added any price"
+            "empty": "Non hai aggiunto nessun prezzo"
         },
         "publishers": {
-            "__title": "Publishers",
+            "__title": "Editori",
             "add": {
-                "__title": "Add publisher",
+                "__title": "Aggiungi editore",
                 "empty": "You don't have any publisher to add"
             },
             "empty": "You haven't added any publisher",
-            "remove": "Remove"
+            "remove": "Rimuovi"
         },
         "subscribe": {
             "__title": "Subscribe",
             "billing_period": {
-                "month": "month"
+                "month": "mese"
             },
             "choose_option": "Choose an option",
             "no_pm": {
@@ -71,74 +71,74 @@
     },
     "components": {
         "add_comment": {
-            "__title": "Add a comment",
-            "submit": "Add comment"
+            "__title": "Aggiungi un commento",
+            "submit": "Aggiungi commento"
         },
         "article_list": {
             "article": {
-                "for": "for",
+                "for": "per",
                 "reading_time": {
-                    "less_than_a_minute": "less than a minute",
-                    "minutes": "minutes"
+                    "less_than_a_minute": "meno di un minuto",
+                    "minutes": "minuti"
                 }
             }
         },
         "comment_list": {
             "comment": {
                 "actions": {
-                    "cancel": "Cancel",
-                    "reply": "Reply"
+                    "cancel": "Annulla",
+                    "reply": "Rispondi"
                 },
-                "replies": "Replies",
-                "updated_on": "Updated on"
+                "replies": "Risposte",
+                "updated_on": "Aggiornato il"
             }
         },
         "header": {
             "search": {
-                "placeholder": "Search articles"
+                "placeholder": "Cerca articoli"
             }
         },
         "stripe": {
             "connect_button": {
-                "connect": "Connect with",
+                "connect": "Connettiti con",
                 "go_to_dashboard": {
-                    "after_img": "Dashboard",
-                    "before_img": "Go to"
+                    "after_img": "",
+                    "before_img": "Vai alla Dashboard"
                 }
             }
         }
     },
     "explore": {
         "search": {
-            "empty": "No results for <b>{{ QUERY }}</b>"
+            "empty": "Non ci sono risultati per <b>{{ QUERY }}</b>"
         }
     },
     "feed": {
         "empty": {
-            "title": "Congratulations, <b>{{ USER_FIRST_NAME }}</b>",
+            "title": "Congratulazioni, <b>{{ USER_FIRST_NAME }}</b>",
             "subtitle": "You are just a few seconds away from starting to read news you love from sources you can trust"
         }
     },
     "generic": {
-        "add": "Add",
-        "cancel": "Cancel",
-        "create": "Create",
-        "delete": "Delete",
+        "add": "Aggiungi",
+        "cancel": "Annulla",
+        "create": "Crea",
+        "delete": "Elimina",
         "email": "Email",
-        "first_name": "First name",
-        "last_name": "Last name",
+        "first_name": "Nome",
+        "last_name": "Cognome",
         "password": "Password",
-        "sign_in": "Sign In",
-        "sign_out": "Sign Out",
-        "sign_up": "Sign Up",
-        "submit": "Submit",
-        "update": "Update"
+        "sign_in": "Accedi",
+        "sign_out": "Esci",
+        "sign_up": "Registrati",
+        "submit": "Invia",
+        "update": "Aggiorna"
     },
     "home": {
         "hero": {
-            "create_account": "Create an account",
+            "create_account": "Crea un account",
             "headline": "A fact-checked news-only social network",
-            "subheadline": "The reliability of newspapers with the scale of the Internet"
+            "subheadline": "L'affidabilità dei giornali con le dimensioni di Internet"
         }
     },
     "organization": {
@@ -165,13 +165,13 @@
         }
     },
     "page_not_found": {
-        "__title": "Page Not Found",
-        "subtitle": "The specified file was not found on this website. Please check the URL for mistakes and try again"
+        "__title": "Pagina non trovata",
+        "subtitle": "Il file specificato non è stato trovato in questo sito. Controlla eventuali errori nell'URL e riprova"
     },
     "publisher": {
         "details": {
-            "__title": "Details",
-            "name": "Name"
+            "__title": "Dettagli",
+            "name": "Nome"
         },
         "authors": {
             "__title": "Authors",
@@ -184,7 +184,7 @@
     },
     "publisher_public_page": {
         "actions": {
-            "__title": "Actions",
+            "__title": "Azioni",
             "new_article": "Write new article"
         },
         "how_to_subscribe": "In order to see the articles of <b>{{ PUBLISHER_NAME }}</b> you need to subscribe a bundle that includes this publisher",
@@ -199,7 +199,7 @@
         }
     },
     "settings": {
-        "__title": "Settings",
+        "__title": "Impostazioni",
         "account": {
             "__title": "Account",
             "advanced": {
@@ -275,18 +275,18 @@
             }
         },
         "author": {
-            "__title": "Author",
+            "__title": "Autore",
             "publishers": {
-                "__title": "Publishers",
-                "empty": "You are not an author of any publisher"
+                "__title": "Editori",
+                "empty": "Non sei l'autore di nessun editore"
             }
         }
     },
     "sign_in": {
-        "no_account": "Don't have an account yet?"
+        "no_account": "Non hai ancora un account?"
     },
     "sign_up": {
-        "__title": "Create an account",
-        "have_account": "Already have an account?"
+        "__title": "Crea un account",
+        "have_account": "Hai già un account?"
     }
 }
