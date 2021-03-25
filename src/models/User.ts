@@ -33,6 +33,16 @@ interface IUpdateUser
     old_password?: string,
 }
 
+interface IUserSettings
+{
+    language: string | null,
+}
+
+interface IUpdateUserSettings
+{
+    language?: string,
+}
+
 export interface ISerializedUser
 {
     id: string,
@@ -303,6 +313,66 @@ export class User
             {
                 throw Boom.badImplementation();
             });
+    }
+
+    public async retrieveSettings(): Promise<IUserSettings>
+    {
+        const { rows: [ row ] } = await Database.pool
+            .query(
+                `
+                select "language"
+                from "user_settings"
+                where "user" = $1
+                `,
+                [ this.id ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badImplementation();
+            });
+
+        return {
+            language: row?.language ?? null,
+        };
+    }
+
+    public async updateSettings(settings: IUpdateUserSettings): Promise<void>
+    {
+        if (!Config.LANGUAGES.find(l => l.id === settings.language))
+        {
+            throw Boom.badData(`Unsupported language: '${settings.language}'`);
+        }
+
+        // TODO: Insert if not exists
+
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client
+            .query(
+                `
+                update "user_settings"
+                set
+                    "language" = $1
+                where
+                    "user" = $2
+                `,
+                [
+                    settings.language,
+                    this.id,
+                ],
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public async canBeDeleted(): Promise<boolean>

@@ -215,6 +215,11 @@ export const PAYMENT_METHOD_SCHEMA = Joi
         }),
     });
 
+export const USER_SETTINGS_SCHEMA = Joi
+    .object({
+        language: LANGUAGE_SCHEMA.allow(null).required(),
+    });
+
 /*
 ---------------
 REQUEST SCHEMAS
