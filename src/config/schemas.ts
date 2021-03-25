@@ -321,3 +321,8 @@ export const SUBSCRIPTION_CREATE_SCHEMA = Joi
     .object({
         price: ID_SCHEMA(Config.ID_PREFIXES.PRICE).required(),
     });
+
+export const USER_SETTINGS_UPDATE_SCHEMA = Joi
+    .object({
+        language: LANGUAGE_SCHEMA,
+    });

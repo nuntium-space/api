@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, URL_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
+import { ID_SCHEMA, URL_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
 import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
@@ -145,6 +145,31 @@ export default <ServerRoute[]>[
             await user.update(request.payload as any);
 
             return user.serialize();
+        },
+    },
+    {
+        method: "PATCH",
+        path: "/users/{id}/settings",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                }),
+                payload: USER_SETTINGS_UPDATE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await authenticatedUser.updateSettings(request.payload as any);
+
+            return h.response();
         },
     },
     {
