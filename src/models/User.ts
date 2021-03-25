@@ -336,12 +336,16 @@ export class User
         };
     }
 
-    public async updateSettings(settings: IUpdateUserSettings): Promise<void>
+    public async updateSettings(data: IUpdateUserSettings): Promise<void>
     {
         if (!Config.LANGUAGES.find(l => l.id === settings.language))
         {
-            throw Boom.badData(`Unsupported language: '${settings.language}'`);
+            throw Boom.badData(`Unsupported language: '${data.language}'`);
         }
+
+        const settings = await this.retrieveSettings();
+
+        settings.language = data.language ?? settings.language;
 
         // TODO: Insert if not exists
 
@@ -369,6 +373,20 @@ export class User
 
                 throw Boom.badImplementation();
             });
+
+        if (this.stripe_customer_id && settings.language)
+        {
+            await Config.STRIPE.customers
+                .update(this.stripe_customer_id, {
+                    preferred_locales: [ settings.language ],
+                })
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badRequest();
+                });
+        }
 
         await client.query("commit");
 
