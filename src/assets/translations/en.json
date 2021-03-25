@@ -244,6 +244,13 @@
                 "make_default": "Make default",
                 "remove": "Remove"
             },
+            "preferences": {
+                "__title": "Preferences",
+                "language": {
+                    "__title": "Language",
+                    "choose_option": "Choose an option"
+                }
+            },
             "security": {
                 "__title": "Security",
                 "change_password": {
