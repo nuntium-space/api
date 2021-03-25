@@ -51,22 +51,22 @@
             "__title": "Editori",
             "add": {
                 "__title": "Aggiungi editore",
-                "empty": "You don't have any publisher to add"
+                "empty": "Non hai nessun editore da aggiungere"
             },
-            "empty": "You haven't added any publisher",
+            "empty": "Non hai aggiunto nessun editore",
             "remove": "Rimuovi"
         },
         "subscribe": {
-            "__title": "Subscribe",
+            "__title": "Abbonati",
             "billing_period": {
                 "month": "mese"
             },
-            "choose_option": "Choose an option",
+            "choose_option": "Scegli un'opzione",
             "no_pm": {
                 "msg": "Before subscribing to <b>{{ BUNDLE_NAME }}</b> you need to set a default payment method",
-                "go_to_settings": "Go to Settings"
+                "go_to_settings": "Vai alle Impostazioni"
             },
-            "submit": "Subscribe"
+            "submit": "Abbonati"
         }
     },
     "components": {
@@ -143,25 +143,25 @@
     },
     "organization": {
         "bundles": {
-            "__title": "Bundles",
-            "archived": "Archived",
+            "__title": "Bundle",
+            "archived": "Archiviato",
             "create": {
-                "__title": "Create new bundle",
-                "name": "Name"
+                "__title": "Crea nuovo bundle",
+                "name": "Nome"
             },
-            "empty": "You haven't created any bundle"
+            "empty": "Non hai creato nessun bundle"
         },
         "details": {
-            "__title": "Details",
-            "name": "Name"
+            "__title": "Dettagli",
+            "name": "Nome"
         },
         "publishers": {
-            "__title": "Publishers",
+            "__title": "Editori",
             "create": {
-                "__title": "Create new publisher",
-                "name": "Name"
+                "__title": "Crea nuovo editore",
+                "name": "Nome"
             },
-            "empty": "You haven't created any publisher"
+            "empty": "Non hai creato nessun editore"
         }
     },
     "page_not_found": {
@@ -174,28 +174,28 @@
             "name": "Nome"
         },
         "authors": {
-            "__title": "Authors",
-            "empty": "You haven't invited any author",
-            "invite": "Invite",
+            "__title": "Autori",
+            "empty": "Non hai invitato nessun autore",
+            "invite": "Invita",
             "invite_author": {
-                "__title": "Invite author"
+                "__title": "Invita autore"
             }
         }
     },
     "publisher_public_page": {
         "actions": {
             "__title": "Azioni",
-            "new_article": "Write new article"
+            "new_article": "Scrivi nuovo articolo"
         },
         "how_to_subscribe": "In order to see the articles of <b>{{ PUBLISHER_NAME }}</b> you need to subscribe a bundle that includes this publisher",
         "new_article": {
-            "title": "Title",
-            "content": "Content"
+            "title": "Titolo",
+            "content": "Contenuto"
         },
         "not_subscribed": "You are not subscribed to <b>{{ PUBLISHER_NAME }}</b>",
         "subscribe": {
-            "__title": "Subscribe",
-            "empty": "There are no bundles for this publisher"
+            "__title": "Abbonati",
+            "empty": "Non ci sono bundle per questo editore"
         }
     },
     "settings": {
@@ -203,9 +203,9 @@
         "account": {
             "__title": "Account",
             "advanced": {
-                "__title": "Advanced",
+                "__title": "Avanzate",
                 "delete_account": {
-                    "__title": "Delete account",
+                    "__title": "Elimina account",
                     "conditions": {
                         "__title": "Note that you cannot delete your account if you match any of these conditions",
                         "items": [
@@ -223,55 +223,55 @@
                 }
             },
             "details": {
-                "__title": "Details"
+                "__title": "Dettagli"
             },
             "organizations": {
-                "__title": "Organizations",
+                "__title": "Organizzazioni",
                 "create": {
                     "__title": "Create new organization",
-                    "name": "Name"
+                    "name": "Nome"
                 },
                 "empty": "You haven't created any organization"
             },
             "payment_methods": {
-                "__title": "Payment Methods",
+                "__title": "Metodi di Pagamento",
                 "add": {
                     "__title": "Add Payment Method",
-                    "card": "Card"
+                    "card": "Carta"
                 },
-                "default": "Default",
+                "default": "Predefinito",
                 "empty": "You haven't added any payment method",
-                "make_default": "Make default",
-                "remove": "Remove"
+                "make_default": "Imposta come predefinito",
+                "remove": "Rimuovi"
             },
             "preferences": {
-                "__title": "Preferences",
+                "__title": "Preferenze",
                 "language": {
-                    "__title": "Language",
-                    "choose_option": "Choose an option"
+                    "__title": "Lingua",
+                    "choose_option": "Scegli un'opzione"
                 }
             },
             "security": {
-                "__title": "Security",
+                "__title": "Sicurezza",
                 "change_password": {
-                    "__title": "Change password",
-                    "new_password": "New password",
-                    "old_password": "Old password"
+                    "__title": "Cambia password",
+                    "new_password": "Nuova password",
+                    "old_password": "Vecchia password"
                 }
             },
             "subscriptions": {
-                "__title": "Subscriptions",
-                "empty": "You are not subscribed to any bundle",
+                "__title": "Abbonamenti",
+                "empty": "Non sei abbonato a nessun bundle",
                 "details": {
-                    "cancels_on": "Cancels on",
+                    "cancels_on": "Si cancella il",
                     "billing_period": {
-                        "month": "month"
+                        "month": "mese"
                     },
-                    "renews_on": "Renews on"
+                    "renews_on": "Si rinnova il"
                 },
-                "inactive": "Inactive",
-                "manage": "Manage",
-                "old": "Old"
+                "inactive": "Inattivi",
+                "manage": "Gestisci",
+                "old": "Vecchi"
             }
         },
         "author": {
