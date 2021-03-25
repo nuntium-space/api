@@ -245,7 +245,7 @@ create table "default_payment_methods"
 create table "user_settings"
 (
     "user" id not null,
-    "language" text not null,
+    "language" text,
 
     primary key ("user"),
 
