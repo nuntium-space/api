@@ -1,5 +1,6 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -43,7 +44,7 @@ export interface ISerializedComment
     updated_at: string,
 }
 
-export class Comment
+export class Comment implements ISerializable<ISerializedComment>
 {
     private constructor
     (
@@ -208,13 +209,15 @@ export class Comment
         return Promise.all(result.rows.map(row => Comment.deserialize(row, options?.expand)));
     }
 
-    public serialize(): ISerializedComment
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedComment
     {
         return {
             id: this.id,
             content: this.content,
             user: this.user instanceof User
-                ? this.user.serialize()
+                ? this.user.serialize({ for: options?.for })
                 : this.user,
             article: this.article instanceof Article
                 ? this.article.serialize()

@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -32,7 +33,7 @@ export interface ISerializedOrganization
     stripe_account_enabled: boolean,
 }
 
-export class Organization
+export class Organization implements ISerializable<ISerializedOrganization>
 {
     private constructor
     (
@@ -170,12 +171,14 @@ export class Organization
         return Promise.all(result.rows.map(Organization.deserialize));
     }
 
-    public serialize(): ISerializedOrganization
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedOrganization
     {
         return {
             id: this.id,
             name: this.name,
-            owner: this.owner.serialize(),
+            owner: this.owner.serialize({ for: options?.for }),
             stripe_account_enabled: this.stripe_account_enabled,
         };
     }

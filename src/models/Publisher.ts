@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -34,7 +35,7 @@ export interface ISerializedPublisher
     organization: ISerializedOrganization,
 }
 
-export class Publisher
+export class Publisher implements ISerializable<ISerializedPublisher>
 {
     private constructor
     (
@@ -196,13 +197,15 @@ export class Publisher
         return this.organization.owner.id === user.id;
     }
 
-    public serialize(): ISerializedPublisher
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedPublisher
     {
         return {
             id: this.id,
             name: this.name,
             url: this.url,
-            organization: this.organization.serialize(),
+            organization: this.organization.serialize({ for: options?.for }),
         };
     }
 

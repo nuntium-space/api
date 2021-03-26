@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import marked from "marked";
 import readingTime from "reading-time";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -42,7 +43,7 @@ export interface ISerializedArticle
     updated_at: string,
 }
 
-export class Article
+export class Article implements ISerializable<ISerializedArticle>
 {
     private constructor
     (
@@ -309,6 +310,7 @@ export class Article
     }
 
     public serialize(options?: {
+        for?: User,
         /**
          * @default false
          */
@@ -333,7 +335,7 @@ export class Article
             content: options.includeContent ? content : "",
             reading_time: Math.round(readingTime(this.content).minutes),
             author: this.author instanceof Author
-                ? this.author.serialize()
+                ? this.author.serialize({ for: options.for })
                 : this.author,
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),

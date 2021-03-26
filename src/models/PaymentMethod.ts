@@ -1,5 +1,6 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ISerializable } from "../common/ISerializable";
 import Database from "../utilities/Database";
 import { ISerializedUser, User } from "./User";
 
@@ -20,7 +21,7 @@ export interface ISerializedPaymentMethod
     user: ISerializedUser | INotExpandedResource,
 }
 
-export class PaymentMethod
+export class PaymentMethod implements ISerializable<ISerializedPaymentMethod>
 {
     private constructor
     (
@@ -112,14 +113,16 @@ export class PaymentMethod
         return Promise.all(result.rows.map(row => PaymentMethod.deserialize(row, expand)));
     }
 
-    public serialize(): ISerializedPaymentMethod
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedPaymentMethod
     {
         return {
             id: this.id,
             type: this.type,
             data: this.data,
             user: this.user instanceof User
-                ? this.user.serialize()
+                ? this.user.serialize({ for: options?.for })
                 : this.user,
         };
     }

@@ -1,5 +1,6 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -26,7 +27,7 @@ export interface ISerializedAuthor
     publisher: ISerializedPublisher | INotExpandedResource,
 }
 
-export class Author
+export class Author implements ISerializable<ISerializedAuthor>
 {
     private constructor
     (
@@ -121,15 +122,17 @@ export class Author
         return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
     }
 
-    public serialize(): ISerializedAuthor
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedAuthor
     {
         return {
             id: this.id,
             user: this.user instanceof User
-                ? this.user.serialize()
+                ? this.user.serialize({ for: options?.for })
                 : this.user,
             publisher: this.publisher instanceof Publisher
-                ? this.publisher.serialize()
+                ? this.publisher.serialize({ for: options?.for })
                 : this.publisher,
         };
     }

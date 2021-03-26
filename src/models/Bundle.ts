@@ -1,10 +1,12 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedOrganization, Organization } from "./Organization";
 import { Publisher } from "./Publisher";
+import { User } from "./User";
 
 interface IDatabaseBundle
 {
@@ -33,7 +35,7 @@ export interface ISerializedBundle
     active: boolean,
 }
 
-export class Bundle
+export class Bundle implements ISerializable<ISerializedBundle>
 {
     private constructor
     (
@@ -272,13 +274,15 @@ export class Bundle
         return Promise.all(result.rows.map(row => Bundle.deserialize(row, expand)));
     }
 
-    public serialize(): ISerializedBundle
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedBundle
     {
         return {
             id: this.id,
             name: this.name,
             organization: this.organization instanceof Organization
-                ? this.organization.serialize()
+                ? this.organization.serialize({ for: options?.for })
                 : this.organization,
             active: this.active,
         };

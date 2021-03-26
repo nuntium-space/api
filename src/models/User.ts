@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -52,7 +53,7 @@ export interface ISerializedUser
     has_default_payment_method: boolean,
 }
 
-export class User
+export class User implements ISerializable<ISerializedUser>
 {
     private constructor
     (
@@ -557,7 +558,7 @@ export class User
          * the response if the authenticated user does not match
          * the user that will be serialized
          */
-        for: User,
+        for?: User,
     }): ISerializedUser
     {
         let response: any = {
@@ -566,7 +567,7 @@ export class User
             last_name: this.last_name,
         };
 
-        if (options?.for.id === this.id)
+        if (options?.for?.id === this.id)
         {
             response = {
                 ...response,

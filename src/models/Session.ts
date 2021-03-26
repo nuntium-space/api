@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -24,7 +25,7 @@ export interface ISerializedSession
     expires_at: string,
 }
 
-export class Session
+export class Session implements ISerializable<ISerializedSession>
 {
     private constructor
     (
@@ -112,11 +113,13 @@ export class Session
         return this.expires_at < new Date();
     }
 
-    public serialize(): ISerializedSession
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedSession
     {
         return {
             id: this.id,
-            user: this.user.serialize(),
+            user: this.user.serialize({ for: options?.for }),
             expires_at: this.expires_at.toISOString(),
         };
     }

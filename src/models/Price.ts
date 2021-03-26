@@ -1,5 +1,6 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -30,7 +31,7 @@ export interface ISerializedPrice
     active: boolean,
 }
 
-export class Price
+export class Price implements ISerializable<ISerializedPrice>
 {
     private constructor
     (
@@ -185,14 +186,16 @@ export class Price
         return Promise.all(result.rows.map(row => Price.deserialize(row, options?.expand)));
     }
 
-    public serialize(): ISerializedPrice
+    public serialize(options?: {
+        for?: User,
+    }): ISerializedPrice
     {
         return {
             id: this.id,
             amount: this.amount,
             currency: this.currency,
             bundle: this.bundle instanceof Bundle
-                ? this.bundle.serialize()
+                ? this.bundle.serialize({ for: options?.for })
                 : this.bundle,
             active: this.active,
         };
