@@ -171,10 +171,6 @@
         "subtitle": "The specified file was not found on this website. Please check the URL for mistakes and try again"
     },
     "publisher": {
-        "details": {
-            "__title": "Details",
-            "name": "Name"
-        },
         "authors": {
             "__title": "Authors",
             "empty": "You haven't invited any author",
@@ -182,7 +178,12 @@
             "invite_author": {
                 "__title": "Invite author"
             }
-        }
+        },
+        "details": {
+            "__title": "Details",
+            "name": "Name"
+        },
+        "verify": "Verify"
     },
     "publisher_public_page": {
         "actions": {
