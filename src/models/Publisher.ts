@@ -13,6 +13,7 @@ interface IDatabasePublisher
     name: string,
     url: string,
     organization: string,
+    verified: boolean,
 }
 
 interface ICreatePublisher
@@ -43,6 +44,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         private _name: string,
         private _url: string,
         private  _organization: Organization,
+        public readonly verified: boolean,
     )
     {}
 
@@ -218,6 +220,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             data.name,
             data.url,
             organization,
+            data.verified,
         );
     }
 }
