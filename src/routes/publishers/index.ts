@@ -1,3 +1,4 @@
+import { promises as dns } from "dns";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
@@ -173,6 +174,18 @@ export default <ServerRoute[]>[
             const publisher = await Publisher.create(request.payload as any, organization);
 
             return publisher.serialize({ for: authenticatedUser });
+        },
+    },
+    {
+        method: "POST",
+        path: "/publishers/{id}/verify",
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            const result = await dns.resolveTxt(new URL(publisher.url).hostname);
+
+            return result;
         },
     },
     {
