@@ -162,7 +162,8 @@
                 "__title": "Crea nuovo editore",
                 "name": "Nome"
             },
-            "empty": "Non hai creato nessun editore"
+            "empty": "Non hai creato nessun editore",
+            "unverified": "Non verificato"
         }
     },
     "page_not_found": {

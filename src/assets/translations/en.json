@@ -162,7 +162,8 @@
                 "__title": "Create new publisher",
                 "name": "Name"
             },
-            "empty": "You haven't created any publisher"
+            "empty": "You haven't created any publisher",
+            "unverified": "Unverified"
         }
     },
     "page_not_found": {
