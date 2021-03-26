@@ -66,6 +66,7 @@ create table "publishers"
     "name" varchar(50) not null,
     "url" url not null,
     "organization" id not null,
+    "verified" boolean not null,
 
     primary key ("id"),
 
