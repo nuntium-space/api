@@ -28,7 +28,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            return authenticatedUser.serialize();
+            return authenticatedUser.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -114,7 +114,7 @@ export default <ServerRoute[]>[
         {
             const user = await User.create(request.payload as any);
 
-            return user.serialize();
+            return user.serialize({ for: user });
         },
     },
     {
@@ -144,7 +144,7 @@ export default <ServerRoute[]>[
 
             await user.update(request.payload as any);
 
-            return user.serialize();
+            return user.serialize({ for: authenticatedUser });
         },
     },
     {
