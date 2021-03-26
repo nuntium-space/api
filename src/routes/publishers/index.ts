@@ -8,6 +8,7 @@ import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
 import { User } from "../../models/User";
+import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
     {
@@ -181,9 +182,40 @@ export default <ServerRoute[]>[
         path: "/publishers/{id}/verify",
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const result = await dns.resolveTxt(new URL(publisher.url).hostname);
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
+
+            const result = await dns
+                .resolveTxt(new URL(publisher.url).hostname)
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
+
+            const domainVerificationId = result
+                .find(record => record[0].startsWith(Config.DOMAIN_VERIFICATION_DNS_TXT_RECORD_PREFIX))
+                ?.[0].split("=")[1];
+
+            if (!domainVerificationId)
+            {
+                throw Boom.badRequest(`Could not verify domain '${publisher.url}'`);
+            }
+
+            await Database.pool
+                .query(
+                    `update "publishers" set "verified" = $1 where "id" = $2`,
+                    [ true, publisher.id ],
+                )
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
 
             return result;
         },
