@@ -549,15 +549,33 @@ export class User
         return result.rows[0].count > 0;
     }
 
-    public serialize(): ISerializedUser
+    public serialize(options?: {
+        /**
+         * The authenticated user that requested this user's data
+         * 
+         * This param is used to remove sensitive information from
+         * the response if the authenticated user does not match
+         * the user that will be serialized
+         */
+        for: User,
+    }): ISerializedUser
     {
-        return {
+        let response: any = {
             id: this.id,
             first_name: this.first_name,
             last_name: this.last_name,
-            email: this.email,
-            has_default_payment_method: this.default_payment_method !== null,
         };
+
+        if (options?.for.id === this.id)
+        {
+            response = {
+                ...response,
+                email: this.email,
+                has_default_payment_method: this.default_payment_method !== null
+            };
+        }
+
+        return response;
     }
 
     private static async deserialize(data: IDatabaseUser): Promise<User>
