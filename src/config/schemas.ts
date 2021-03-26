@@ -72,6 +72,7 @@ export const PUBLISHER_SCHEMA = Joi
         name: STRING_SCHEMA.max(50).required(),
         url: URL_SCHEMA.required(),
         organization: ORGANIZATION_SCHEMA.required(),
+        verified: Joi.boolean().required(),
         __metadata: Joi.object({
             is_author: Joi.boolean().required(),
             is_subscribed: Joi.boolean().required(),

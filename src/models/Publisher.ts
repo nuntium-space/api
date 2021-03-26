@@ -34,6 +34,7 @@ export interface ISerializedPublisher
     name: string,
     url: string,
     organization: ISerializedOrganization,
+    verified: boolean,
 }
 
 export class Publisher implements ISerializable<ISerializedPublisher>
@@ -208,6 +209,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             name: this.name,
             url: this.url,
             organization: this.organization.serialize({ for: options?.for }),
+            verified: this.verified,
         };
     }
 
