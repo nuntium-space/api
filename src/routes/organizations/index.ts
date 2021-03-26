@@ -31,7 +31,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            return organization.serialize();
+            return organization.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -135,7 +135,7 @@ export default <ServerRoute[]>[
 
             const organizations = await Organization.forUser(authenticatedUser);
 
-            return organizations.map(organization => organization.serialize());
+            return organizations.map(organization => organization.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -155,7 +155,7 @@ export default <ServerRoute[]>[
 
             const organization = await Organization.create(request.payload as any, authenticatedUser);
 
-            return organization.serialize();
+            return organization.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -185,7 +185,7 @@ export default <ServerRoute[]>[
 
             await organization.update(request.payload as any);
 
-            return organization.serialize();
+            return organization.serialize({ for: authenticatedUser });
         },
     },
     {

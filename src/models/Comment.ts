@@ -220,10 +220,10 @@ export class Comment implements ISerializable<ISerializedComment>
                 ? this.user.serialize({ for: options?.for })
                 : this.user,
             article: this.article instanceof Article
-                ? this.article.serialize()
+                ? this.article.serialize({ for: options?.for })
                 : this.article,
             parent: this.parent instanceof Comment
-                ? this.parent.serialize()
+                ? this.parent.serialize({ for: options?.for })
                 : this.parent,
             // I think I'll never reach a point where this breaks, right?
             reply_count: parseInt(this.reply_count.toString()),

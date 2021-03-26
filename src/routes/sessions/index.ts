@@ -31,7 +31,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            return session.serialize();
+            return session.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -50,7 +50,7 @@ export default <ServerRoute[]>[
         {
             const session = await Session.create(request.payload as any);
 
-            return session.serialize();
+            return session.serialize({ for: session.user });
         },
     },
     {

@@ -5,6 +5,7 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle, ISerializedBundle } from "./Bundle";
+import { User } from "./User";
 
 interface IDatabasePrice
 {

@@ -79,7 +79,7 @@ export default <ServerRoute[]>[
 
             const articles = await Article.forPublisher(publisher, request.query.expand);
 
-            return articles.map(article => article.serialize());
+            return articles.map(article => article.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -116,7 +116,7 @@ export default <ServerRoute[]>[
                 request.query.expand,
             );
 
-            return article.serialize();
+            return article.serialize({ for: authenticatedUser });
         },
     },
     {

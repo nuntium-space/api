@@ -26,9 +26,11 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const author = await Author.retrieve(request.params.id, request.query.expand);
 
-            return author.serialize();
+            return author.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -60,7 +62,7 @@ export default <ServerRoute[]>[
 
             const authors = await Author.forPublisher(publisher, request.query.expand);
 
-            return authors.map(author => author.serialize());
+            return authors.map(author => author.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -90,7 +92,7 @@ export default <ServerRoute[]>[
 
             const authors = await Author.forUser(authenticatedUser, request.query.expand);
 
-            return authors.map(author => author.serialize());
+            return authors.map(author => author.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -129,7 +131,7 @@ export default <ServerRoute[]>[
                 request.query.expand,
             );
 
-            return author.serialize();
+            return author.serialize({ for: authenticatedUser });
         },
     },
     {

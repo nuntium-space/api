@@ -27,9 +27,11 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
 
-            return bundle.serialize();
+            return bundle.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -61,7 +63,7 @@ export default <ServerRoute[]>[
 
             const bundles = await Bundle.forOrganization(organization, request.query.expand);
 
-            return bundles.map(bundle => bundle.serialize());
+            return bundles.map(bundle => bundle.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -82,11 +84,13 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const publisher = await Publisher.retrieve(request.params.id);
 
             const bundles = await Bundle.forPublisher(publisher, request.query.expand);
 
-            return bundles.map(bundle => bundle.serialize());
+            return bundles.map(bundle => bundle.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -123,7 +127,7 @@ export default <ServerRoute[]>[
                 request.query.expand,
             );
 
-            return bundle.serialize();
+            return bundle.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -158,7 +162,7 @@ export default <ServerRoute[]>[
 
             await bundle.update(request.payload as any);
 
-            return bundle.serialize();
+            return bundle.serialize({ for: authenticatedUser });
         },
     },
     {

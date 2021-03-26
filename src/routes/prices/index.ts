@@ -27,9 +27,11 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const price = await Price.retrieve(request.params.id, request.query.expand);
 
-            return price.serialize();
+            return price.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -51,6 +53,8 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const bundle = await Bundle.retrieve(request.params.id);
 
             const prices = await Price.forBundle(bundle, {
@@ -58,7 +62,7 @@ export default <ServerRoute[]>[
                 expand: request.query.expand,
             });
 
-            return prices.map(price => price.serialize());
+            return prices.map(price => price.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -100,7 +104,7 @@ export default <ServerRoute[]>[
                 request.query.expand,
             );
 
-            return price.serialize();
+            return price.serialize({ for: authenticatedUser });
         },
     },
     {

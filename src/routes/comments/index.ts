@@ -26,9 +26,11 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const comment = await Comment.retrieve(request.params.id, request.query.expand);
 
-            return comment.serialize();
+            return comment.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -50,6 +52,8 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const article = await Article.retrieve(request.params.id);
 
             const comments = await Comment.forArticle(article, {
@@ -57,7 +61,7 @@ export default <ServerRoute[]>[
                 expand: request.query.expand,
             });
 
-            return comments.map(comment => comment.serialize());
+            return comments.map(comment => comment.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -90,7 +94,7 @@ export default <ServerRoute[]>[
                 request.query.expand,
             );
 
-            return comment.serialize();
+            return comment.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -120,7 +124,7 @@ export default <ServerRoute[]>[
 
             await comment.update(request.payload as any);
 
-            return comment.serialize();
+            return comment.serialize({ for: authenticatedUser });
         },
     },
     {

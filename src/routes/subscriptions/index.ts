@@ -37,7 +37,7 @@ export default <ServerRoute[]>[
 
             const subscriptions = await Subscription.forUser(authenticatedUser, request.query.expand);
 
-            return subscriptions.map(subscription => subscription.serialize());
+            return subscriptions.map(subscription => subscription.serialize({ for: authenticatedUser }));
         },
     },
     {

@@ -106,6 +106,8 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const result = await Config.ELASTICSEARCH.search({
                 index: "articles",
                 size: request.query.limit,
@@ -126,7 +128,7 @@ const init = async () =>
 
             const articles = await Article.retrieveMultiple(ids, request.query.expand);
 
-            return articles.map(article => article.serialize());
+            return articles.map(article => article.serialize({ for: authenticatedUser }));
         },
     });
 
@@ -163,7 +165,7 @@ const init = async () =>
                 expand: request.query.expand,
             });
 
-            return articles.map(article => article.serialize());
+            return articles.map(article => article.serialize({ for: authenticatedUser }));
         },
     });
 

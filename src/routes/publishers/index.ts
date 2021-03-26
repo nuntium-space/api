@@ -29,7 +29,7 @@ export default <ServerRoute[]>[
             const publisher = await Publisher.retrieve(request.params.id);
 
             return {
-                ...publisher.serialize(),
+                ...publisher.serialize({ for: authenticatedUser }),
                 __metadata: {
                     is_author: await authenticatedUser.isAuthorOfPublisher(publisher),
                     is_subscribed: await authenticatedUser.isSubscribedToPublisher(publisher),
@@ -52,11 +52,13 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
+            const authenticatedUser = request.auth.credentials.user as User;
+
             const bundle = await Bundle.retrieve(request.params.id);
 
             const publishers = await Publisher.forBundle(bundle);
 
-            return publishers.map(publisher => publisher.serialize());
+            return publishers.map(publisher => publisher.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -90,7 +92,7 @@ export default <ServerRoute[]>[
                 not_in_bundle: request.query.not_in_bundle,
             });
 
-            return publishers.map(publisher => publisher.serialize());
+            return publishers.map(publisher => publisher.serialize({ for: authenticatedUser }));
         },
     },
     {
@@ -170,7 +172,7 @@ export default <ServerRoute[]>[
 
             const publisher = await Publisher.create(request.payload as any, organization);
 
-            return publisher.serialize();
+            return publisher.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -200,7 +202,7 @@ export default <ServerRoute[]>[
 
             await publisher.update(request.payload as any);
 
-            return publisher.serialize();
+            return publisher.serialize({ for: authenticatedUser });
         },
     },
     {
