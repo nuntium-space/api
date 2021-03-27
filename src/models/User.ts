@@ -195,7 +195,12 @@ export class User implements ISerializable<ISerializedUser>
         {
             if (!await Utilities.verifyHash(data.old_password, this._password))
             {
-                throw Boom.forbidden(`"old_password" is wrong`);
+                throw Boom.forbidden(undefined, [
+                    {
+                        field: "old_password",
+                        error: "Wrong password",
+                    },
+                ]);
             }
 
             this._password = data.new_password
