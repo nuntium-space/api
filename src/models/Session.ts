@@ -57,7 +57,12 @@ export class Session implements ISerializable<ISerializedSession>
 
         if (!await Utilities.verifyHash(data.password, user.password))
         {
-            throw Boom.forbidden(`"password" is wrong`);
+            throw Boom.forbidden(undefined, [
+                {
+                    field: "password",
+                    error: "Wrong password",
+                },
+            ]);
         }
 
         const expires = new Date();
