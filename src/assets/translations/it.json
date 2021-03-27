@@ -115,7 +115,7 @@
     "feed": {
         "empty": {
             "title": "Congratulazioni, <b>{{ USER_FIRST_NAME }}</b>",
-            "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piaccioni da fonti di cui ti puoi fidare"
+            "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piacciono da fonti di cui ti puoi fidare"
         }
     },
     "generic": {
