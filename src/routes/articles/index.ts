@@ -117,7 +117,12 @@ export default <ServerRoute[]>[
 
             if (!author.publisher.verified)
             {
-                throw Boom.forbidden(`Cannot add articles to unverified publisher '${author.publisher.id}'`);
+                throw Boom.forbidden(undefined, [
+                    {
+                        field: "author",
+                        error: `Cannot add articles to unverified publisher '${author.publisher.id}'`,
+                    },
+                ]);
             }
 
             const article = await Article.create(

@@ -204,7 +204,12 @@ export default <ServerRoute[]>[
 
             if (!domainVerificationId)
             {
-                throw Boom.badRequest(`Could not verify domain '${publisher.url}'`);
+                throw Boom.badRequest(undefined, [
+                    {
+                        field: "url",
+                        error: `Could not verify domain '${publisher.url}'`,
+                    },
+                ]);
             }
 
             await Database.pool
