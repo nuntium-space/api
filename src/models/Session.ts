@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
