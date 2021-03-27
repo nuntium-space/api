@@ -131,7 +131,12 @@ export class Bundle implements ISerializable<ISerializedBundle>
     {
         if (data.name && await Bundle.existsWithNameAndOrganization(data.name, this.organization.id))
         {
-            throw Boom.conflict(`A bundle named '${data.name}' already exists for this organization`);
+            throw Boom.conflict(undefined, [
+                {
+                    field: "name",
+                    error: `A bundle named '${data.name}' already exists for this organization`,
+                },
+            ]);
         }
         else if (!this.stripe_product_id)
         {
@@ -214,7 +219,12 @@ export class Bundle implements ISerializable<ISerializedBundle>
     {
         if (publisher.organization.id !== this.organization.id)
         {
-            throw Boom.forbidden(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
+            throw Boom.forbidden(undefined, [
+                {
+                    field: "publisher",
+                    error: `Cannot add publisher '${publisher.id}' to bundle ${this.id}`,
+                },
+            ]);
         }
 
         await Database.pool
@@ -224,7 +234,12 @@ export class Bundle implements ISerializable<ISerializedBundle>
             )
             .catch(() =>
             {
-                throw Boom.badRequest(`Cannot add publisher '${publisher.id}' to bundle ${this.id}`);
+                throw Boom.badRequest(undefined, [
+                    {
+                        field: "publisher",
+                        error: `Cannot add publisher '${publisher.id}' to bundle ${this.id}`,
+                    },
+                ]);
             });
     }
 
