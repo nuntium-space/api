@@ -71,6 +71,7 @@ create table "publishers"
     primary key ("id"),
 
     unique ("name"),
+    unique ("url"),
 
     foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
