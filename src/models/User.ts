@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import Database from "../utilities/Database";
@@ -552,13 +553,13 @@ export class User implements ISerializable<ISerializedUser>
 
     public serialize(options?: {
         /**
-         * The authenticated user that requested this user's data
+         * The authenticated user (or just its ID) that requested this user's data
          * 
          * This param is used to remove sensitive information from
          * the response if the authenticated user does not match
          * the user that will be serialized
          */
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedUser
     {
         let response: any = {

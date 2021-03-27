@@ -201,7 +201,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedPublisher
     {
         return {

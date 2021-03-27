@@ -114,7 +114,7 @@ export class Session implements ISerializable<ISerializedSession>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedSession
     {
         return {

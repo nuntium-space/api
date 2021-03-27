@@ -310,7 +310,7 @@ export class Article implements ISerializable<ISerializedArticle>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
         /**
          * @default false
          */

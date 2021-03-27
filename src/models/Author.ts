@@ -123,7 +123,7 @@ export class Author implements ISerializable<ISerializedAuthor>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedAuthor
     {
         return {

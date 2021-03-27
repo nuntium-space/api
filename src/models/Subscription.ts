@@ -114,7 +114,7 @@ export class Subscription implements ISerializable<ISerializedSubscription>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedSubscription
     {
         return {

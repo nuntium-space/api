@@ -210,7 +210,7 @@ export class Comment implements ISerializable<ISerializedComment>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedComment
     {
         return {

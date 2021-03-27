@@ -114,7 +114,7 @@ export class PaymentMethod implements ISerializable<ISerializedPaymentMethod>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedPaymentMethod
     {
         return {

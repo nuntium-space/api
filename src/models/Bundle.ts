@@ -275,7 +275,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedBundle
     {
         return {

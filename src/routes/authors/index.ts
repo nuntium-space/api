@@ -62,7 +62,8 @@ export default <ServerRoute[]>[
 
             const authors = await Author.forPublisher(publisher, request.query.expand);
 
-            return authors.map(author => author.serialize({ for: authenticatedUser }));
+            // Pass the author.user to load email address
+            return authors.map(author => author.serialize({ for: author.user }));
         },
     },
     {

@@ -172,7 +172,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedOrganization
     {
         return {

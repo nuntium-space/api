@@ -188,7 +188,7 @@ export class Price implements ISerializable<ISerializedPrice>
     }
 
     public serialize(options?: {
-        for?: User,
+        for?: User | INotExpandedResource,
     }): ISerializedPrice
     {
         return {
