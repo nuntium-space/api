@@ -56,7 +56,12 @@ export class Bundle implements ISerializable<ISerializedBundle>
     {
         if (await Bundle.existsWithNameAndOrganization(data.name, organization))
         {
-            throw Boom.conflict(`A bundle named '${data.name}' already exists for this organization`);
+            throw Boom.conflict(undefined, [
+                {
+                    field: "name",
+                    error: `A bundle named '${data.name}' already exists for this organization`,
+                },
+            ]);
         }
 
         const client = await Database.pool.connect();

@@ -263,7 +263,12 @@ export class User implements ISerializable<ISerializedUser>
     {
         if (!await this.canBeDeleted())
         {
-            throw Boom.forbidden(`Cannot delete user '${this.id}'`);
+            throw Boom.forbidden(undefined, [
+                {
+                    field: "user",
+                    error: `Cannot delete user '${this.id}'`,
+                },
+            ]);
         }
 
         const client = await Database.pool.connect();
@@ -371,7 +376,12 @@ export class User implements ISerializable<ISerializedUser>
 
         if (!Config.LANGUAGES.find(l => l.id === settings.language))
         {
-            throw Boom.badData(`Unsupported language: '${data.language}'`);
+            throw Boom.badData(undefined, [
+                {
+                    field: "language",
+                    error: `Unsupported language: '${data.language}'`,
+                },
+            ]);
         }
 
         const hasSettings = await this.hasSettings();
