@@ -73,6 +73,16 @@ export class Organization implements ISerializable<ISerializedOrganization>
 
     public static async create(data: ICreateOrganization, user: User): Promise<Organization>
     {
+        if (await Organization.existsWithName(data.name))
+        {
+            throw Boom.badRequest(undefined, [
+                {
+                    field: "name",
+                    error: `An organization with the name '${data.name}' already exists`,
+                },
+            ]);
+        }
+
         const id = Utilities.id(Config.ID_PREFIXES.ORGANIZATION);
 
         const account = await Config.STRIPE.accounts
@@ -125,6 +135,16 @@ export class Organization implements ISerializable<ISerializedOrganization>
         }
 
         return Organization.deserialize(result.rows[0]);
+    }
+
+    public static async existsWithName(name: string): Promise<boolean>
+    {
+        const { rowCount } = await Database.pool.query(
+            `select "id" from "organizations" where "name" = $1 limit 1`,
+            [ name ],
+        );
+
+        return rowCount > 0;
     }
 
     public async update(data: IUpdateOrganization): Promise<void>
