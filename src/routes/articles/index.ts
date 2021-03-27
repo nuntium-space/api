@@ -103,11 +103,21 @@ export default <ServerRoute[]>[
         {
             const authenticatedUser = request.auth.credentials.user as User;
 
-            const author = await Author.retrieve(request.params.id);
+            const author = await Author.retrieve(request.params.id, [ "publisher" ]);
+
+            if (!(author.publisher instanceof Publisher))
+            {
+                throw Boom.badImplementation();
+            }
 
             if (author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
+            }
+
+            if (!author.publisher.verified)
+            {
+                throw Boom.forbidden(`Cannot add articles to unverified publisher '${author.publisher.id}'`);
             }
 
             const article = await Article.create(
