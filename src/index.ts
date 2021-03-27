@@ -79,6 +79,18 @@ const init = async () =>
 
     server.auth.default({ strategy: "session" });
 
+    server.ext("onPreResponse", (request, h) =>
+    {
+        const { response } = request;
+
+        if (response instanceof Boom.Boom && response.data)
+        {
+            response.output.payload.details = response.data;
+        }
+
+        return h.continue;
+    });
+
     server.route(routes);
 
     /**
