@@ -56,12 +56,22 @@ export class Price implements ISerializable<ISerializedPrice>
 
         if (!currencyConfig)
         {
-            throw Boom.badData(`Unsupported currency: '${data.currency}'`);
+            throw Boom.badData(undefined, [
+                {
+                    field: "currency",
+                    error: `Unsupported currency: '${data.currency}'`,
+                },
+            ]);
         }
 
         if (data.amount < currencyConfig.min)
         {
-            throw Boom.badData(`The amount must be equal to or greater than '${currencyConfig.min}' for currency '${data.currency}'`);
+            throw Boom.badData(undefined, [
+                {
+                    field: "amount",
+                    error: `The amount must be equal to or greater than '${currencyConfig.min}' for currency '${data.currency}'`,
+                },
+            ]);
         }
 
         const client = await Database.pool.connect();
