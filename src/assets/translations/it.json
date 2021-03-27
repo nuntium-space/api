@@ -53,8 +53,7 @@
                 "__title": "Aggiungi editore",
                 "empty": "Non hai nessun editore da aggiungere"
             },
-            "empty": "Non hai aggiunto nessun editore",
-            "remove": "Rimuovi"
+            "empty": "Non hai aggiunto nessun editore"
         },
         "subscribe": {
             "__title": "Abbonati",
@@ -129,6 +128,7 @@
         "first_name": "Nome",
         "last_name": "Cognome",
         "password": "Password",
+        "remove": "Rimuovi",
         "sign_in": "Accedi",
         "sign_out": "Esci",
         "sign_up": "Registrati",
@@ -244,8 +244,7 @@
                 },
                 "default": "Predefinito",
                 "empty": "Non hai ancora aggiunto nessun metodo di pagamento",
-                "make_default": "Imposta come predefinito",
-                "remove": "Rimuovi"
+                "make_default": "Imposta come predefinito"
             },
             "preferences": {
                 "__title": "Preferenze",

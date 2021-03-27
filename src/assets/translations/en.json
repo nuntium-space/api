@@ -53,8 +53,7 @@
                 "__title": "Add publisher",
                 "empty": "You don't have any publisher to add"
             },
-            "empty": "You haven't added any publisher",
-            "remove": "Remove"
+            "empty": "You haven't added any publisher"
         },
         "subscribe": {
             "__title": "Subscribe",
@@ -129,6 +128,7 @@
         "first_name": "First name",
         "last_name": "Last name",
         "password": "Password",
+        "remove": "Remove",
         "sign_in": "Sign In",
         "sign_out": "Sign Out",
         "sign_up": "Sign Up",
@@ -244,8 +244,7 @@
                 },
                 "default": "Default",
                 "empty": "You haven't added any payment method",
-                "make_default": "Make default",
-                "remove": "Remove"
+                "make_default": "Make default"
             },
             "preferences": {
                 "__title": "Preferences",
