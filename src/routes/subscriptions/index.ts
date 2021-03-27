@@ -82,22 +82,42 @@ export default <ServerRoute[]>[
 
             if (!price.bundle.organization.stripe_account_enabled)
             {
-                throw Boom.badRequest(`The organization that owns the bundle '${price.bundle.id}' hasn't enabled payments`);
+                throw Boom.badRequest(undefined, [
+                    {
+                        field: "subscription",
+                        error: `The organization that owns the bundle '${price.bundle.id}' hasn't enabled payments`,
+                    },
+                ]);
             }
 
             if (!await authenticatedUser.canSubscribeToBundle(price.bundle))
             {
-                throw Boom.conflict(`The user '${authenticatedUser.id}' is already subscribed to the bundle '${price.bundle.id}'`);
+                throw Boom.conflict(undefined, [
+                    {
+                        field: "subscription",
+                        error: `The user '${authenticatedUser.id}' is already subscribed to the bundle '${price.bundle.id}'`,
+                    },
+                ]);
             }
 
             if (!price.active)
             {
-                throw Boom.forbidden(`The price '${price.id}' is not active`);
+                throw Boom.forbidden(undefined, [
+                    {
+                        field: "subscription",
+                        error: `The price '${price.id}' is not active`,
+                    },
+                ]);
             }
 
             if (!price.bundle.active)
             {
-                throw Boom.forbidden(`The bundle '${price.bundle.id}' is not active`);
+                throw Boom.forbidden(undefined, [
+                    {
+                        field: "subscription",
+                        error: `The bundle '${price.bundle.id}' is not active`,
+                    },
+                ]);
             }
 
             await Config.STRIPE.subscriptions
