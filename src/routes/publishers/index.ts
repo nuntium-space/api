@@ -261,6 +261,7 @@ export default <ServerRoute[]>[
         path: "/publishers/{id}/image",
         options: {
             payload: {
+                allow: "multipart/form-data",
                 multipart: true,
             },
             validate: {
