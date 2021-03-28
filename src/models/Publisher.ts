@@ -1,3 +1,4 @@
+import AWS from "aws-sdk";
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
@@ -36,6 +37,7 @@ export interface ISerializedPublisher
     url: string,
     organization: ISerializedOrganization,
     verified: boolean,
+    imageUrl: string,
 }
 
 export class Publisher implements ISerializable<ISerializedPublisher>
@@ -205,12 +207,18 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         for?: User | INotExpandedResource,
     }): ISerializedPublisher
     {
+        const s3Client = new AWS.S3({
+            credentials: Config.AWS_CREDENTIALS,
+            endpoint: Config.AWS_ENDPOINT,
+        });
+
         return {
             id: this.id,
             name: this.name,
             url: this.url,
             organization: this.organization.serialize({ for: options?.for }),
             verified: this.verified,
+            imageUrl: `${s3Client.endpoint.href}/${process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME}/${this.id}`,
         };
     }
 
