@@ -107,6 +107,17 @@
             }
         }
     },
+    "errors": {
+        "string": {
+            "email": "Must be a valid email",
+            "empty": "Cannot be empty",
+            "max": "Too long",
+            "min": "Too short"
+        },
+        "custom": {
+            "wrong_password": "Wrong password"
+        }
+    },
     "explore": {
         "search": {
             "empty": "No results for <b>{{ QUERY }}</b>"

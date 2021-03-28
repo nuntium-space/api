@@ -107,6 +107,17 @@
             }
         }
     },
+    "errors": {
+        "string": {
+            "email": "Deve essere un indirizzo email valido",
+            "empty": "Non può essere vuoto",
+            "max": "Troppo lungo",
+            "min": "Troppo corto"
+        },
+        "custom": {
+            "wrong_password": "Password errata"
+        }
+    },
     "explore": {
         "search": {
             "empty": "Non ci sono risultati per <b>{{ QUERY }}</b>"
