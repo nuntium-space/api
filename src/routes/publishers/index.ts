@@ -285,6 +285,15 @@ export default <ServerRoute[]>[
 
             // TODO: Validate image
 
+            const client = await Database.pool.connect();
+
+            await client.query("begin");
+
+            await client.query(
+                `update "publishers" set "has_image" = $1 where "id" = $2`,
+                [ true, publisher.id ],
+            );
+
             const s3Client = new AWS.S3({
                 credentials: Config.AWS_CREDENTIALS,
                 endpoint: Config.AWS_ENDPOINT,
@@ -297,10 +306,14 @@ export default <ServerRoute[]>[
                 Body: image,
             })
             .promise()
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badImplementation();
             });
+
+            await client.query("commit");
 
             return h.response();
         },
