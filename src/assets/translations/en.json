@@ -129,7 +129,11 @@
                     "not_supported": "Unsupported currency"
                 }
             },
-            "wrong_password": "Wrong password"
+            "session": {
+                "password": {
+                    "wrong": "Wrong password"
+                }
+            }
         }
     },
     "explore": {

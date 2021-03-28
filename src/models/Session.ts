@@ -60,7 +60,7 @@ export class Session implements ISerializable<ISerializedSession>
             throw Boom.forbidden(undefined, [
                 {
                     field: "password",
-                    error: "custom.wrong_password",
+                    error: "custom.session.password.wrong",
                 },
             ]);
         }

@@ -129,7 +129,11 @@
                     "not_supported": "Valuta non supportata"
                 }
             },
-            "wrong_password": "Password errata"
+            "session": {
+                "password": {
+                    "wrong": "Password errata"
+                }
+            }
         }
     },
     "explore": {
