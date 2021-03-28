@@ -115,6 +115,20 @@
             "min": "Troppo corto"
         },
         "custom": {
+            "bundle": {
+                "already_exists": "Un bundle con questo nome esiste già per questa organizzazione"
+            },
+            "organization": {
+                "already_exists": "Un'organizzazione con questo nome esiste già"
+            },
+            "price": {
+                "amount": {
+                    "not_enough": "L'importo deve essere uguale o superiore a '{{ MIN_AMOUNT }}' per la valuta '{{ CURRENCY }}'"
+                },
+                "currency": {
+                    "not_supported": "Valuta non supportata"
+                }
+            },
             "wrong_password": "Password errata"
         }
     },
