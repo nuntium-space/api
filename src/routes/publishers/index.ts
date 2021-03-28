@@ -260,6 +260,9 @@ export default <ServerRoute[]>[
         method: "PUT",
         path: "/publishers/{id}/image",
         options: {
+            payload: {
+                multipart: true,
+            },
             validate: {
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
@@ -277,37 +280,22 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
+            const { image } = request.payload as any;
+
+            // TODO: Validate image
+
             const s3Client = new AWS.S3({
                 credentials: Config.AWS_CREDENTIALS,
                 endpoint: Config.AWS_ENDPOINT,
                 s3ForcePathStyle: true,
             });
 
-            await new Promise((resolve, reject) =>
-            {
-                s3Client.upload(
-                    {
-                        Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
-                        Key: publisher.id,
-                        Body: request.payload,
-                    },
-                    (error, response) =>
-                    {
-                        console.log(error);
-
-                        if (error)
-                        {
-                            reject(error);
-
-                            return;
-                        }
-
-                        console.log(response);
-
-                        resolve(response);
-                    },
-                );
+            await s3Client.upload({
+                Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+                Key: publisher.id,
+                Body: image,
             })
+            .promise()
             .catch(() =>
             {
                 throw Boom.badImplementation();
