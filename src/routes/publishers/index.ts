@@ -256,6 +256,31 @@ export default <ServerRoute[]>[
         },
     },
     {
+        method: "PUT",
+        path: "/publishers/{id}/image",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+                payload: PUBLISHER_UPDATE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
+
+            return h.response();
+        },
+    },
+    {
         method: "DELETE",
         path: "/publishers/{id}",
         options: {

@@ -24,7 +24,7 @@ import Utilities from "./utilities/Utilities";
 import routes from "./routes";
 
 const server = Hapi.server({
-    port: 4000,
+    port: process.env.PORT,
     routes: {
         cors: true,
         validate: {

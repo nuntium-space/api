@@ -51,11 +51,11 @@ export class Config
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
 
-    public static readonly API_HOST = process.env.ENVIRONMENT === "production"
+    public static readonly API_HOST = process.env.NODE_ENV === "production"
         ? "https://api.example.com"
         : "http://localhost:4000";
 
-    public static readonly CLIENT_HOST = process.env.ENVIRONMENT === "production"
+    public static readonly CLIENT_HOST = process.env.NODE_ENV === "production"
         ? "https://example.com"
         : "http://localhost:4200";
 
