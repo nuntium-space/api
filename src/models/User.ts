@@ -198,7 +198,7 @@ export class User implements ISerializable<ISerializedUser>
                 throw Boom.forbidden(undefined, [
                     {
                         field: "old_password",
-                        error: "Wrong password",
+                        error: "custom.session.password.wrong",
                     },
                 ]);
             }
