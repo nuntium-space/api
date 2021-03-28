@@ -289,10 +289,17 @@ export default <ServerRoute[]>[
 
             await client.query("begin");
 
-            await client.query(
-                `update "publishers" set "has_image" = $1 where "id" = $2`,
-                [ true, publisher.id ],
-            );
+            await client
+                .query(
+                    `update "publishers" set "has_image" = $1 where "id" = $2`,
+                    [ true, publisher.id ],
+                )
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badImplementation();
+                });
 
             const s3Client = new AWS.S3({
                 credentials: Config.AWS_CREDENTIALS,
