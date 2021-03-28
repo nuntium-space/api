@@ -283,7 +283,35 @@ export default <ServerRoute[]>[
                 s3ForcePathStyle: true,
             });
 
-            // TODO
+            await new Promise((resolve, reject) =>
+            {
+                s3Client.upload(
+                    {
+                        Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+                        Key: publisher.id,
+                        Body: request.payload,
+                    },
+                    (error, response) =>
+                    {
+                        console.log(error);
+
+                        if (error)
+                        {
+                            reject(error);
+
+                            return;
+                        }
+
+                        console.log(response);
+
+                        resolve(response);
+                    },
+                );
+            })
+            .catch(() =>
+            {
+                throw Boom.badImplementation();
+            });
 
             return h.response();
         },
