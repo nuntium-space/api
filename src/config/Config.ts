@@ -1,4 +1,5 @@
 import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
+import { CredentialsOptions } from "aws-sdk/lib/credentials";
 import Stripe from "stripe";
 
 export class Config
@@ -62,4 +63,13 @@ export class Config
     public static readonly ELASTICSEARCH = new ElasticSearchClient({
         node: "http://localhost:9200",
     });
+
+    public static readonly AWS_CREDENTIALS: CredentialsOptions = {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? "",
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
+    };
+
+    public static readonly AWS_ENDPOINT = process.env.NODE_ENV === "production"
+        ? undefined
+        : "http://localhost:4566";
 }

@@ -1,3 +1,4 @@
+import AWS from "aws-sdk";
 import { promises as dns } from "dns";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
@@ -263,7 +264,6 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
                 }),
-                payload: PUBLISHER_UPDATE_SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -276,6 +276,14 @@ export default <ServerRoute[]>[
             {
                 throw Boom.forbidden();
             }
+
+            const s3Client = new AWS.S3({
+                credentials: Config.AWS_CREDENTIALS,
+                endpoint: Config.AWS_ENDPOINT,
+                s3ForcePathStyle: true,
+            });
+
+            // TODO
 
             return h.response();
         },
