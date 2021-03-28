@@ -16,6 +16,7 @@ interface IDatabasePublisher
     url: string,
     organization: string,
     verified: boolean,
+    has_image: boolean,
 }
 
 interface ICreatePublisher
@@ -37,7 +38,7 @@ export interface ISerializedPublisher
     url: string,
     organization: ISerializedOrganization,
     verified: boolean,
-    imageUrl: string,
+    imageUrl: string | null,
 }
 
 export class Publisher implements ISerializable<ISerializedPublisher>
@@ -49,6 +50,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         private _url: string,
         private  _organization: Organization,
         public readonly verified: boolean,
+        public readonly has_image: boolean,
     )
     {}
 
@@ -207,10 +209,17 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         for?: User | INotExpandedResource,
     }): ISerializedPublisher
     {
-        const s3Client = new AWS.S3({
-            credentials: Config.AWS_CREDENTIALS,
-            endpoint: Config.AWS_ENDPOINT,
-        });
+        let imageUrl: string | null = null;
+
+        if (this.has_image)
+        {
+            const s3Client = new AWS.S3({
+                credentials: Config.AWS_CREDENTIALS,
+                endpoint: Config.AWS_ENDPOINT,
+            });
+
+            imageUrl = `${s3Client.endpoint.href}/${process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME}/${this.id}`;
+        }
 
         return {
             id: this.id,
@@ -218,7 +227,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             url: this.url,
             organization: this.organization.serialize({ for: options?.for }),
             verified: this.verified,
-            imageUrl: `${s3Client.endpoint.href}/${process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME}/${this.id}`,
+            imageUrl,
         };
     }
 
@@ -232,6 +241,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             data.url,
             organization,
             data.verified,
+            data.has_image,
         );
     }
 }
