@@ -4,7 +4,7 @@ dotenv.config();
 
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import Joi from "joi";
+import Joi, { ValidationError } from "joi";
 import qs from "qs";
 import { Config } from "./config/Config";
 import {
@@ -33,6 +33,17 @@ const server = Hapi.server({
             },
             failAction: async (request, h, error) =>
             {
+                if (error instanceof ValidationError)
+                {
+                    throw Boom.badRequest(undefined, error.details.map(e =>
+                    {
+                        return {
+                            field: e.path.join("."),
+                            error: e.type,
+                        };
+                    }));
+                }
+
                 throw error;
             },
         },
