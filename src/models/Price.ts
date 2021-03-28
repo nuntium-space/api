@@ -59,7 +59,7 @@ export class Price implements ISerializable<ISerializedPrice>
             throw Boom.badData(undefined, [
                 {
                     field: "currency",
-                    error: `Unsupported currency: '${data.currency}'`,
+                    error: "custom.price.currency.not_supported",
                 },
             ]);
         }
@@ -69,7 +69,11 @@ export class Price implements ISerializable<ISerializedPrice>
             throw Boom.badData(undefined, [
                 {
                     field: "amount",
-                    error: `The amount must be equal to or greater than '${currencyConfig.min}' for currency '${data.currency}'`,
+                    error: "custom.price.amount.not_enough",
+                    params: {
+                        MIN_AMOUNT: currencyConfig.min,
+                        CURRENCY: data.currency,
+                    },
                 },
             ]);
         }

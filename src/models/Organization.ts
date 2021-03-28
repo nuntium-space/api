@@ -78,7 +78,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
             throw Boom.badRequest(undefined, [
                 {
                     field: "name",
-                    error: `An organization with the name '${data.name}' already exists`,
+                    error: "custom.organization.already_exists",
                 },
             ]);
         }

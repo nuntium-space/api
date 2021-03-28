@@ -59,7 +59,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
             throw Boom.conflict(undefined, [
                 {
                     field: "name",
-                    error: `A bundle named '${data.name}' already exists for this organization`,
+                    error: "custom.bundle.already_exists",
                 },
             ]);
         }
@@ -134,7 +134,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
             throw Boom.conflict(undefined, [
                 {
                     field: "name",
-                    error: `A bundle named '${data.name}' already exists for this organization`,
+                    error: "custom.bundle.already_exists",
                 },
             ]);
         }
