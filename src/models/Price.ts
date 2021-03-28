@@ -71,7 +71,7 @@ export class Price implements ISerializable<ISerializedPrice>
                     field: "amount",
                     error: "custom.price.amount.not_enough",
                     params: {
-                        MIN_AMOUNT: currencyConfig.min,
+                        MIN_AMOUNT: Utilities.formatCurrencyAmount(currencyConfig.min, data.currency),
                         CURRENCY: data.currency,
                     },
                 },

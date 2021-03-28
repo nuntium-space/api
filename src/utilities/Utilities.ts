@@ -18,4 +18,14 @@ export default class Utilities
     {
         return `${prefix}_${cuid()}`;
     }
+
+    public static formatCurrencyAmount(amount: number, currency: string): number
+    {
+        if ([ "usd", "eur" ].includes(currency.toLowerCase()))
+        {
+            return amount /= 100;
+        }
+
+        return amount;
+    }
 }
