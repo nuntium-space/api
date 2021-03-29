@@ -215,6 +215,16 @@ export default <ServerRoute[]>[
                 ]);
             }
 
+            if (domainVerificationId !== publisher.dns_txt_value)
+            {
+                throw Boom.badRequest(undefined, [
+                    {
+                        field: "publisher",
+                        error: `TXT Record for '${publisher.url}' does not match the expected value`,
+                    },
+                ]);
+            }
+
             await Database.pool
                 .query(
                     `update "publishers" set "verified" = $1 where "id" = $2`,
