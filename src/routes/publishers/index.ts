@@ -10,6 +10,7 @@ import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
 import { User } from "../../models/User";
 import Database from "../../utilities/Database";
+import imageType from "image-type";
 
 export default <ServerRoute[]>[
     {
@@ -287,7 +288,17 @@ export default <ServerRoute[]>[
 
             const { image } = request.payload as any;
 
-            // TODO: Validate image
+            const { mime } = imageType(image) ?? { mime: "" };
+
+            if (!Config.PUBLISHER_IMAGE_SUPPORTED_MIME_TYPES.includes(mime))
+            {
+                throw Boom.unsupportedMediaType(undefined, [
+                    {
+                        field: "image",
+                        error: "Unsupported image type"
+                    },
+                ]);
+            }
 
             const client = await Database.pool.connect();
 

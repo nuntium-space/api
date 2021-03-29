@@ -60,6 +60,11 @@ export class Config
      */
     public static readonly PUBLISHER_IMAGE_MAX_SIZE = 2 ** 20;
 
+    public static readonly PUBLISHER_IMAGE_SUPPORTED_MIME_TYPES = [
+        "image/jpeg",
+        "image/png",
+    ];
+
     public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
