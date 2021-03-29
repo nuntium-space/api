@@ -83,9 +83,9 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             .query(
                 `
                 insert into "publishers"
-                    ("id", "name", "url", "organization", "verified", "dns_txt_value")
+                    ("id", "name", "url", "organization", "verified", "has_image", "dns_txt_value")
                 values
-                    ($1, $2, $3, $4, $5, $6)
+                    ($1, $2, $3, $4, $5, $6, $7)
                 returning *
                 `,
                 [
