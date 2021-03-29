@@ -1,5 +1,6 @@
 import AWS from "aws-sdk";
 import Boom from "@hapi/boom";
+import crypto from "crypto";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -17,6 +18,7 @@ interface IDatabasePublisher
     organization: string,
     verified: boolean,
     has_image: boolean,
+    dns_txt_value: string,
 }
 
 interface ICreatePublisher
@@ -51,6 +53,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         private  _organization: Organization,
         public readonly verified: boolean,
         public readonly has_image: boolean,
+        public readonly dns_txt_value: string,
     )
     {}
 
@@ -80,9 +83,9 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             .query(
                 `
                 insert into "publishers"
-                    ("id", "name", "url", "organization", "verified")
+                    ("id", "name", "url", "organization", "verified", "dns_txt_value")
                 values
-                    ($1, $2, $3, $4, $5)
+                    ($1, $2, $3, $4, $5, $6)
                 returning *
                 `,
                 [
@@ -91,6 +94,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     data.url,
                     organization.id,
                     false,
+                    crypto.randomBytes(Config.PUBLISHER_DNS_TXT_VALUE_BYTES).toString("utf8"),
                 ],
             )
             .catch(() =>
@@ -243,6 +247,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             organization,
             data.verified,
             data.has_image,
+            data.dns_txt_value,
         );
     }
 }
