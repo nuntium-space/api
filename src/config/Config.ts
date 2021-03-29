@@ -6,6 +6,11 @@ export class Config
 {
     public static readonly PASSWORD_MIN_LENGTH = 10;
 
+    /**
+     * @default
+     * 
+     * 30 days
+     */
     public static readonly SESSION_DURATION = 60 * 60 * 24 * 30;
 
     public static readonly HASH_ROUNDS = 15;
@@ -48,13 +53,20 @@ export class Config
 
     public static readonly DOMAIN_VERIFICATION_DNS_TXT_RECORD_PREFIX = "nuntium-domain-verification";
 
+    /**
+     * @default
+     * 
+     * 1MiB
+     */
+    public static readonly PUBLISHER_IMAGE_MAX_SIZE = 2 ** 20;
+
     public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
 
     public static readonly API_HOST = process.env.NODE_ENV === "production"
         ? "https://api.example.com"
-        : "http://localhost:4000";
+        : `http://localhost:${process.env.PORT}`;
 
     public static readonly CLIENT_HOST = process.env.NODE_ENV === "production"
         ? "https://example.com"
