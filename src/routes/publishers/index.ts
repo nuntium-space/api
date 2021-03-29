@@ -11,6 +11,7 @@ import { Publisher } from "../../models/Publisher";
 import { User } from "../../models/User";
 import Database from "../../utilities/Database";
 import imageType from "image-type";
+import imageSize from "image-size";
 
 export default <ServerRoute[]>[
     {
@@ -295,7 +296,19 @@ export default <ServerRoute[]>[
                 throw Boom.unsupportedMediaType(undefined, [
                     {
                         field: "image",
-                        error: "Unsupported image type"
+                        error: "custom.publisher.image.not_supported",
+                    },
+                ]);
+            }
+
+            const { width, height } = imageSize(image);
+
+            if (width !== height)
+            {
+                throw Boom.badData(undefined, [
+                    {
+                        field: "image",
+                        error: "custom.publisher.image.must_be_square",
                     },
                 ]);
             }
