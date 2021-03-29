@@ -26,7 +26,9 @@ import routes from "./routes";
 const server = Hapi.server({
     port: process.env.PORT,
     routes: {
-        cors: true,
+        cors: {
+            origin: [ Config.CLIENT_HOST ],
+        },
         validate: {
             options: {
                 abortEarly: false,
