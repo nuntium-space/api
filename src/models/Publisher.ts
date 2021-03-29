@@ -94,6 +94,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     data.url,
                     organization.id,
                     false,
+                    false,
                     crypto.randomBytes(Config.PUBLISHER_DNS_TXT_VALUE_BYTES).toString("utf8"),
                 ],
             )

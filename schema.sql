@@ -74,6 +74,7 @@ create table "publishers"
 
     unique ("name"),
     unique ("url"),
+    unique ("dns_txt_value"),
 
     foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
