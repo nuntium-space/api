@@ -216,7 +216,11 @@
         },
         "details": {
             "__title": "Details",
-            "name": "Name"
+            "name": "Name",
+            "image": {
+                "__title": "Image",
+                "image": "Image"
+            }
         },
         "verify": "Verify"
     },
