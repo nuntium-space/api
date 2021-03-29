@@ -80,9 +80,9 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             .query(
                 `
                 insert into "publishers"
-                    ("id", "name", "url", "organization")
+                    ("id", "name", "url", "organization", "verified")
                 values
-                    ($1, $2, $3, $4)
+                    ($1, $2, $3, $4, $5)
                 returning *
                 `,
                 [
@@ -90,6 +90,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     data.name,
                     data.url,
                     organization.id,
+                    false,
                 ],
             )
             .catch(() =>
