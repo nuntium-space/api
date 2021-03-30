@@ -155,7 +155,6 @@
         "delete": "Delete",
         "edit": "Edit",
         "email": "Email",
-        "password": "Password",
         "remove": "Remove",
         "sign_in": "Sign In",
         "sign_out": "Sign Out",
@@ -286,12 +285,7 @@
                 }
             },
             "security": {
-                "__title": "Security",
-                "change_password": {
-                    "__title": "Change password",
-                    "new_password": "New password",
-                    "old_password": "Old password"
-                }
+                "__title": "Security"
             },
             "subscriptions": {
                 "__title": "Subscriptions",
