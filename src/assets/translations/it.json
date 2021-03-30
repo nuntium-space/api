@@ -134,11 +134,6 @@
                     "must_be_square": "L'immagine deve essere quadrata",
                     "not_supported": "Tipo di immagine non supportato"
                 }
-            },
-            "session": {
-                "password": {
-                    "wrong": "Password errata"
-                }
             }
         }
     },

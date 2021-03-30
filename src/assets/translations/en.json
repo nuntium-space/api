@@ -134,11 +134,6 @@
                     "must_be_square": "The image must be a square",
                     "not_supported": "Unsupported image type"
                 }
-            },
-            "session": {
-                "password": {
-                    "wrong": "Wrong password"
-                }
             }
         }
     },
