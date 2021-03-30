@@ -11,14 +11,14 @@ import { Publisher } from "./Publisher";
 interface IDatabaseUser
 {
     id: string,
-    username: string,
+    username: string | null,
     email: string,
     stripe_customer_id: string | null,
 }
 
 interface ICreateUser
 {
-    username: string,
+    username?: string,
     email: string,
 }
 
@@ -41,7 +41,7 @@ interface IUpdateUserSettings
 export interface ISerializedUser
 {
     id: string,
-    username: string,
+    username: string | null,
     email: string,
     has_default_payment_method: boolean,
 }
@@ -51,14 +51,14 @@ export class User implements ISerializable<ISerializedUser>
     private constructor
     (
         public readonly id: string,
-        private _username: string,
+        private _username: string | null,
         private _email: string,
         public readonly default_payment_method: PaymentMethod | null,
         public readonly stripe_customer_id: string | null,
     )
     {}
 
-    public get username(): string
+    public get username(): string | null
     {
         return this._username;
     }
@@ -85,7 +85,7 @@ export class User implements ISerializable<ISerializedUser>
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.USER),
-                    data.username,
+                    data.username ?? null,
                     data.email,
                 ],
             )

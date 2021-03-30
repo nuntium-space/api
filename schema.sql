@@ -30,7 +30,7 @@ TABLES
 create table "users"
 (
     "id" id not null,
-    "username" varchar(30) not null,
+    "username" text,
     "email" email_address not null,
     "stripe_customer_id" text,
 

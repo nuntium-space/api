@@ -22,10 +22,7 @@ export default <ServerRoute[]>[
             }
 
             const profile: {
-                name: {
-                    first: string,
-                    last: string,
-                },
+                id: string,
                 email: string,
             } = request.auth.credentials.profile as any;
 
@@ -37,11 +34,7 @@ export default <ServerRoute[]>[
             }
             else
             {
-                user = await User.create({
-                    first_name: profile.name.first,
-                    last_name: profile.name.last,
-                    email: profile.email,
-                });
+                user = await User.create({ email: profile.email });
             }
 
             const session = await Session.create(user);

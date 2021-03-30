@@ -43,7 +43,7 @@ RESPONSE SCHEMAS
 export const USER_SCHEMA = Joi
     .object({
         id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
-        username: STRING_SCHEMA.max(30).required(),
+        username: STRING_SCHEMA.max(30).allow(null).required(),
         email: EMAIL_SCHEMA,
         has_default_payment_method: Joi.boolean(),
     });
