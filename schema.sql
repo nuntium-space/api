@@ -335,6 +335,6 @@ INITIAL DATA
 
 insert into "account_types" ("id")
 values
-    ("email'),
+    ('email'),
     ('facebook'),
     ('google');
