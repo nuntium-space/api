@@ -32,6 +32,7 @@ create table "users"
     "id" id not null,
     "username" varchar(30) not null,
     "email" email_address not null,
+    "external_type" text not null,
     "stripe_customer_id" text,
 
     primary key ("id"),
