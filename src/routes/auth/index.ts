@@ -1,6 +1,7 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import { Config } from "../../config/Config";
+import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 
@@ -37,6 +38,12 @@ export default <ServerRoute[]>[
                 user = await User.create({ email: profile.email });
             }
 
+            await Account.create({
+                user,
+                type: "facebook",
+                external_id: profile.id,
+            });
+
             const session = await Session.create(user);
 
             return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
@@ -59,10 +66,7 @@ export default <ServerRoute[]>[
             }
 
             const profile: {
-                name: {
-                    given_name: string,
-                    family_name: string,
-                },
+                id: string,
                 email: string,
             } = request.auth.credentials.profile as any;
 
@@ -74,12 +78,14 @@ export default <ServerRoute[]>[
             }
             else
             {
-                user = await User.create({
-                    first_name: profile.name.given_name,
-                    last_name: profile.name.family_name,
-                    email: profile.email,
-                });
+                user = await User.create({ email: profile.email });
             }
+
+            await Account.create({
+                user,
+                type: "google",
+                external_id: profile.id,
+            });
 
             const session = await Session.create(user);
 
