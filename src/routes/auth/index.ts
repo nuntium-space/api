@@ -1,6 +1,8 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import { Config } from "../../config/Config";
+import { Session } from "../../models/Session";
+import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
     {
@@ -37,20 +39,39 @@ export default <ServerRoute[]>[
               strategy: "google",
             },
         },
-        handler: (request, h) =>
+        handler: async (request, h) =>
         {
             if (!request.auth.isAuthenticated)
             {
                 throw Boom.unauthorized();
             }
 
-            // TODO:
-            // CREDENTIALS: request.auth.credentials
-            // Add user if it does not exist
-            // Create session
-            // Redirect with session id
+            const profile: {
+                name: {
+                    given_name: string,
+                    family_name: string,
+                },
+                email: string,
+            } = request.auth.credentials.profile as any;
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${"TODO"}`);
+            let user: User;
+
+            if (await User.exists(profile.email))
+            {
+                user = await User.retrieveWithEmail(profile.email);
+            }
+            else
+            {
+                user = await User.create({
+                    first_name: profile.name.given_name,
+                    last_name: profile.name.family_name,
+                    email: profile.email,
+                });
+            }
+
+            const session = await Session.create(user);
+
+            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
         },
     },
     {

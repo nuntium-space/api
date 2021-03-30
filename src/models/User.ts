@@ -174,6 +174,16 @@ export class User implements ISerializable<ISerializedUser>
         return User.deserialize(result.rows[0]);
     }
 
+    public static async exists(email: string): Promise<boolean>
+    {
+        const { rowCount } = await Database.pool.query(
+            `select count(*) from "users" where "email" = $1 limit 1`,
+            [ email ],
+        );
+
+        return rowCount > 0;
+    }
+
     public async update(data: IUpdateUser): Promise<void>
     {
         this._first_name = data.first_name ?? this.first_name;

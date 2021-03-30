@@ -13,12 +13,6 @@ interface IDatabaseSession
     expires_at: Date,
 }
 
-interface ICreateSession
-{
-    email: string,
-    password: string,
-}
-
 export interface ISerializedSession
 {
     id: string,
@@ -51,20 +45,8 @@ export class Session implements ISerializable<ISerializedSession>
         return this._expires_at;
     }
 
-    public static async create(data: ICreateSession): Promise<Session>
+    public static async create(user: User): Promise<Session>
     {
-        const user = await User.retrieveWithEmail(data.email);
-
-        if (!await Utilities.verifyHash(data.password, user.password))
-        {
-            throw Boom.forbidden(undefined, [
-                {
-                    field: "password",
-                    error: "custom.session.password.wrong",
-                },
-            ]);
-        }
-
         const expires = new Date();
         expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
 
