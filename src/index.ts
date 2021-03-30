@@ -92,7 +92,21 @@ const init = async () =>
 
     server.auth.strategy("session", "token");
 
-    server.auth.default({ strategy: "session" });
+    server.auth.strategy("facebook", "bell", {
+        provider: "facebook",
+        password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
+        clientId: "TODO",
+        clientSecret: "TODO",
+        isSecure: Config.IS_PRODUCTION,
+    });
+
+    server.auth.strategy("google", "bell", {
+        provider: "google",
+        password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
+        clientId: "TODO",
+        clientSecret: "TODO",
+        isSecure: Config.IS_PRODUCTION,
+    });
 
     server.auth.strategy("twitter", "bell", {
         provider: "twitter",
@@ -101,6 +115,8 @@ const init = async () =>
         clientSecret: "TODO",
         isSecure: Config.IS_PRODUCTION,
     });
+
+    server.auth.default({ strategy: "session" });
 
     server.ext("onPreResponse", (request, h) =>
     {

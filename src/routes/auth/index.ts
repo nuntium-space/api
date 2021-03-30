@@ -3,7 +3,6 @@ import { ServerRoute } from "@hapi/hapi";
 import { Config } from "../../config/Config";
 
 export default <ServerRoute[]>[
-    /*
     {
         method: [ "GET", "POST" ],
         path: "/auth/facebook",
@@ -54,7 +53,6 @@ export default <ServerRoute[]>[
             return h.redirect(`${Config.CLIENT_HOST}?session_id=${"TODO"}`);
         },
     },
-    */
     {
         method: [ "GET", "POST" ],
         path: "/auth/twitter",
