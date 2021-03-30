@@ -30,13 +30,13 @@ TABLES
 create table "users"
 (
     "id" id not null,
-    "first_name" varchar(50) not null,
-    "last_name" varchar(50) not null,
+    "username" varchar(30) not null,
     "email" email_address not null,
     "stripe_customer_id" text,
 
     primary key ("id"),
 
+    unique ("username"),
     unique ("email"),
 
     check ("id" like 'usr_%')
@@ -181,7 +181,7 @@ create table "prices"
     foreign key ("bundle") references "bundles" on update cascade on delete cascade,
 
     check ("id" like 'pri_%'),
-    check ("value" >= 0)
+    check ("amount" >= 0)
 );
 
 create table "bundles_publishers"
