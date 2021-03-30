@@ -99,25 +99,6 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "POST",
-        path: "/users",
-        options: {
-            auth: false,
-            validate: {
-                payload: USER_CREATE_SCHEMA,
-            },
-            response: {
-                schema: USER_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const user = await User.create(request.payload as any);
-
-            return user.serialize({ for: user });
-        },
-    },
-    {
         method: "PATCH",
         path: "/users/{id}",
         options: {
