@@ -96,7 +96,7 @@ const init = async () =>
 
     server.auth.strategy("twitter", "bell", {
         provider: "twitter",
-        password: "cookie_encryption_password_secure",
+        password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
         clientId: "TODO",
         clientSecret: "TODO",
         isSecure: Config.IS_PRODUCTION,
