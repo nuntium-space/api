@@ -25,6 +25,7 @@ export class Config
         SUBSCRIPTION: "sub",
         PAYMENT_METHOD: "pmt",
         PRICE: "pri",
+        ACCOUNT: "acc",
     };
 
     public static readonly LANGUAGES = [
