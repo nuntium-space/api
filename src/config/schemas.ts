@@ -22,8 +22,6 @@ export const URL_SCHEMA = STRING_SCHEMA.max(500).uri({
     },
 });
 
-export const PASSWORD_SCHEMA = Joi.string().min(Config.PASSWORD_MIN_LENGTH);
-
 export const DATE_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DD");
 export const DATETIME_SCHEMA = Joi.extend(require("@joi/date")).date().utc().format("YYYY-MM-DDTHH:mm:ss.SSSZ");
 
@@ -233,7 +231,6 @@ export const USER_CREATE_SCHEMA = Joi
         first_name: STRING_SCHEMA.max(50).required(),
         last_name: STRING_SCHEMA.max(50).required(),
         email: EMAIL_SCHEMA.required(),
-        password: PASSWORD_SCHEMA.required(),
     });
 
 export const USER_UPDATE_SCHEMA = Joi
@@ -241,10 +238,6 @@ export const USER_UPDATE_SCHEMA = Joi
         first_name: STRING_SCHEMA.max(50),
         last_name: STRING_SCHEMA.max(50),
         email: EMAIL_SCHEMA,
-        old_password: PASSWORD_SCHEMA.when(Joi.ref("new_password"), {
-            then: Joi.required(),
-        }),
-        new_password: PASSWORD_SCHEMA,
     });
 
 export const ORGANIZATION_CREATE_SCHEMA = Joi
@@ -277,7 +270,6 @@ export const AUTHOR_CREATE_SCHEMA = Joi
 export const SESSION_CREATE_SCHEMA = Joi
     .object({
         email: EMAIL_SCHEMA.required(),
-        password: PASSWORD_SCHEMA.required(),
     });
 
 export const ARTICLE_CREATE_SCHEMA = Joi

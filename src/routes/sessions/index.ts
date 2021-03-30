@@ -48,9 +48,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const session = await Session.create(request.payload as any);
-
-            return session.serialize({ for: session.user });
+            // TODO
         },
     },
     {
