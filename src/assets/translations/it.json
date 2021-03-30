@@ -144,7 +144,7 @@
     },
     "feed": {
         "empty": {
-            "title": "Congratulazioni, <b>{{ USER_FIRST_NAME }}</b>",
+            "title": "Congratulazioni, <b>{{ USERNAME }}</b>",
             "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piacciono da fonti di cui ti puoi fidare"
         }
     },
@@ -155,8 +155,6 @@
         "delete": "Elimina",
         "edit": "Modifica",
         "email": "Email",
-        "first_name": "Nome",
-        "last_name": "Cognome",
         "password": "Password",
         "remove": "Rimuovi",
         "sign_in": "Accedi",
