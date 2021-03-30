@@ -1,8 +1,9 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import sendgrid from "@sendgrid/mail";
+import Joi from "joi";
 import { Config } from "../../config/Config";
-import { SESSION_CREATE_SCHEMA } from "../../config/schemas";
+import { SESSION_CREATE_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
@@ -10,6 +11,29 @@ import { User } from "../../models/User";
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
 export default <ServerRoute[]>[
+    {
+        method: "GET",
+        path: "/auth/email/{token}",
+        options: {
+            auth: false,
+            validate: {
+                params: Joi.object({
+                    token: STRING_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const { token } = request.payload as any;
+
+            // TODO:
+            // Retrieve sign in request
+
+            const session = await Session.create(user);
+
+            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
+        },
+    },
     {
         method: "POST",
         path: "/auth/email",
@@ -21,7 +45,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const email = (request.payload as any).email;
+            const { email } = request.payload as any;
 
             let user: User;
 
