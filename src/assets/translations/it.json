@@ -324,7 +324,9 @@
         }
     },
     "sign_in": {
-        "no_account": "Non hai ancora un account?"
+        "no_account": "Non hai ancora un account?",
+        "or": "oppure",
+        "with": "Accedi con"
     },
     "sign_up": {
         "__title": "Crea un account",

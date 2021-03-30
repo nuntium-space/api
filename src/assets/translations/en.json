@@ -324,7 +324,9 @@
         }
     },
     "sign_in": {
-        "no_account": "Don't have an account yet?"
+        "no_account": "Don't have an account yet?",
+        "or": "or",
+        "with": "Sign In with"
     },
     "sign_up": {
         "__title": "Create an account",
