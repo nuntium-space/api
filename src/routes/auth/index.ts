@@ -1,10 +1,13 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
+import sendgrid from "@sendgrid/mail";
 import { Config } from "../../config/Config";
 import { SESSION_CREATE_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
+
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
 export default <ServerRoute[]>[
     {
@@ -32,7 +35,19 @@ export default <ServerRoute[]>[
             }
 
             // TODO:
-            // Send email to user to authenticate
+            // Create sign in request in db
+
+            await sendgrid
+                .send({
+                    to: user.email,
+                    from: "TODO",
+                    subject: "TODO",
+                    text: "TODO",
+                })
+                .catch(() =>
+                {
+                    throw Boom.badImplementation();
+                });
 
             // HTTP 202 - Accepted
             return h.response().code(202);
