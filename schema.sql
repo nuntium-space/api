@@ -32,7 +32,6 @@ create table "users"
     "id" id not null,
     "username" varchar(30) not null,
     "email" email_address not null,
-    "external_type" text not null,
     "stripe_customer_id" text,
 
     primary key ("id"),
@@ -41,6 +40,30 @@ create table "users"
     unique ("email"),
 
     check ("id" like 'usr_%')
+);
+
+create table "account_types"
+(
+    "id" text not null,
+
+    primary key ("id")
+);
+
+create table "accounts"
+(
+    "id" id not null,
+    "user" id not null,
+    "type" text not null,
+    "external_id" text not null,
+
+    primary key ("id"),
+
+    unique ("user", "type"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+    foreign key ("type") references "account_types" on update cascade on delete cascade,
+
+    check ("id" like 'acc_%')
 );
 
 create table "organizations"
@@ -303,3 +326,15 @@ create trigger "update_updated_at"
 before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
+
+/*
+------------
+INITIAL DATA
+------------
+*/
+
+insert into "account_types" ("id")
+values
+    ("email"),
+    ("facebook"),
+    ("google");
