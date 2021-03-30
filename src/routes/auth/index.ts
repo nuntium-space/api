@@ -14,20 +14,39 @@ export default <ServerRoute[]>[
               strategy: "facebook",
             },
         },
-        handler: (request, h) =>
+        handler: async (request, h) =>
         {
             if (!request.auth.isAuthenticated)
             {
                 throw Boom.unauthorized();
             }
 
-            // TODO:
-            // CREDENTIALS: request.auth.credentials
-            // Add user if it does not exist
-            // Create session
-            // Redirect with session id
+            const profile: {
+                name: {
+                    first: string,
+                    last: string,
+                },
+                email: string,
+            } = request.auth.credentials.profile as any;
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${"TODO"}`);
+            let user: User;
+
+            if (await User.exists(profile.email))
+            {
+                user = await User.retrieveWithEmail(profile.email);
+            }
+            else
+            {
+                user = await User.create({
+                    first_name: profile.name.first,
+                    last_name: profile.name.last,
+                    email: profile.email,
+                });
+            }
+
+            const session = await Session.create(user);
+
+            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
         },
     },
     {
@@ -83,18 +102,14 @@ export default <ServerRoute[]>[
               strategy: "twitter",
             },
         },
-        handler: (request, h) =>
+        handler: async (request, h) =>
         {
             if (!request.auth.isAuthenticated)
             {
                 throw Boom.unauthorized();
             }
 
-            // TODO:
-            // CREDENTIALS: request.auth.credentials
-            // Add user if it does not exist
-            // Create session
-            // Redirect with session id
+            // TODO
 
             return h.redirect(`${Config.CLIENT_HOST}?session_id=${"TODO"}`);
         },
