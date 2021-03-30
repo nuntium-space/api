@@ -14,7 +14,6 @@ interface IDatabaseUser
     first_name: string,
     last_name: string,
     email: string,
-    password: string,
     stripe_customer_id: string | null,
 }
 
@@ -23,7 +22,6 @@ interface ICreateUser
     first_name: string,
     last_name: string,
     email: string,
-    password: string,
 }
 
 interface IUpdateUser
@@ -31,8 +29,6 @@ interface IUpdateUser
     first_name?: string,
     last_name?: string,
     email?: string,
-    new_password?: string,
-    old_password?: string,
 }
 
 interface IUserSettings
@@ -62,7 +58,6 @@ export class User implements ISerializable<ISerializedUser>
         private _first_name: string,
         private _last_name: string,
         private _email: string,
-        private _password: string,
         public readonly default_payment_method: PaymentMethod | null,
         public readonly stripe_customer_id: string | null,
     )
@@ -83,11 +78,6 @@ export class User implements ISerializable<ISerializedUser>
         return this._email;
     }
 
-    public get password(): string
-    {
-        return this._password;
-    }
-
     public static async create(data: ICreateUser): Promise<User>
     {
         const client = await Database.pool.connect();
@@ -98,7 +88,7 @@ export class User implements ISerializable<ISerializedUser>
             .query(
                 `
                 insert into "users"
-                    ("id", "first_name", "last_name", "email", "password")
+                    ("id", "first_name", "last_name", "email")
                 values
                     ($1, $2, $3, $4, $5)
                 returning *
@@ -108,7 +98,6 @@ export class User implements ISerializable<ISerializedUser>
                     data.first_name,
                     data.last_name,
                     data.email,
-                    await Utilities.hash(data.password),
                 ],
             )
             .catch(async () =>
@@ -191,23 +180,6 @@ export class User implements ISerializable<ISerializedUser>
         this._last_name = data.last_name ?? this.last_name;
         this._email = data.email ?? this.email;
 
-        if (data.old_password)
-        {
-            if (!await Utilities.verifyHash(data.old_password, this._password))
-            {
-                throw Boom.forbidden(undefined, [
-                    {
-                        field: "old_password",
-                        error: "custom.session.password.wrong",
-                    },
-                ]);
-            }
-
-            this._password = data.new_password
-                ? await Utilities.hash(data.new_password)
-                : this._password;
-        }
-
         const client = await Database.pool.connect();
 
         await client.query("begin");
@@ -219,16 +191,14 @@ export class User implements ISerializable<ISerializedUser>
                 set
                     "first_name" = $1,
                     "last_name" = $2,
-                    "email" = $3,
-                    "password" = $4
+                    "email" = $3
                 where
-                    "id" = $5
+                    "id" = $4
                 `,
                 [
                     this.first_name,
                     this.last_name,
                     this.email,
-                    this._password,
                     this.id,
                 ],
             )
@@ -604,7 +574,6 @@ export class User implements ISerializable<ISerializedUser>
             data.first_name,
             data.last_name,
             data.email,
-            data.password,
             paymentMethod,
             data.stripe_customer_id,
         );

@@ -6,16 +6,12 @@ export class Config
 {
     public static readonly IS_PRODUCTION = process.env.NODE_ENV === "production";
 
-    public static readonly PASSWORD_MIN_LENGTH = 10;
-
     /**
      * @default
      * 
      * 30 days
      */
     public static readonly SESSION_DURATION = 60 * 60 * 24 * 30;
-
-    public static readonly HASH_ROUNDS = 15;
 
     public static readonly ID_PREFIXES = {
         USER: "usr",
