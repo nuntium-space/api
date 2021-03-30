@@ -62,6 +62,8 @@ const init = async () =>
 {
     Database.init();
 
+    await server.register(require("@hapi/bell"));
+
     server.auth.scheme("token", () =>
     {
         return {
@@ -91,6 +93,14 @@ const init = async () =>
     server.auth.strategy("session", "token");
 
     server.auth.default({ strategy: "session" });
+
+    server.auth.strategy("twitter", "bell", {
+        provider: "twitter",
+        password: "cookie_encryption_password_secure",
+        clientId: "TODO",
+        clientSecret: "TODO",
+        isSecure: Config.IS_PRODUCTION,
+    });
 
     server.ext("onPreResponse", (request, h) =>
     {

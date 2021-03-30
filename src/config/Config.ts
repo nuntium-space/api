@@ -4,6 +4,8 @@ import Stripe from "stripe";
 
 export class Config
 {
+    public static readonly IS_PRODUCTION = process.env.NODE_ENV === "production";
+
     public static readonly PASSWORD_MIN_LENGTH = 10;
 
     /**
@@ -71,11 +73,11 @@ export class Config
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
 
-    public static readonly API_HOST = process.env.NODE_ENV === "production"
+    public static readonly API_HOST = Config.IS_PRODUCTION
         ? "https://api.example.com"
         : `http://localhost:${process.env.PORT}`;
 
-    public static readonly CLIENT_HOST = process.env.NODE_ENV === "production"
+    public static readonly CLIENT_HOST = Config.IS_PRODUCTION
         ? "https://example.com"
         : "http://localhost:4200";
 
@@ -88,7 +90,7 @@ export class Config
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
     };
 
-    public static readonly AWS_ENDPOINT = process.env.NODE_ENV === "production"
+    public static readonly AWS_ENDPOINT = Config.IS_PRODUCTION
         ? undefined
         : "http://localhost:4566";
 }
