@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA } from "../../config/schemas";
+import { ID_SCHEMA, SESSION_SCHEMA } from "../../config/schemas";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 
@@ -32,23 +32,6 @@ export default <ServerRoute[]>[
             }
 
             return session.serialize({ for: authenticatedUser });
-        },
-    },
-    {
-        method: "POST",
-        path: "/sessions",
-        options: {
-            auth: false,
-            validate: {
-                payload: SESSION_CREATE_SCHEMA,
-            },
-            response: {
-                schema: SESSION_SCHEMA,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            // TODO
         },
     },
     {

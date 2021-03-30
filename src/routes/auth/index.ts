@@ -1,11 +1,43 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import { Config } from "../../config/Config";
+import { SESSION_CREATE_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
+    {
+        method: "POST",
+        path: "/auth/email",
+        options: {
+            auth: false,
+            validate: {
+                payload: SESSION_CREATE_SCHEMA,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const email = (request.payload as any).email;
+
+            let user: User;
+
+            if (await User.exists(email))
+            {
+                user = await User.retrieveWithEmail(email);
+            }
+            else
+            {
+                user = await User.create({ email });
+            }
+
+            // TODO:
+            // Send email to user to authenticate
+
+            // HTTP 202 - Accepted
+            return h.response().code(202);
+        },
+    },
     {
         method: [ "GET", "POST" ],
         path: "/auth/facebook",
