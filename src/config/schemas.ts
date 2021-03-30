@@ -225,12 +225,6 @@ REQUEST SCHEMAS
 ---------------
 */
 
-export const USER_CREATE_SCHEMA = Joi
-    .object({
-        username: STRING_SCHEMA.max(30).required(),
-        email: EMAIL_SCHEMA.required(),
-    });
-
 export const USER_UPDATE_SCHEMA = Joi
     .object({
         username: STRING_SCHEMA.max(30),

@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, URL_SCHEMA, USER_CREATE_SCHEMA, USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
+import { ID_SCHEMA, URL_SCHEMA, USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
 import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
