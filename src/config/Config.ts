@@ -26,7 +26,6 @@ export class Config
         PAYMENT_METHOD: "pmt",
         PRICE: "pri",
         ACCOUNT: "acc",
-        SIGN_IN_REQUEST: "sir",
     };
 
     public static readonly LANGUAGES = [

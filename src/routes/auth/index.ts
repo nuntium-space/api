@@ -7,6 +7,7 @@ import { SESSION_CREATE_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
+import Database from "../../utilities/Database";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
@@ -24,14 +25,28 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const { token } = request.params;
+            const result = await Database.pool
+                .query(
+                    `select * from "sign_in_requests" where "id" = $1`,
+                    [ request.params.token ],
+                );
 
-            // TODO:
-            // Retrieve sign in request
+            if (result.rowCount === 0)
+            {
+                throw Boom.notFound();
+            }
+
+            await Database.pool
+                .query(
+                    `delete from "sign_in_requests" where "id" = $1`,
+                    [ request.params.token ],
+                );
+
+            const user = await User.retrieve(result.rows[0].user);
 
             const session = await Session.create(user);
 
-            request.server.publish(`/auth/email/requests/${signInRequestId}`, {
+            request.server.publish(`/auth/email/requests/${result.rows[0].id}`, {
                 id: session.id,
             });
 

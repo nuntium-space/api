@@ -282,7 +282,7 @@ create table "user_settings"
 
 create table "sign_in_requests"
 (
-    "id" id not null,
+    "id" text not null,
     "user" id not null,
     "expires_at" timestamp not null,
 
@@ -290,7 +290,6 @@ create table "sign_in_requests"
 
     foreign key ("user") references "users" on update cascade on delete cascade,
 
-    check ("id" like 'sir_%'),
     check ("expires_at" > current_timestamp)
 );
 
