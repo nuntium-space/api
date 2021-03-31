@@ -24,14 +24,18 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const { token } = request.payload as any;
+            const { token } = request.params;
 
             // TODO:
             // Retrieve sign in request
 
             const session = await Session.create(user);
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
+            request.server.publish(`/auth/email/requests/${signInRequestId}`, {
+                id: session.id,
+            });
+
+            return h.response();
         },
     },
     {
@@ -74,7 +78,7 @@ export default <ServerRoute[]>[
                 });
 
             // HTTP 202 - Accepted
-            return h.response().code(202);
+            return h.response(signInRequestId).code(202);
         },
     },
     {
