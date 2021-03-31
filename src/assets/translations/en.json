@@ -312,12 +312,10 @@
         }
     },
     "sign_in": {
-        "no_account": "Don't have an account yet?",
+        "email": {
+            "success": "You will soon receive an email with a link to accept this sign in"
+        },
         "or": "or",
         "with": "Sign In with"
-    },
-    "sign_up": {
-        "__title": "Create an account",
-        "have_account": "Already have an account?"
     }
 }

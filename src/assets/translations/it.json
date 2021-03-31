@@ -312,12 +312,10 @@
         }
     },
     "sign_in": {
-        "no_account": "Non hai ancora un account?",
+        "email": {
+            "success": "Riceverai a breve una email con un link per confermare questo accesso"
+        },
         "or": "oppure",
         "with": "Accedi con"
-    },
-    "sign_up": {
-        "__title": "Crea un account",
-        "have_account": "Hai già un account?"
     }
 }
