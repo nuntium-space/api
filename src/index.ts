@@ -115,6 +115,12 @@ const init = async () =>
 
     server.auth.strategy("twitter", "bell", {
         provider: "twitter",
+        config: {
+            getMethod: "account/verify_credentials",
+            getParams: {
+                include_email: "true",
+            },
+        },
         password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
         clientId: "TODO",
         clientSecret: "TODO",

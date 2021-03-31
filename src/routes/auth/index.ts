@@ -240,9 +240,33 @@ export default <ServerRoute[]>[
                 throw Boom.unauthorized();
             }
 
-            // TODO
+            const profile: {
+                id: string,
+                raw: {
+                    email: string,
+                },
+            } = request.auth.credentials.profile as any;
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${"TODO"}`);
+            let user: User;
+
+            if (await User.exists(profile.raw.email))
+            {
+                user = await User.retrieveWithEmail(profile.raw.email);
+            }
+            else
+            {
+                user = await User.create({ email: profile.raw.email });
+            }
+
+            await Account.create({
+                user,
+                type: "twitter",
+                external_id: profile.id,
+            });
+
+            const session = await Session.create(user);
+
+            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
         },
     },
 ];
