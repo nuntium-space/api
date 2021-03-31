@@ -280,6 +280,20 @@ create table "user_settings"
     foreign key ("user") references "users" on update cascade on delete cascade
 );
 
+create table "sign_in_requests"
+(
+    "id" id not null,
+    "user" id not null,
+    "expires_at" timestamp not null,
+
+    primary key ("id"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+
+    check ("id" like 'sir_%'),
+    check ("expires_at" > current_timestamp)
+);
+
 /*
 -----
 VIEWS
