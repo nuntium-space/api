@@ -164,12 +164,12 @@ export class User implements ISerializable<ISerializedUser>
 
     public static async exists(email: string): Promise<boolean>
     {
-        const { rowCount } = await Database.pool.query(
-            `select count(*) from "users" where "email" = $1 limit 1`,
+        const result = await Database.pool.query(
+            `select count(*) as "count" from "users" where "email" = $1 limit 1`,
             [ email ],
         );
 
-        return rowCount > 0;
+        return result.rows[0].count > 0;
     }
 
     public async update(data: IUpdateUser): Promise<void>
