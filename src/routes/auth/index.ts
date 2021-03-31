@@ -48,7 +48,7 @@ export default <ServerRoute[]>[
             const session = await Session.create(user);
 
             request.server.publish(`/auth/email/requests/${result.rows[0].id}`, {
-                id: session.id,
+                session: session.serialize({ for: user }),
             });
 
             return h.response();
