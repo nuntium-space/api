@@ -170,11 +170,14 @@ export default <ServerRoute[]>[
                 user = await User.create({ email: profile.email });
             }
 
-            await Account.create({
-                user,
-                type: "facebook",
-                external_id: profile.id,
-            });
+            if (!await Account.exists(user, "facebook"))
+            {
+                await Account.create({
+                    user,
+                    type: "facebook",
+                    external_id: profile.id,
+                });
+            }
 
             const session = await Session.create(user);
 
@@ -213,11 +216,14 @@ export default <ServerRoute[]>[
                 user = await User.create({ email: profile.email });
             }
 
-            await Account.create({
-                user,
-                type: "google",
-                external_id: profile.id,
-            });
+            if (!await Account.exists(user, "google"))
+            {
+                await Account.create({
+                    user,
+                    type: "google",
+                    external_id: profile.id,
+                });
+            }
 
             const session = await Session.create(user);
 
@@ -258,11 +264,14 @@ export default <ServerRoute[]>[
                 user = await User.create({ email: profile.raw.email });
             }
 
-            await Account.create({
-                user,
-                type: "twitter",
-                external_id: profile.id,
-            });
+            if (!await Account.exists(user, "twitter"))
+            {
+                await Account.create({
+                    user,
+                    type: "twitter",
+                    external_id: profile.id,
+                });
+            }
 
             const session = await Session.create(user);
 

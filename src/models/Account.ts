@@ -80,6 +80,16 @@ export class Account implements ISerializable<ISerializedAccount>
         return Account.deserialize(result.rows[0]);
     }
 
+    public static async exists(user: User, type: string): Promise<boolean>
+    {
+        const result = await Database.pool.query(
+            `select count(*) as "count" from "accounts" where "user" = $1 and "type" = $2 limit 1`,
+            [ user.id, type ],
+        );
+
+        return result.rows[0].count > 0;
+    }
+
     public async delete(): Promise<void>
     {
         await Database.pool.query(
