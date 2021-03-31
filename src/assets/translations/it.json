@@ -144,7 +144,7 @@
     },
     "feed": {
         "empty": {
-            "title": "Congratulazioni, <b>{{ USERNAME }}</b>",
+            "title": "Congratulazioni,",
             "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piacciono da fonti di cui ti puoi fidare"
         }
     },
@@ -160,7 +160,8 @@
         "sign_out": "Esci",
         "sign_up": "Registrati",
         "submit": "Invia",
-        "update": "Aggiorna"
+        "update": "Aggiorna",
+        "username": "Nome utente"
     },
     "home": {
         "hero": {
