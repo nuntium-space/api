@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import crypto from "crypto";
 import { ServerRoute } from "@hapi/hapi";
 import sendgrid from "@sendgrid/mail";
 import Joi from "joi";
@@ -61,6 +62,9 @@ export default <ServerRoute[]>[
             validate: {
                 payload: SESSION_CREATE_SCHEMA,
             },
+            response: Joi.object({
+                id: STRING_SCHEMA.required(),
+            }),
         },
         handler: async (request, h) =>
         {
@@ -77,8 +81,35 @@ export default <ServerRoute[]>[
                 user = await User.create({ email });
             }
 
-            // TODO:
-            // Create sign in request in db
+            const token = crypto.randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
+
+            const expires = new Date();
+            expires.setSeconds(new Date().getSeconds() + Config.SIGN_IN_REQUEST_DURATION);
+
+            const client = await Database.pool.connect();
+
+            await client.query("begin");
+
+            await client
+                .query(
+                    `
+                    insert into "sign_in_requests"
+                        ("id", "user", "expires_at")
+                    values
+                        ($1, $2, $3)
+                    `,
+                    [
+                        token,
+                        user.id,
+                        expires.toISOString(),
+                    ],
+                )
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badImplementation();
+                });
 
             await sendgrid
                 .send({
@@ -87,13 +118,18 @@ export default <ServerRoute[]>[
                     subject: "TODO",
                     text: "TODO",
                 })
-                .catch(() =>
+                .catch(async () =>
                 {
+                    await client.query("rollback");
+
                     throw Boom.badImplementation();
                 });
 
-            // HTTP 202 - Accepted
-            return h.response(signInRequestId).code(202);
+            await client.query("commit");
+
+            client.release();
+
+            return { id: token };
         },
     },
     {
