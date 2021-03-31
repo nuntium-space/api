@@ -134,11 +134,6 @@
                     "must_be_square": "L'immagine deve essere quadrata",
                     "not_supported": "Tipo di immagine non supportato"
                 }
-            },
-            "session": {
-                "password": {
-                    "wrong": "Password errata"
-                }
             }
         }
     },
@@ -149,7 +144,7 @@
     },
     "feed": {
         "empty": {
-            "title": "Congratulazioni, <b>{{ USER_FIRST_NAME }}</b>",
+            "title": "Congratulazioni, <b>{{ USERNAME }}</b>",
             "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piacciono da fonti di cui ti puoi fidare"
         }
     },
@@ -160,9 +155,6 @@
         "delete": "Elimina",
         "edit": "Modifica",
         "email": "Email",
-        "first_name": "Nome",
-        "last_name": "Cognome",
-        "password": "Password",
         "remove": "Rimuovi",
         "sign_in": "Accedi",
         "sign_out": "Esci",
@@ -293,12 +285,7 @@
                 }
             },
             "security": {
-                "__title": "Sicurezza",
-                "change_password": {
-                    "__title": "Cambia password",
-                    "new_password": "Nuova password",
-                    "old_password": "Vecchia password"
-                }
+                "__title": "Sicurezza"
             },
             "subscriptions": {
                 "__title": "Abbonamenti",
@@ -324,7 +311,9 @@
         }
     },
     "sign_in": {
-        "no_account": "Non hai ancora un account?"
+        "no_account": "Non hai ancora un account?",
+        "or": "oppure",
+        "with": "Accedi con"
     },
     "sign_up": {
         "__title": "Crea un account",

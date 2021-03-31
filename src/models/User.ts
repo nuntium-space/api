@@ -11,28 +11,21 @@ import { Publisher } from "./Publisher";
 interface IDatabaseUser
 {
     id: string,
-    first_name: string,
-    last_name: string,
+    username: string | null,
     email: string,
-    password: string,
     stripe_customer_id: string | null,
 }
 
 interface ICreateUser
 {
-    first_name: string,
-    last_name: string,
+    username?: string,
     email: string,
-    password: string,
 }
 
 interface IUpdateUser
 {
-    first_name?: string,
-    last_name?: string,
+    username?: string,
     email?: string,
-    new_password?: string,
-    old_password?: string,
 }
 
 interface IUserSettings
@@ -48,8 +41,7 @@ interface IUpdateUserSettings
 export interface ISerializedUser
 {
     id: string,
-    first_name: string,
-    last_name: string,
+    username: string | null,
     email: string,
     has_default_payment_method: boolean,
 }
@@ -59,33 +51,21 @@ export class User implements ISerializable<ISerializedUser>
     private constructor
     (
         public readonly id: string,
-        private _first_name: string,
-        private _last_name: string,
+        private _username: string | null,
         private _email: string,
-        private _password: string,
         public readonly default_payment_method: PaymentMethod | null,
         public readonly stripe_customer_id: string | null,
     )
     {}
 
-    public get first_name(): string
+    public get username(): string | null
     {
-        return this._first_name;
-    }
-
-    public get last_name(): string
-    {
-        return this._last_name;
+        return this._username;
     }
 
     public get email(): string
     {
         return this._email;
-    }
-
-    public get password(): string
-    {
-        return this._password;
     }
 
     public static async create(data: ICreateUser): Promise<User>
@@ -98,17 +78,15 @@ export class User implements ISerializable<ISerializedUser>
             .query(
                 `
                 insert into "users"
-                    ("id", "first_name", "last_name", "email", "password")
+                    ("id", "username", "email")
                 values
-                    ($1, $2, $3, $4, $5)
+                    ($1, $2, $3)
                 returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.USER),
-                    data.first_name,
-                    data.last_name,
+                    data.username ?? null,
                     data.email,
-                    await Utilities.hash(data.password),
                 ],
             )
             .catch(async () =>
@@ -120,7 +98,6 @@ export class User implements ISerializable<ISerializedUser>
 
         await Config.STRIPE.customers
             .create({
-                name: `${data.first_name} ${data.last_name}`,
                 email: data.email,
                 metadata: {
                     user_id: result.rows[0].id,
@@ -185,28 +162,20 @@ export class User implements ISerializable<ISerializedUser>
         return User.deserialize(result.rows[0]);
     }
 
+    public static async exists(email: string): Promise<boolean>
+    {
+        const { rowCount } = await Database.pool.query(
+            `select count(*) from "users" where "email" = $1 limit 1`,
+            [ email ],
+        );
+
+        return rowCount > 0;
+    }
+
     public async update(data: IUpdateUser): Promise<void>
     {
-        this._first_name = data.first_name ?? this.first_name;
-        this._last_name = data.last_name ?? this.last_name;
+        this._username = data.username ?? this.username;
         this._email = data.email ?? this.email;
-
-        if (data.old_password)
-        {
-            if (!await Utilities.verifyHash(data.old_password, this._password))
-            {
-                throw Boom.forbidden(undefined, [
-                    {
-                        field: "old_password",
-                        error: "custom.session.password.wrong",
-                    },
-                ]);
-            }
-
-            this._password = data.new_password
-                ? await Utilities.hash(data.new_password)
-                : this._password;
-        }
 
         const client = await Database.pool.connect();
 
@@ -217,18 +186,14 @@ export class User implements ISerializable<ISerializedUser>
                 `
                 update "users"
                 set
-                    "first_name" = $1,
-                    "last_name" = $2,
-                    "email" = $3,
-                    "password" = $4
+                    "username" = $1,
+                    "email" = $2
                 where
-                    "id" = $5
+                    "id" = $3
                 `,
                 [
-                    this.first_name,
-                    this.last_name,
+                    this.username,
                     this.email,
-                    this._password,
                     this.id,
                 ],
             )
@@ -243,7 +208,6 @@ export class User implements ISerializable<ISerializedUser>
         {
             await Config.STRIPE.customers
                 .update(this.stripe_customer_id, {
-                    name: `${this.first_name} ${this.last_name}`,
                     email: this.email,
                 })
                 .catch(async () =>
@@ -253,9 +217,9 @@ export class User implements ISerializable<ISerializedUser>
                     throw Boom.badRequest();
                 });
         }
-    
+
         await client.query("commit");
-    
+
         client.release();
     }
 
@@ -579,8 +543,7 @@ export class User implements ISerializable<ISerializedUser>
     {
         let response: any = {
             id: this.id,
-            first_name: this.first_name,
-            last_name: this.last_name,
+            username: this.username,
         };
 
         if (options?.for?.id === this.id)
@@ -601,10 +564,8 @@ export class User implements ISerializable<ISerializedUser>
 
         return new User(
             data.id,
-            data.first_name,
-            data.last_name,
+            data.username,
             data.email,
-            data.password,
             paymentMethod,
             data.stripe_customer_id,
         );

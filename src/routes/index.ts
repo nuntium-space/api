@@ -1,4 +1,5 @@
 import articles from "./articles";
+import auth from "./auth";
 import authors from "./authors";
 import bundles from "./bundles";
 import comments from "./comments";
@@ -14,6 +15,7 @@ import users from "./users";
 
 export = [
     articles,
+    auth,
     authors,
     bundles,
     comments,

@@ -4,7 +4,7 @@ import Stripe from "stripe";
 
 export class Config
 {
-    public static readonly PASSWORD_MIN_LENGTH = 10;
+    public static readonly IS_PRODUCTION = process.env.NODE_ENV === "production";
 
     /**
      * @default
@@ -13,7 +13,14 @@ export class Config
      */
     public static readonly SESSION_DURATION = 60 * 60 * 24 * 30;
 
-    public static readonly HASH_ROUNDS = 15;
+    /**
+     * @default
+     * 
+     * 5 minutes
+     */
+    public static readonly SIGN_IN_REQUEST_DURATION = 60 * 5;
+
+    public static readonly SIGN_IN_REQUEST_TOKEN_BYTES = 60;
 
     public static readonly ID_PREFIXES = {
         USER: "usr",
@@ -27,6 +34,7 @@ export class Config
         SUBSCRIPTION: "sub",
         PAYMENT_METHOD: "pmt",
         PRICE: "pri",
+        ACCOUNT: "acc",
     };
 
     public static readonly LANGUAGES = [
@@ -71,11 +79,11 @@ export class Config
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
 
-    public static readonly API_HOST = process.env.NODE_ENV === "production"
+    public static readonly API_HOST = Config.IS_PRODUCTION
         ? "https://api.example.com"
         : `http://localhost:${process.env.PORT}`;
 
-    public static readonly CLIENT_HOST = process.env.NODE_ENV === "production"
+    public static readonly CLIENT_HOST = Config.IS_PRODUCTION
         ? "https://example.com"
         : "http://localhost:4200";
 
@@ -88,7 +96,7 @@ export class Config
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? "",
     };
 
-    public static readonly AWS_ENDPOINT = process.env.NODE_ENV === "production"
+    public static readonly AWS_ENDPOINT = Config.IS_PRODUCTION
         ? undefined
         : "http://localhost:4566";
 }

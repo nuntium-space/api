@@ -2,8 +2,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+import Bell from "@hapi/bell";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
+import Nes from "@hapi/nes";
 import Joi, { ValidationError } from "joi";
 import qs from "qs";
 import { Config } from "./config/Config";
@@ -62,6 +64,11 @@ const init = async () =>
 {
     Database.init();
 
+    await server.register(Bell);
+    await server.register(Nes);
+
+    server.subscription("/auth/email/requests/{id}");
+
     server.auth.scheme("token", () =>
     {
         return {
@@ -89,6 +96,30 @@ const init = async () =>
     });
 
     server.auth.strategy("session", "token");
+
+    server.auth.strategy("facebook", "bell", {
+        provider: "facebook",
+        password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
+        clientId: "TODO",
+        clientSecret: "TODO",
+        isSecure: Config.IS_PRODUCTION,
+    });
+
+    server.auth.strategy("google", "bell", {
+        provider: "google",
+        password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
+        clientId: "TODO",
+        clientSecret: "TODO",
+        isSecure: Config.IS_PRODUCTION,
+    });
+
+    server.auth.strategy("twitter", "bell", {
+        provider: "twitter",
+        password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
+        clientId: "TODO",
+        clientSecret: "TODO",
+        isSecure: Config.IS_PRODUCTION,
+    });
 
     server.auth.default({ strategy: "session" });
 

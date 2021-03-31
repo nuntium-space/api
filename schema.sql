@@ -30,17 +30,40 @@ TABLES
 create table "users"
 (
     "id" id not null,
-    "first_name" varchar(50) not null,
-    "last_name" varchar(50) not null,
+    "username" text,
     "email" email_address not null,
-    "password" text not null,
     "stripe_customer_id" text,
 
     primary key ("id"),
 
+    unique ("username"),
     unique ("email"),
 
     check ("id" like 'usr_%')
+);
+
+create table "account_types"
+(
+    "id" text not null,
+
+    primary key ("id")
+);
+
+create table "accounts"
+(
+    "id" id not null,
+    "user" id not null,
+    "type" text not null,
+    "external_id" text not null,
+
+    primary key ("id"),
+
+    unique ("user", "type"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+    foreign key ("type") references "account_types" on update cascade on delete cascade,
+
+    check ("id" like 'acc_%')
 );
 
 create table "organizations"
@@ -182,7 +205,7 @@ create table "prices"
     foreign key ("bundle") references "bundles" on update cascade on delete cascade,
 
     check ("id" like 'pri_%'),
-    check ("value" >= 0)
+    check ("amount" >= 0)
 );
 
 create table "bundles_publishers"
@@ -257,6 +280,19 @@ create table "user_settings"
     foreign key ("user") references "users" on update cascade on delete cascade
 );
 
+create table "sign_in_requests"
+(
+    "id" text not null,
+    "user" id not null,
+    "expires_at" timestamp not null,
+
+    primary key ("id"),
+
+    foreign key ("user") references "users" on update cascade on delete cascade,
+
+    check ("expires_at" > current_timestamp)
+);
+
 /*
 -----
 VIEWS
@@ -303,3 +339,15 @@ create trigger "update_updated_at"
 before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
+
+/*
+------------
+INITIAL DATA
+------------
+*/
+
+insert into "account_types" ("id")
+values
+    ('facebook'),
+    ('google')
+    ('twitter');
