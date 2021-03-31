@@ -100,8 +100,8 @@ const init = async () =>
     server.auth.strategy("facebook", "bell", {
         provider: "facebook",
         password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
-        clientId: "TODO",
-        clientSecret: "TODO",
+        clientId: process.env.FACEBOOK_OAUTH_CLIENT_ID,
+        clientSecret: process.env.FACEBOOK_OAUTH_CLIENT_SECRET,
         isSecure: Config.IS_PRODUCTION,
     });
 
@@ -122,8 +122,8 @@ const init = async () =>
             },
         },
         password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
-        clientId: "TODO",
-        clientSecret: "TODO",
+        clientId: process.env.TWITTER_OAUTH_CLIENT_ID,
+        clientSecret: process.env.TWITTER_OAUTH_CLIENT_SECRET,
         isSecure: Config.IS_PRODUCTION,
     });
 
