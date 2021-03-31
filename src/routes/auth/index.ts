@@ -62,9 +62,11 @@ export default <ServerRoute[]>[
             validate: {
                 payload: SESSION_CREATE_SCHEMA,
             },
-            response: Joi.object({
-                id: STRING_SCHEMA.required(),
-            }),
+            response: {
+                schema: Joi.object({
+                    id: STRING_SCHEMA.required(),
+                }),
+            },
         },
         handler: async (request, h) =>
         {
