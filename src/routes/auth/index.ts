@@ -114,9 +114,13 @@ export default <ServerRoute[]>[
             await sendgrid
                 .send({
                     to: user.email,
-                    from: "TODO",
-                    subject: "TODO",
-                    text: "TODO",
+                    from: "nuntium.tokens@alexsandri.com",
+                    subject: "[nuntium] Accept Sign In Request",
+                    text: "Hi,\n"
+                        + "We received a request to sign into your account\n"
+                        + "If this is you click the link below to accept the sign in\n"
+                        + "If you are not sure and decide not to click it no one will gain access to your account\n\n"
+                        + `${Config.API_HOST}/auth/email/${token}`,
                 })
                 .catch(async () =>
                 {
