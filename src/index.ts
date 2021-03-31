@@ -108,8 +108,8 @@ const init = async () =>
     server.auth.strategy("google", "bell", {
         provider: "google",
         password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
-        clientId: "TODO",
-        clientSecret: "TODO",
+        clientId: process.env.GOOGLE_OAUTH_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
         isSecure: Config.IS_PRODUCTION,
     });
 
