@@ -67,10 +67,6 @@ const init = async () =>
     await server.register(Bell);
     await server.register(Nes);
 
-    server.subscription("/auth/email/requests/{id}", {
-        auth: false,
-    });
-
     server.auth.scheme("token", () =>
     {
         return {
@@ -128,8 +124,6 @@ const init = async () =>
         clientSecret: process.env.TWITTER_OAUTH_CLIENT_SECRET,
         isSecure: Config.IS_PRODUCTION,
     });
-
-    server.auth.default({ strategy: "session" });
 
     server.ext("onPreResponse", (request, h) =>
     {
@@ -575,6 +569,8 @@ const init = async () =>
             return { received: true };
         },
     });
+
+    server.subscription("/auth/email/requests/{id}");
 
     server.start();
 }
