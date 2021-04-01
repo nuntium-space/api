@@ -67,7 +67,9 @@ const init = async () =>
     await server.register(Bell);
     await server.register(Nes);
 
-    server.subscription("/auth/email/requests/{id}");
+    server.subscription("/auth/email/requests/{id}", {
+        auth: false,
+    });
 
     server.auth.scheme("token", () =>
     {
