@@ -50,7 +50,7 @@ export default <ServerRoute[]>[
             await Database.pool
                 .query(
                     `update "sign_in_requests" set "session" = $1 where "id" = $2`,
-                    [ session.id, request.params.token ],
+                    [ session.id, result.rows[0].id ],
                 );
 
             return h.response();
