@@ -37,16 +37,16 @@ export default <ServerRoute[]>[
                 throw Boom.notFound();
             }
 
-            if (result.rows[0].expires_at < new Date())
-            {
-                throw Boom.forbidden();
-            }
-
             await Database.pool
                 .query(
                     `delete from "sign_in_requests" where "id" = $1`,
                     [ request.params.token ],
                 );
+
+            if (result.rows[0].expires_at < new Date())
+            {
+                throw Boom.forbidden();
+            }
 
             const user = await User.retrieve(result.rows[0].user);
 
