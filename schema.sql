@@ -290,7 +290,7 @@ create table "sign_in_requests"
 
     foreign key ("user") references "users" on update cascade on delete cascade,
 
-    check ("expires_at" > current_timestamp)
+    check ("expires_at" > current_timestamp at time zone 'UTC')
 );
 
 /*
