@@ -125,6 +125,8 @@ const init = async () =>
         isSecure: Config.IS_PRODUCTION,
     });
 
+    server.auth.default({ strategy: "session" });
+
     server.ext("onPreResponse", (request, h) =>
     {
         const { response } = request;
