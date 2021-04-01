@@ -282,14 +282,20 @@ create table "user_settings"
 
 create table "sign_in_requests"
 (
-    "id" text not null,
+    "id" id not null,
+    "token" text not null,
     "user" id not null,
+    "session" id,
     "expires_at" timestamp not null,
 
     primary key ("id"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
+    unique ("token"),
 
+    foreign key ("user") references "users" on update cascade on delete cascade,
+    foreign key ("session") references "sessions" on update cascade on delete cascade,
+
+    check ("id" like 'sir_%'),
     check ("expires_at" > current_timestamp at time zone 'UTC')
 );
 

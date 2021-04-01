@@ -5,7 +5,6 @@ dotenv.config();
 import Bell from "@hapi/bell";
 import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
-import Nes from "@hapi/nes";
 import Joi, { ValidationError } from "joi";
 import qs from "qs";
 import { Config } from "./config/Config";
@@ -65,7 +64,6 @@ const init = async () =>
     Database.init();
 
     await server.register(Bell);
-    await server.register(Nes);
 
     server.auth.scheme("token", () =>
     {
@@ -571,8 +569,6 @@ const init = async () =>
             return { received: true };
         },
     });
-
-    server.subscription("/auth/email/requests/{id}");
 
     server.start();
 }

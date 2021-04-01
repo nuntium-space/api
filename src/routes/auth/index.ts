@@ -4,11 +4,12 @@ import { ServerRoute } from "@hapi/hapi";
 import sendgrid from "@sendgrid/mail";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { SESSION_CREATE_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
+import { ID_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 import Database from "../../utilities/Database";
+import Utilities from "../../utilities/Utilities";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
@@ -28,7 +29,7 @@ export default <ServerRoute[]>[
         {
             const result = await Database.pool
                 .query(
-                    `select * from "sign_in_requests" where "id" = $1`,
+                    `select * from "sign_in_requests" where "token" = $1`,
                     [ request.params.token ],
                 );
 
@@ -36,12 +37,6 @@ export default <ServerRoute[]>[
             {
                 throw Boom.notFound();
             }
-
-            await Database.pool
-                .query(
-                    `delete from "sign_in_requests" where "id" = $1`,
-                    [ request.params.token ],
-                );
 
             if (result.rows[0].expires_at < new Date())
             {
@@ -52,11 +47,54 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            request.server.publish(`/auth/email/requests/${result.rows[0].id}`, {
-                session: session.serialize({ for: user }),
-            });
+            await Database.pool
+                .query(
+                    `update "sign_in_requests" set "session" = $1 where "id" = $2`,
+                    [ session.id, request.params.token ],
+                );
 
             return h.response();
+        },
+    },
+    {
+        method: "GET",
+        path: "/auth/email/requests/{id}",
+        options: {
+            auth: false,
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.SIGN_IN_REQUEST).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    session: SESSION_SCHEMA.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const result = await Database.pool
+                .query(
+                    `select * from "sign_in_requests" where "id" = $1`,
+                    [ request.params.id ],
+                );
+
+            if (result.rowCount === 0 || !result.rows[0].session)
+            {
+                throw Boom.notFound();
+            }
+
+            if (result.rows[0].expires_at < new Date())
+            {
+                throw Boom.forbidden();
+            }
+
+            const user = await User.retrieve(result.rows[0].user);
+
+            const session = await Session.retrieve(result.rows[0].session);
+
+            return { session: session.serialize({ for: user }) };
         },
     },
     {
@@ -69,7 +107,7 @@ export default <ServerRoute[]>[
             },
             response: {
                 schema: Joi.object({
-                    id: STRING_SCHEMA.required(),
+                    id: ID_SCHEMA(Config.ID_PREFIXES.SIGN_IN_REQUEST).required(),
                 }),
             },
         },
@@ -88,6 +126,8 @@ export default <ServerRoute[]>[
                 user = await User.create({ email });
             }
 
+            const id = Utilities.id(Config.ID_PREFIXES.SIGN_IN_REQUEST);
+
             const token = crypto.randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
 
             const expires = new Date();
@@ -101,11 +141,12 @@ export default <ServerRoute[]>[
                 .query(
                     `
                     insert into "sign_in_requests"
-                        ("id", "user", "expires_at")
+                        ("id", "token", "user", "expires_at")
                     values
-                        ($1, $2, $3)
+                        ($1, $2, $3, $4)
                     `,
                     [
+                        id,
                         token,
                         user.id,
                         expires.toISOString(),
@@ -140,7 +181,7 @@ export default <ServerRoute[]>[
 
             client.release();
 
-            return { id: token };
+            return { id };
         },
     },
     {
