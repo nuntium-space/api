@@ -94,6 +94,12 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
+            await Database.pool
+                .query(
+                    `delete from "sign_in_requests" where "id" = $1`,
+                    [ result.rows[0].id ],
+                );
+
             const user = await User.retrieve(result.rows[0].user);
 
             const session = await Session.retrieve(result.rows[0].session);
