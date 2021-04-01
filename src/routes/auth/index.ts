@@ -38,7 +38,11 @@ export default <ServerRoute[]>[
                 throw Boom.notFound();
             }
 
-            if (result.rows[0].expires_at < new Date())
+            if
+            (
+                result.rows[0].expires_at < new Date()
+                || result.rows[0].session !== null
+            )
             {
                 throw Boom.forbidden();
             }
