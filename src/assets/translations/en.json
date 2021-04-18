@@ -118,6 +118,9 @@
             "bundle": {
                 "already_exists": "A bundle with this name already exists for this organization"
             },
+            "comment": {
+                "no_username": "You must set a username in order to be able to add a comment"
+            },
             "organization": {
                 "already_exists": "An organization with this name already exists"
             },

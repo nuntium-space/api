@@ -101,6 +101,18 @@ export class Comment implements ISerializable<ISerializedComment>
 
     public static async create(data: ICreateComment, expand?: string[]): Promise<Comment>
     {
+        const user = await User.retrieve(data.user);
+
+        if (!user.username)
+        {
+            throw Boom.forbidden(undefined, [
+                {
+                    field: "comment",
+                    error: "custom.comment.no_username",
+                },
+            ]);
+        }
+
         const result = await Database.pool
             .query(
                 `
@@ -113,7 +125,7 @@ export class Comment implements ISerializable<ISerializedComment>
                 [
                     Utilities.id(Config.ID_PREFIXES.COMMENT),
                     data.content,
-                    data.user,
+                    user.id,
                     data.article,
                     data.parent,
                 ],
