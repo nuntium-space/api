@@ -230,7 +230,22 @@
                 "image": "Image"
             }
         },
-        "verify": "Verify"
+        "verify": {
+            "__title": "Verify",
+            "message": {
+                "after_link": "you must create a record in your DNS manager with the provided values",
+                "before_link": "In order to verify that you are the owner of"
+            },
+            "record": {
+                "host": {
+                    "__title": "Host",
+                    "blank": "Blank",
+                    "or": "or"
+                },
+                "type": "Type",
+                "value": "Value"
+            }
+        }
     },
     "publisher_public_page": {
         "actions": {

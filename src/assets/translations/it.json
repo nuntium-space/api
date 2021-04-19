@@ -230,7 +230,22 @@
                 "image": "Immagine"
             }
         },
-        "verify": "Verifica"
+        "verify": {
+            "__title": "Verifica",
+            "message": {
+                "after_link": "devi creare un record nel tuo manager DNS con i valori forniti",
+                "before_link": "Per poter verificare che tu sia il possessore del dominio"
+            },
+            "record": {
+                "host": {
+                    "__title": "Host",
+                    "blank": "Nessun valore",
+                    "or": "oppure"
+                },
+                "type": "Tipo",
+                "value": "Valore"
+            }
+        }
     },
     "publisher_public_page": {
         "actions": {
