@@ -4,7 +4,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA } from "../../config/schemas";
+import { ID_SCHEMA, PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
@@ -38,6 +38,41 @@ export default <ServerRoute[]>[
                 __metadata: {
                     is_author: await authenticatedUser.isAuthorOfPublisher(publisher),
                     is_subscribed: await authenticatedUser.isSubscribedToPublisher(publisher),
+                },
+            };
+        },
+    },
+    {
+        method: "GET",
+        path: "/publishers/{id}/verification/data",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    dns: Joi.object({
+                        record: STRING_SCHEMA.required(),
+                    }).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = request.auth.credentials.user as User;
+
+            const publisher = await Publisher.retrieve(request.params.id);
+
+            if (!publisher.isOwnedByUser(authenticatedUser))
+            {
+                throw Boom.forbidden();
+            }
+
+            return {
+                dns: {
+                    record: `${Config.DOMAIN_VERIFICATION_DNS_TXT_RECORD_PREFIX}=${publisher.dns_txt_value}`,
                 },
             };
         },
