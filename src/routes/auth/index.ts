@@ -169,7 +169,9 @@ export default <ServerRoute[]>[
                     throw Boom.badImplementation();
                 });
 
-            const lang = "en";
+            const userSettings = await user.retrieveSettings();
+
+            const lang = userSettings.language ?? "en";
 
             const translations = require(`../../assets/translations/${lang}.json`);
 
