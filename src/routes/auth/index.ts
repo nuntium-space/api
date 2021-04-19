@@ -182,7 +182,7 @@ export default <ServerRoute[]>[
                     subject: `[nuntium] ${translations.auth.email.subject}`,
                     text: (translations.auth.email.lines as string[])
                         .join("\n")
-                        .replace("{{ CLIENT_HOST }}", Config.CLIENT_HOST)
+                        .replace("{{ API_HOST }}", Config.API_HOST)
                         .replace("{{ TOKEN }}", token),
                 })
                 .catch(async () =>
