@@ -169,16 +169,19 @@ export default <ServerRoute[]>[
                     throw Boom.badImplementation();
                 });
 
+            const lang = "en";
+
+            const translations = require(`../../assets/translations/${lang}.json`);
+
             await sendgrid
                 .send({
                     to: user.email,
                     from: "nuntium.tokens@alexsandri.com",
-                    subject: "[nuntium] Accept Sign In Request",
-                    text: "Hi,\n"
-                        + "We received a request to sign into your account\n"
-                        + "If this is you click the link below to accept the sign in\n"
-                        + "If you are not sure and decide not to click it no one will gain access to your account\n\n"
-                        + `${Config.API_HOST}/auth/email/${token}`,
+                    subject: `[nuntium] ${translations.auth.email.subject}`,
+                    text: (translations.auth.email.lines as string[])
+                        .join("\n")
+                        .replace("{{ CLIENT_HOST }}", Config.CLIENT_HOST)
+                        .replace("{{ TOKEN }}", token),
                 })
                 .catch(async () =>
                 {
@@ -199,8 +202,8 @@ export default <ServerRoute[]>[
         path: "/auth/facebook",
         options: {
             auth: {
-              mode: "try",
-              strategy: "facebook",
+                mode: "try",
+                strategy: "facebook",
             },
         },
         handler: async (request, h) =>
@@ -245,8 +248,8 @@ export default <ServerRoute[]>[
         path: "/auth/google",
         options: {
             auth: {
-              mode: "try",
-              strategy: "google",
+                mode: "try",
+                strategy: "google",
             },
         },
         handler: async (request, h) =>
@@ -291,8 +294,8 @@ export default <ServerRoute[]>[
         path: "/auth/twitter",
         options: {
             auth: {
-              mode: "try",
-              strategy: "twitter",
+                mode: "try",
+                strategy: "twitter",
             },
         },
         handler: async (request, h) =>
