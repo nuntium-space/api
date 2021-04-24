@@ -270,7 +270,7 @@ export default <ServerRoute[]>[
                     throw Boom.badImplementation();
                 });
 
-            return result;
+            return h.response();
         },
     },
     {
