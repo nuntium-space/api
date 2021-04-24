@@ -123,6 +123,8 @@ export class Publisher implements ISerializable<ISerializedPublisher>
 
     public async update(data: IUpdatePublisher): Promise<void>
     {
+        const shouldInvalidateDomainVerification = (data.url ?? this.url) !== this.url;
+
         this._name = data.name ?? this.name;
         this._url = data.url ?? this.url;
 
@@ -132,13 +134,15 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                 update "publishers"
                 set
                     "name" = $1,
-                    "url" = $2
+                    "url" = $2,
+                    "verified" = $3
                 where
-                    "id" = $3
+                    "id" = $4
                 `,
                 [
                     this.name,
                     this.url,
+                    !shouldInvalidateDomainVerification,
                     this.id,
                 ],
             )
