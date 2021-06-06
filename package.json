@@ -2,9 +2,9 @@
   "name": "nuntium-api",
   "version": "1.0.0",
   "description": "nuntium's API",
-  "main": "lib/index.js",
+  "main": "api/index.ts",
   "scripts": {
-    "start": "ts-node-dev src/index.ts"
+    "start": "ts-node-dev api/index.ts"
   },
   "keywords": [],
   "author": "",

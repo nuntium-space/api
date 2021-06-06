@@ -7,22 +7,22 @@ import Boom from "@hapi/boom";
 import Hapi from "@hapi/hapi";
 import Joi, { ValidationError } from "joi";
 import qs from "qs";
-import { Config } from "./config/Config";
+import { Config } from "../src/config/Config";
 import {
     ARTICLE_SCHEMA,
     EXPAND_QUERY_SCHEMA,
     ID_SCHEMA,
     STRING_SCHEMA,
-} from "./config/schemas";
-import { Article } from "./models/Article";
-import { Organization } from "./models/Organization";
-import { Session } from "./models/Session";
-import { User } from "./models/User";
-import Database from "./utilities/Database";
+} from "../src/config/schemas";
+import { Article } from "../src/models/Article";
+import { Organization } from "../src/models/Organization";
+import { Session } from "../src/models/Session";
+import { User } from "../src/models/User";
+import Database from "../src/utilities/Database";
 import Stripe from "stripe";
-import { Subscription } from "./models/Subscription";
-import Utilities from "./utilities/Utilities";
-import routes from "./routes";
+import { Subscription } from "../src/models/Subscription";
+import Utilities from "../src/utilities/Utilities";
+import routes from "../src/routes";
 
 const server = Hapi.server({
     port: process.env.PORT,
