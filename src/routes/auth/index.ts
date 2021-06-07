@@ -242,7 +242,10 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
+            // TODO:
+            // Set session_id cookie
+
+            return h.redirect(Config.CLIENT_HOST);
         },
     },
     {
@@ -288,7 +291,10 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
+            // TODO:
+            // Set session_id cookie
+
+            return h.redirect(Config.CLIENT_HOST);
         },
     },
     {
@@ -336,7 +342,10 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            return h.redirect(`${Config.CLIENT_HOST}?session_id=${session.id}`);
+            // TODO:
+            // Set session_id cookie
+
+            return h.redirect(Config.CLIENT_HOST);
         },
     },
 ];
