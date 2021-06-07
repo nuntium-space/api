@@ -81,11 +81,11 @@ export class Config
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
 
     public static readonly API_HOST = Config.IS_PRODUCTION
-        ? "https://api.example.com"
+        ? "https://api.nuntium.space"
         : `http://localhost:${process.env.PORT}`;
 
     public static readonly CLIENT_HOST = Config.IS_PRODUCTION
-        ? "https://example.com"
+        ? "https://nuntium.space"
         : "http://localhost:4200";
 
     public static readonly ELASTICSEARCH = new ElasticSearchClient({
