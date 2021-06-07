@@ -23,6 +23,7 @@ const server = Hapi.server({
     routes: {
         cors: {
             origin: [ Config.CLIENT_HOST ],
+            credentials: true,
         },
         validate: {
             options: {
