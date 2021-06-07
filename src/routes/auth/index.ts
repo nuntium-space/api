@@ -104,6 +104,8 @@ export default <ServerRoute[]>[
 
             const session = await Session.retrieve(result.rows[0].session);
 
+            request.cookieAuth.set({ id: session.id });
+
             return { session: session.serialize({ for: user }) };
         },
     },
