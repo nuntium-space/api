@@ -1,9 +1,8 @@
-import dotenv from "dotenv";
-
-dotenv.config();
+import "dotenv/config";
 
 import Bell from "@hapi/bell";
 import Boom from "@hapi/boom";
+import Cookie from "@hapi/cookie";
 import Hapi from "@hapi/hapi";
 import Joi, { ValidationError } from "joi";
 import qs from "qs";
@@ -60,6 +59,7 @@ const init = async () =>
     Database.init();
 
     await server.register(Bell);
+    await server.register(Cookie);
 
     server.auth.scheme("token", () =>
     {
@@ -87,7 +87,36 @@ const init = async () =>
         };
     });
 
-    server.auth.strategy("session", "token");
+    server.auth.strategy("token", "token");
+
+    server.auth.strategy("cookie", "cookie", {
+        cookie: {
+            name: "session_id",
+            password: "password-should-be-32-characters",
+            isSecure: Config.IS_PRODUCTION,
+        },
+        redirectTo: Config.CLIENT_HOST,
+        validateFunc: async (request, session) =>
+        {
+            if (!session)
+            {
+                throw Boom.unauthorized();
+            }
+
+            console.log(session);
+
+            const dbSession = await Session.retrieve((session as any).id);
+
+            if (dbSession.hasExpired())
+            {
+                throw Boom.unauthorized();
+            }
+
+            const { user } = dbSession;
+
+            return { valid: true, credentials: { user } };
+        },
+    });
 
     server.auth.strategy("facebook", "bell", {
         provider: "facebook",
@@ -119,7 +148,13 @@ const init = async () =>
         isSecure: Config.IS_PRODUCTION,
     });
 
-    server.auth.default({ strategy: "session" });
+    server.auth.default({
+        // Allow both cookie and token authentication
+        strategies: [
+            "cookie",
+            "token",
+        ],
+    });
 
     server.ext("onPreResponse", (request, h) =>
     {
