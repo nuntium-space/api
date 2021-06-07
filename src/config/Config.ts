@@ -86,7 +86,7 @@ export class Config
 
     public static readonly CLIENT_HOST = Config.IS_PRODUCTION
         ? "https://example.com"
-        : "https://localhost:4200";
+        : "http://localhost:4200";
 
     public static readonly ELASTICSEARCH = new ElasticSearchClient({
         node: "http://localhost:9200",
