@@ -99,7 +99,6 @@ const init = async () =>
             isHttpOnly: true,
         },
         keepAlive: false,
-        redirectTo: Config.CLIENT_HOST,
         validateFunc: async (request, { id }: { id?: string }) =>
         {
             if (!id)
