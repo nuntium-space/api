@@ -4,7 +4,7 @@ import Joi from "joi";
 import { Config } from "../../config/Config";
 import { ID_SCHEMA, PAYMENT_METHOD_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
 import { PaymentMethod } from "../../models/PaymentMethod";
-import { User } from "../../models/User";
+import { Session } from "../../models/Session";
 
 export default <ServerRoute[]>[
     {
@@ -22,7 +22,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -55,7 +55,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -99,7 +99,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -142,7 +142,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const paymentMethod = await PaymentMethod.retrieve(request.params.id);
 

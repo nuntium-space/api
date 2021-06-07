@@ -5,7 +5,7 @@ import { Config } from "../../config/Config";
 import { COMMENT_CREATE_SCHEMA, COMMENT_SCHEMA, COMMENT_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Comment } from "../../models/Comment";
-import { User } from "../../models/User";
+import { Session } from "../../models/Session";
 
 export default <ServerRoute[]>[
     {
@@ -26,7 +26,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const comment = await Comment.retrieve(request.params.id, request.query.expand);
 
@@ -52,7 +52,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const article = await Article.retrieve(request.params.id);
 
@@ -83,7 +83,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const comment = await Comment.create(
                 {
@@ -115,7 +115,7 @@ export default <ServerRoute[]>[
         {
             const comment = await Comment.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (comment.user.id !== authenticatedUser.id)
             {
@@ -141,7 +141,7 @@ export default <ServerRoute[]>[
         {
             const comment = await Comment.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (comment.user.id !== authenticatedUser.id)
             {

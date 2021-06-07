@@ -3,6 +3,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { ID_SCHEMA, URL_SCHEMA, USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
+import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
@@ -21,7 +22,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -46,7 +47,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -73,7 +74,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -116,7 +117,7 @@ export default <ServerRoute[]>[
         {
             const user = await User.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (user.id !== authenticatedUser.id)
             {
@@ -141,7 +142,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -167,7 +168,7 @@ export default <ServerRoute[]>[
         {
             const user = await User.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (user.id !== authenticatedUser.id)
             {

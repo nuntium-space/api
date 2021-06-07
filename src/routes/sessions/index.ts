@@ -1,21 +1,13 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
-import Joi from "joi";
-import { Config } from "../../config/Config";
-import { ID_SCHEMA, SESSION_SCHEMA } from "../../config/schemas";
+import { SESSION_SCHEMA } from "../../config/schemas";
 import { Session } from "../../models/Session";
-import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
     {
         method: "GET",
-        path: "/sessions/{id}",
+        path: "/sessions/current",
         options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
-                }),
-            },
             response: {
                 schema: SESSION_SCHEMA,
             },
@@ -24,7 +16,7 @@ export default <ServerRoute[]>[
         {
             const session = await Session.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (session.user.id !== authenticatedUser.id)
             {
@@ -36,19 +28,12 @@ export default <ServerRoute[]>[
     },
     {
         method: "DELETE",
-        path: "/sessions/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
-                }),
-            },
-        },
+        path: "/sessions/current",
         handler: async (request, h) =>
         {
             const session = await Session.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (session.user.id !== authenticatedUser.id)
             {

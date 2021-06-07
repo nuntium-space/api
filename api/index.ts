@@ -15,7 +15,6 @@ import {
 } from "../src/config/schemas";
 import { Article } from "../src/models/Article";
 import { Session } from "../src/models/Session";
-import { User } from "../src/models/User";
 import Database from "../src/utilities/Database";
 import routes from "../src/routes";
 
@@ -54,18 +53,6 @@ const server = Hapi.server({
     },
 });
 
-const retrieveUserWithSessionId = async (sessionId: string): Promise<User> =>
-{
-    const session = await Session.retrieve(sessionId);
-
-    if (session.hasExpired())
-    {
-        throw Boom.unauthorized();
-    }
-
-    return session.user;
-}
-
 const init = async () =>
 {
     Database.init();
@@ -85,9 +72,14 @@ const init = async () =>
                     throw Boom.unauthorized();
                 }
 
-                const user = await retrieveUserWithSessionId(authorization.split(" ")[1]);
+                const session = await Session.retrieve(authorization.split(" ")[1]);
 
-                return h.authenticated({ credentials: { user } });
+                if (session.hasExpired())
+                {
+                    throw Boom.unauthorized();
+                }
+
+                return h.authenticated({ credentials: { session } });
             },
         };
     });
@@ -108,18 +100,21 @@ const init = async () =>
         },
         keepAlive: false,
         redirectTo: Config.CLIENT_HOST,
-        validateFunc: async (request, session) =>
+        validateFunc: async (request, { id }: { id?: string }) =>
         {
-            if (!session)
+            if (!id)
             {
                 throw Boom.unauthorized();
             }
 
-            console.log(session);
+            const session = await Session.retrieve(id);
 
-            const user = await retrieveUserWithSessionId((session as any).id);
+            if (session.hasExpired())
+            {
+                throw Boom.unauthorized();
+            }
 
-            return { valid: true, credentials: { user } };
+            return { valid: true, credentials: { session } };
         },
     });
 
@@ -200,7 +195,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const result = await Config.ELASTICSEARCH.search({
                 index: "articles",
@@ -246,7 +241,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {

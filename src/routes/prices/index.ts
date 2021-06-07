@@ -6,7 +6,7 @@ import { EXPAND_QUERY_SCHEMA, ID_SCHEMA, PRICE_CREATE_SCHEMA, PRICE_SCHEMA } fro
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
-import { User } from "../../models/User";
+import { Session } from "../../models/Session";
 
 export default <ServerRoute[]>[
     {
@@ -27,7 +27,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const price = await Price.retrieve(request.params.id, request.query.expand);
 
@@ -53,7 +53,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const bundle = await Bundle.retrieve(request.params.id);
 
@@ -84,7 +84,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
 
@@ -119,7 +119,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const price = await Price.retrieve(request.params.id, [ "bundle", "bundle.organization" ]);
 
