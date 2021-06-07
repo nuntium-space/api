@@ -242,8 +242,7 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            // TODO:
-            // Set session_id cookie
+            request.cookieAuth.set({ id: session.id });
 
             return h.redirect(Config.CLIENT_HOST);
         },
@@ -291,8 +290,7 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            // TODO:
-            // Set session_id cookie
+            request.cookieAuth.set({ id: session.id });
 
             return h.redirect(Config.CLIENT_HOST);
         },
@@ -342,8 +340,7 @@ export default <ServerRoute[]>[
 
             const session = await Session.create(user);
 
-            // TODO:
-            // Set session_id cookie
+            request.cookieAuth.set({ id: session.id });
 
             return h.redirect(Config.CLIENT_HOST);
         },
