@@ -12,6 +12,7 @@ import sessions from "./sessions";
 import subscriptions from "./subscriptions";
 import translations from "./translations";
 import users from "./users";
+import webhooks from "./webhooks";
 
 export = [
     articles,
@@ -28,4 +29,5 @@ export = [
     subscriptions,
     translations,
     users,
+    webhooks,
 ].flat();

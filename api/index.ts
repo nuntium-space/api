@@ -15,13 +15,9 @@ import {
     STRING_SCHEMA,
 } from "../src/config/schemas";
 import { Article } from "../src/models/Article";
-import { Organization } from "../src/models/Organization";
 import { Session } from "../src/models/Session";
 import { User } from "../src/models/User";
 import Database from "../src/utilities/Database";
-import Stripe from "stripe";
-import { Subscription } from "../src/models/Subscription";
-import Utilities from "../src/utilities/Utilities";
 import routes from "../src/routes";
 
 const server = Hapi.server({
