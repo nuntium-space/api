@@ -91,7 +91,7 @@ const init = async () =>
             name: "session_id",
             password: "password-should-be-32-characters",
             ttl: Config.SESSION_DURATION_IN_SECONDS * 1000,
-            domain: Config.CLIENT_HOST,
+            domain: new URL(Config.CLIENT_HOST).hostname,
             path: "/",
             clearInvalid: true,
             isSameSite: "Strict",
