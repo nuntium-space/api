@@ -48,7 +48,7 @@ export class Session implements ISerializable<ISerializedSession>
     public static async create(user: User): Promise<Session>
     {
         const expires = new Date();
-        expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION);
+        expires.setSeconds(new Date().getSeconds() + Config.SESSION_DURATION_IN_SECONDS);
 
         const result = await Database.pool
             .query(

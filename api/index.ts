@@ -98,8 +98,15 @@ const init = async () =>
         cookie: {
             name: "session_id",
             password: "password-should-be-32-characters",
+            ttl: Config.SESSION_DURATION_IN_SECONDS * 1000,
+            domain: Config.CLIENT_HOST,
+            path: "/",
+            clearInvalid: true,
+            isSameSite: "Strict",
             isSecure: Config.IS_PRODUCTION,
+            isHttpOnly: true,
         },
+        keepAlive: false,
         redirectTo: Config.CLIENT_HOST,
         validateFunc: async (request, session) =>
         {

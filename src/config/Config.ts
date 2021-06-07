@@ -11,7 +11,7 @@ export class Config
      * 
      * 30 days
      */
-    public static readonly SESSION_DURATION = 60 * 60 * 24 * 30;
+    public static readonly SESSION_DURATION_IN_SECONDS = 60 * 60 * 24 * 30;
 
     /**
      * @default
