@@ -54,6 +54,18 @@ const server = Hapi.server({
     },
 });
 
+const retrieveUserWithSessionId = async (sessionId: string): Promise<User> =>
+{
+    const session = await Session.retrieve(sessionId);
+
+    if (session.hasExpired())
+    {
+        throw Boom.unauthorized();
+    }
+
+    return session.user;
+}
+
 const init = async () =>
 {
     Database.init();
@@ -73,14 +85,7 @@ const init = async () =>
                     throw Boom.unauthorized();
                 }
 
-                const session = await Session.retrieve(authorization.split(" ")[1]);
-
-                if (session.hasExpired())
-                {
-                    throw Boom.unauthorized();
-                }
-
-                const { user } = session;
+                const user = await retrieveUserWithSessionId(authorization.split(" ")[1]);
 
                 return h.authenticated({ credentials: { user } });
             },
@@ -105,14 +110,7 @@ const init = async () =>
 
             console.log(session);
 
-            const dbSession = await Session.retrieve((session as any).id);
-
-            if (dbSession.hasExpired())
-            {
-                throw Boom.unauthorized();
-            }
-
-            const { user } = dbSession;
+            const user = await retrieveUserWithSessionId((session as any).id);
 
             return { valid: true, credentials: { user } };
         },
