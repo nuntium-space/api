@@ -6,7 +6,7 @@ import { BUNDLE_CREATE_SCHEMA, BUNDLE_SCHEMA, BUNDLE_UPDATE_SCHEMA, EXPAND_QUERY
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
-import { User } from "../../models/User";
+import { Session } from "../../models/Session";
 
 export default <ServerRoute[]>[
     {
@@ -27,7 +27,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const bundle = await Bundle.retrieve(request.params.id, request.query.expand);
 
@@ -54,7 +54,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -84,7 +84,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const publisher = await Publisher.retrieve(request.params.id);
 
@@ -114,7 +114,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -153,7 +153,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (bundle.organization.owner.id !== authenticatedUser.id)
             {
@@ -184,7 +184,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (bundle.organization.owner.id !== authenticatedUser.id)
             {

@@ -1,61 +1,33 @@
-import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
-import Joi from "joi";
-import { Config } from "../../config/Config";
-import { ID_SCHEMA, SESSION_SCHEMA } from "../../config/schemas";
+import { SESSION_SCHEMA } from "../../config/schemas";
 import { Session } from "../../models/Session";
-import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
     {
         method: "GET",
-        path: "/sessions/{id}",
+        path: "/sessions/current",
         options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
-                }),
-            },
             response: {
                 schema: SESSION_SCHEMA,
             },
         },
         handler: async (request, h) =>
         {
-            const session = await Session.retrieve(request.params.id);
+            const session = request.auth.credentials.session as Session;
 
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (session.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            return session.serialize({ for: authenticatedUser });
+            return session.serialize({ for: session.user });
         },
     },
     {
         method: "DELETE",
-        path: "/sessions/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SESSION).required(),
-                }),
-            },
-        },
+        path: "/sessions/current",
         handler: async (request, h) =>
         {
-            const session = await Session.retrieve(request.params.id);
-
-            const authenticatedUser = request.auth.credentials.user as User;
-
-            if (session.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
+            const session = request.auth.credentials.session as Session;
 
             await session.delete();
+
+            request.cookieAuth.clear();
 
             return h.response();
         },

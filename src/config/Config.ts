@@ -11,7 +11,7 @@ export class Config
      * 
      * 30 days
      */
-    public static readonly SESSION_DURATION = 60 * 60 * 24 * 30;
+    public static readonly SESSION_DURATION_IN_SECONDS = 60 * 60 * 24 * 30;
 
     /**
      * @default
@@ -86,7 +86,7 @@ export class Config
 
     public static readonly CLIENT_HOST = Config.IS_PRODUCTION
         ? "https://example.com"
-        : "https://localhost:4200";
+        : "http://localhost:4200";
 
     public static readonly ELASTICSEARCH = new ElasticSearchClient({
         node: "http://localhost:9200",

@@ -6,8 +6,8 @@ import { EXPAND_QUERY_SCHEMA, ID_SCHEMA, SUBSCRIPTION_CREATE_SCHEMA, SUBSCRIPTIO
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
+import { Session } from "../../models/Session";
 import { Subscription } from "../../models/Subscription";
-import { User } from "../../models/User";
 
 export default <ServerRoute[]>[
     {
@@ -28,7 +28,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -56,7 +56,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {

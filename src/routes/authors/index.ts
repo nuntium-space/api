@@ -5,7 +5,7 @@ import { Config } from "../../config/Config";
 import { AUTHOR_CREATE_SCHEMA, AUTHOR_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA } from "../../config/schemas";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
-import { User } from "../../models/User";
+import { Session } from "../../models/Session";
 
 export default <ServerRoute[]>[
     {
@@ -26,7 +26,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             const author = await Author.retrieve(request.params.id, request.query.expand);
 
@@ -53,7 +53,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -84,7 +84,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -117,7 +117,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -154,7 +154,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = request.auth.credentials.user as User;
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
 
             if (!author.publisher.isOwnedByUser(authenticatedUser))
             {
