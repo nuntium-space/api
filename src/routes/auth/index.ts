@@ -205,10 +205,7 @@ export default <ServerRoute[]>[
         method: [ "GET", "POST" ],
         path: "/auth/facebook",
         options: {
-            auth: {
-                mode: "try",
-                strategy: "facebook",
-            },
+            auth: "facebook",
         },
         handler: async (request, h) =>
         {
@@ -253,10 +250,7 @@ export default <ServerRoute[]>[
         method: [ "GET", "POST" ],
         path: "/auth/google",
         options: {
-            auth: {
-                mode: "try",
-                strategy: "google",
-            },
+            auth: "google",
         },
         handler: async (request, h) =>
         {
@@ -301,10 +295,7 @@ export default <ServerRoute[]>[
         method: [ "GET", "POST" ],
         path: "/auth/twitter",
         options: {
-            auth: {
-                mode: "try",
-                strategy: "twitter",
-            },
+            auth: "twitter",
         },
         handler: async (request, h) =>
         {
