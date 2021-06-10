@@ -320,6 +320,10 @@ export default <ServerRoute[]>[
                     image: Joi.binary().required(),
                 }),
             },
+            response: {
+                schema: Joi.object({
+                    url: STRING_SCHEMA.required(),
+            })},
         },
         handler: async (request, h) =>
         {
@@ -380,7 +384,7 @@ export default <ServerRoute[]>[
                 s3ForcePathStyle: true,
             });
 
-            await s3Client.upload({
+            const a = await s3Client.upload({
                 Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
                 Key: publisher.id,
                 Body: image,
@@ -395,7 +399,7 @@ export default <ServerRoute[]>[
 
             await client.query("commit");
 
-            return h.response();
+            return { url: a.Location };
         },
     },
     {
