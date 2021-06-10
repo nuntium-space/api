@@ -384,7 +384,7 @@ export default <ServerRoute[]>[
                 s3ForcePathStyle: true,
             });
 
-            const a = await s3Client.upload({
+            const upload = await s3Client.upload({
                 Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
                 Key: publisher.id,
                 Body: image,
@@ -399,7 +399,7 @@ export default <ServerRoute[]>[
 
             await client.query("commit");
 
-            return { url: a.Location };
+            return { url: upload.Location };
         },
     },
     {
