@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
-import { Config } from "../../config/Config";
-import { COMMENT_CREATE_SCHEMA, COMMENT_SCHEMA, COMMENT_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { COMMENT_CREATE_SCHEMA, COMMENT_SCHEMA, COMMENT_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Comment } from "../../models/Comment";
 import { Session } from "../../models/Session";
@@ -14,7 +14,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
+                    id: Schema.ID.COMMENT.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -39,10 +39,10 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                    id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
-                    parent: ID_SCHEMA(Config.ID_PREFIXES.COMMENT),
+                    parent: Schema.ID.COMMENT,
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
             },
@@ -70,7 +70,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                    id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -103,7 +103,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
+                    id: Schema.ID.COMMENT.required(),
                 }),
                 payload: COMMENT_UPDATE_SCHEMA,
             },
@@ -133,7 +133,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.COMMENT).required(),
+                    id: Schema.ID.COMMENT.required(),
                 }),
             },
         },

@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
-import { Config } from "../../config/Config";
-import { ARTICLE_CREATE_SCHEMA, ARTICLE_SCHEMA, ARTICLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { ARTICLE_CREATE_SCHEMA, ARTICLE_SCHEMA, ARTICLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
@@ -15,11 +15,11 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                    id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
-                    format: STRING_SCHEMA.allow("raw", "html"),
+                    format: Schema.STRING.allow("raw", "html"),
                 }),
             },
             response: {
@@ -56,7 +56,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -88,7 +88,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.AUTHOR).required(),
+                    id: Schema.ID.AUTHOR.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -140,11 +140,11 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                    id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
-                    format: STRING_SCHEMA.allow("raw", "html"),
+                    format: Schema.STRING.allow("raw", "html"),
                 }),
                 payload: ARTICLE_UPDATE_SCHEMA,
             },
@@ -179,7 +179,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ARTICLE).required(),
+                    id: Schema.ID.ARTICLE.required(),
                 }),
             },
         },

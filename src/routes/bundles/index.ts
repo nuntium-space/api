@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
-import { Config } from "../../config/Config";
-import { BUNDLE_CREATE_SCHEMA, BUNDLE_SCHEMA, BUNDLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA, ID_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { BUNDLE_CREATE_SCHEMA, BUNDLE_SCHEMA, BUNDLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
@@ -15,7 +15,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    id: Schema.ID.BUNDLE.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -40,7 +40,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                    id: Schema.ID.ORGANIZATION.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -72,7 +72,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -99,7 +99,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                    id: Schema.ID.ORGANIZATION.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -136,7 +136,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    id: Schema.ID.BUNDLE.required(),
                 }),
                 payload: BUNDLE_UPDATE_SCHEMA,
             },
@@ -171,7 +171,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    id: Schema.ID.BUNDLE.required(),
                 }),
             },
         },

@@ -1,8 +1,8 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
-import { Config } from "../../config/Config";
-import { EXPAND_QUERY_SCHEMA, ID_SCHEMA, PRICE_CREATE_SCHEMA, PRICE_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { EXPAND_QUERY_SCHEMA, PRICE_CREATE_SCHEMA, PRICE_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
@@ -15,7 +15,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PRICE).required(),
+                    id: Schema.ID.PRICE.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -40,7 +40,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    id: Schema.ID.BUNDLE.required(),
                 }),
                 query: Joi.object({
                     active: Joi.boolean(),
@@ -71,7 +71,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    id: Schema.ID.BUNDLE.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -113,7 +113,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PRICE).required(),
+                    id: Schema.ID.PRICE.required(),
                 }),
             },
         },

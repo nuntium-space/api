@@ -1,7 +1,8 @@
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
-import { CURRENCY_SCHEMA, LANGUAGE_SCHEMA, MONEY_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
+import { CURRENCY_SCHEMA, LANGUAGE_SCHEMA, MONEY_SCHEMA } from "../../config/schemas";
 import { Config } from "../../config/Config";
+import { Schema } from "../../config/Schema";
 
 export default <ServerRoute[]>[
     {
@@ -27,7 +28,7 @@ export default <ServerRoute[]>[
             response: {
                 schema: Joi.array().items(Joi.object({
                     id: LANGUAGE_SCHEMA.required(),
-                    display_name: STRING_SCHEMA.required(),
+                    display_name: Schema.STRING.required(),
                 })).required(),
             },
         },

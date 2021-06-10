@@ -2,7 +2,8 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, PAYMENT_METHOD_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { PAYMENT_METHOD_SCHEMA } from "../../config/schemas";
 import { PaymentMethod } from "../../models/PaymentMethod";
 import { Session } from "../../models/Session";
 
@@ -13,7 +14,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
             },
             response: {
@@ -45,11 +46,11 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 payload: Joi.object({
                     // ID of a Stripe Payment Method
-                    id: STRING_SCHEMA.required(),
+                    id: Schema.STRING.required(),
                 }),
             },
         },
@@ -90,10 +91,10 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 payload: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
+                    id: Schema.ID.PAYMENT_METHOD.required(),
                 }),
             },
         },
@@ -136,7 +137,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PAYMENT_METHOD).required(),
+                    id: Schema.ID.PAYMENT_METHOD.required(),
                 }),
             },
         },

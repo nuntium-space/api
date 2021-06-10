@@ -2,7 +2,8 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { EXPAND_QUERY_SCHEMA, ID_SCHEMA, SUBSCRIPTION_CREATE_SCHEMA, SUBSCRIPTION_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { EXPAND_QUERY_SCHEMA, SUBSCRIPTION_CREATE_SCHEMA, SUBSCRIPTION_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
@@ -16,7 +17,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
@@ -46,7 +47,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,

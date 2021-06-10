@@ -2,7 +2,8 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, URL_SCHEMA, USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
+import { USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 
@@ -13,7 +14,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
             },
             response: {
@@ -38,7 +39,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
             },
             response: {
@@ -63,12 +64,12 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
             },
             response: {
                 schema: Joi.object({
-                    url: URL_SCHEMA.required(),
+                    url: Schema.URL.required(),
                 }),
             },
         },
@@ -105,7 +106,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 payload: USER_UPDATE_SCHEMA,
             },
@@ -135,7 +136,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 payload: USER_SETTINGS_UPDATE_SCHEMA,
             },
@@ -160,7 +161,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
             },
         },

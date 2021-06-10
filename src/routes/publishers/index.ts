@@ -4,7 +4,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
+import { PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
@@ -12,6 +12,7 @@ import Database from "../../utilities/Database";
 import imageType from "image-type";
 import imageSize from "image-size";
 import { Session } from "../../models/Session";
+import { Schema } from "../../config/Schema";
 
 export default <ServerRoute[]>[
     {
@@ -20,7 +21,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
             },
             response: {
@@ -48,13 +49,13 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
             },
             response: {
                 schema: Joi.object({
                     dns: Joi.object({
-                        record: STRING_SCHEMA.required(),
+                        record: Schema.STRING.required(),
                     }).required(),
                 }),
             },
@@ -83,7 +84,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
+                    id: Schema.ID.BUNDLE.required(),
                 }),
             },
             response: {
@@ -107,10 +108,10 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.ORGANIZATION).required(),
+                    id: Schema.ID.ORGANIZATION.required(),
                 }),
                 query: Joi.object({
-                    not_in_bundle: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE),
+                    not_in_bundle: Schema.ID.BUNDLE,
                 }),
             },
             response: {
@@ -141,8 +142,8 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    bundle_id: ID_SCHEMA(Config.ID_PREFIXES.BUNDLE).required(),
-                    publisher_id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    bundle_id: Schema.ID.BUNDLE.required(),
+                    publisher_id: Schema.ID.PUBLISHER.required(),
                 }),
             },
         },
@@ -279,7 +280,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
                 payload: PUBLISHER_UPDATE_SCHEMA,
             },
@@ -314,7 +315,7 @@ export default <ServerRoute[]>[
             },
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
                 payload: Joi.object({
                     image: Joi.binary().required(),
@@ -322,7 +323,7 @@ export default <ServerRoute[]>[
             },
             response: {
                 schema: Joi.object({
-                    url: STRING_SCHEMA.required(),
+                    url: Schema.STRING.required(),
             })},
         },
         handler: async (request, h) =>
@@ -408,7 +409,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.PUBLISHER).required(),
+                    id: Schema.ID.PUBLISHER.required(),
                 }),
             },
         },

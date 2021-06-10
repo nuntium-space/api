@@ -10,13 +10,12 @@ import { Config } from "../src/config/Config";
 import {
     ARTICLE_SCHEMA,
     EXPAND_QUERY_SCHEMA,
-    ID_SCHEMA,
-    STRING_SCHEMA,
 } from "../src/config/schemas";
 import { Article } from "../src/models/Article";
 import { Session } from "../src/models/Session";
 import Database from "../src/utilities/Database";
 import routes from "../src/routes";
+import { Schema } from "../src/config/Schema";
 
 const server = Hapi.server({
     port: process.env.PORT,
@@ -183,7 +182,7 @@ const init = async () =>
         options: {
             validate: {
                 query: Joi.object({
-                    query: STRING_SCHEMA.required(),
+                    query: Schema.STRING.required(),
                     limit: Joi.number().integer().min(0).max(30).required(),
                     offset: Joi.number().integer().min(0).required(),
                     expand: EXPAND_QUERY_SCHEMA,
@@ -227,7 +226,7 @@ const init = async () =>
         options: {
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.USER).required(),
+                    id: Schema.ID.USER.required(),
                 }),
                 query: Joi.object({
                     limit: Joi.number().integer().min(0).max(30).required(),

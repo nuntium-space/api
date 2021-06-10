@@ -4,12 +4,13 @@ import { ServerRoute } from "@hapi/hapi";
 import sendgrid from "@sendgrid/mail";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { ID_SCHEMA, SESSION_CREATE_SCHEMA, SESSION_SCHEMA, STRING_SCHEMA } from "../../config/schemas";
+import { SESSION_CREATE_SCHEMA, SESSION_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 import Database from "../../utilities/Database";
 import Utilities from "../../utilities/Utilities";
+import { Schema } from "../../config/Schema";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
@@ -21,7 +22,7 @@ export default <ServerRoute[]>[
             auth: false,
             validate: {
                 params: Joi.object({
-                    token: STRING_SCHEMA.required(),
+                    token: Schema.STRING.required(),
                 }),
             },
         },
@@ -67,7 +68,7 @@ export default <ServerRoute[]>[
             auth: false,
             validate: {
                 params: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SIGN_IN_REQUEST).required(),
+                    id: Schema.ID.SIGN_IN_REQUEST.required(),
                 }),
             },
             response: {
@@ -119,7 +120,7 @@ export default <ServerRoute[]>[
             },
             response: {
                 schema: Joi.object({
-                    id: ID_SCHEMA(Config.ID_PREFIXES.SIGN_IN_REQUEST).required(),
+                    id: Schema.ID.SIGN_IN_REQUEST.required(),
                 }),
             },
         },
