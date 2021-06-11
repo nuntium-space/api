@@ -1,7 +1,10 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
+import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Article, ISerializedArticle } from "./Article";
@@ -252,7 +255,7 @@ export class Comment implements ISerializable<ISerializedComment>
                 expand
                     .filter(e => e.startsWith("article."))
                     .map(e => e.replace("article.", "")),
-              )
+                )
             : { id: data.article };
 
         const parent = data.parent !== null
@@ -285,4 +288,44 @@ export class Comment implements ISerializable<ISerializedComment>
             data.updated_at,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.COMMENT.required(),
+            content: Schema.STRING.required(),
+            user: Joi
+                .alternatives()
+                .try(
+                    USER_SCHEMA,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
+                )
+                .required(),
+            article: Joi
+                .alternatives()
+                .try(
+                    Article.SCHEMA.OBJ,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
+                )
+                .required(),
+            // Recursive schema
+            parent: Joi
+                .alternatives()
+                .try(
+                    Joi.link("..."),
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.COMMENT),
+                    null,
+                )
+                .required(),
+            reply_count: Joi.number().min(0).required(),
+            created_at: Schema.DATETIME.required(),
+            updated_at: Schema.DATETIME.required(),
+        }),
+        CREATE: Joi.object({
+            content: Schema.STRING.required(),
+            parent: Schema.ID.COMMENT.allow(null).required(),
+        }),
+        UPDATE: Joi.object({
+            content: Schema.STRING,
+        }),
+    } as const;
 }

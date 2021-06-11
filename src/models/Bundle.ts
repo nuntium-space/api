@@ -1,7 +1,10 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
+import { ORGANIZATION_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedOrganization, Organization } from "./Organization";
@@ -322,4 +325,25 @@ export class Bundle implements ISerializable<ISerializedBundle>
             data.stripe_product_id,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.BUNDLE.required(),
+            name: Schema.STRING.max(50).required(),
+            organization: Joi
+                .alternatives()
+                .try(
+                    ORGANIZATION_SCHEMA,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
+                )
+                .required(),
+            active: Joi.boolean().required(),
+        }),
+        CREATE: Joi.object({
+            name: Schema.STRING.max(50).required(),
+        }),
+        UPDATE: Joi.object({
+            name: Schema.STRING.max(50),
+        }),
+    } as const;
 }

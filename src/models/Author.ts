@@ -1,7 +1,10 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
+import { USER_SCHEMA, PUBLISHER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedPublisher, Publisher } from "./Publisher";
@@ -153,4 +156,27 @@ export class Author implements ISerializable<ISerializedAuthor>
             publisher,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.AUTHOR.required(),
+            user: Joi
+                .alternatives()
+                .try(
+                    USER_SCHEMA,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
+                )
+                .required(),
+            publisher: Joi
+                .alternatives()
+                .try(
+                    PUBLISHER_SCHEMA,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
+                )
+                .required(),
+        }),
+        CREATE: Joi.object({
+            email: Schema.EMAIL.required(),
+        }),
+    } as const;
 }

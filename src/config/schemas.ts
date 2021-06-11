@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { Article } from "../models/Article";
+import { Bundle } from "../models/Bundle";
 import { Schema } from "./Schema";
 
 /*
@@ -45,71 +45,6 @@ export const PUBLISHER_SCHEMA = Joi
         }),
     });
 
-export const AUTHOR_SCHEMA = Joi
-    .object({
-        id: Schema.ID.AUTHOR.required(),
-        user: Joi
-            .alternatives()
-            .try(
-                USER_SCHEMA,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
-            )
-            .required(),
-        publisher: Joi
-            .alternatives()
-            .try(
-                PUBLISHER_SCHEMA,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
-            )
-            .required(),
-    });
-
-export const COMMENT_SCHEMA = Joi
-    .object({
-        id: Schema.ID.COMMENT.required(),
-        content: Schema.STRING.required(),
-        user: Joi
-            .alternatives()
-            .try(
-                USER_SCHEMA,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
-            )
-            .required(),
-        article: Joi
-            .alternatives()
-            .try(
-                Article.SCHEMA.OBJ,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
-            )
-            .required(),
-        // Recursive schema
-        parent: Joi
-            .alternatives()
-            .try(
-                Joi.link("..."),
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.COMMENT),
-                null,
-            )
-            .required(),
-        reply_count: Joi.number().min(0).required(),
-        created_at: Schema.DATETIME.required(),
-        updated_at: Schema.DATETIME.required(),
-    });
-
-export const BUNDLE_SCHEMA = Joi
-    .object({
-        id: Schema.ID.BUNDLE.required(),
-        name: Schema.STRING.max(50).required(),
-        organization: Joi
-            .alternatives()
-            .try(
-                ORGANIZATION_SCHEMA,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
-            )
-            .required(),
-        active: Joi.boolean().required(),
-    });
-
 export const PRICE_SCHEMA = Joi
     .object({
         id: Schema.ID.PRICE.required(),
@@ -118,7 +53,7 @@ export const PRICE_SCHEMA = Joi
         bundle: Joi
             .alternatives()
             .try(
-                BUNDLE_SCHEMA,
+                Bundle.SCHEMA.OBJ,
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.BUNDLE),
             )
             .required(),
@@ -204,35 +139,9 @@ export const PUBLISHER_UPDATE_SCHEMA = Joi
         url: Schema.URL,
     });
 
-export const AUTHOR_CREATE_SCHEMA = Joi
-    .object({
-        email: Schema.EMAIL.required(),
-    });
-
 export const SESSION_CREATE_SCHEMA = Joi
     .object({
         email: Schema.EMAIL.required(),
-    });
-
-export const COMMENT_CREATE_SCHEMA = Joi
-    .object({
-        content: Schema.STRING.required(),
-        parent: Schema.ID.COMMENT.allow(null).required(),
-    });
-
-export const COMMENT_UPDATE_SCHEMA = Joi
-    .object({
-        content: Schema.STRING,
-    });
-
-export const BUNDLE_CREATE_SCHEMA = Joi
-    .object({
-        name: Schema.STRING.max(50).required(),
-    });
-
-export const BUNDLE_UPDATE_SCHEMA = Joi
-    .object({
-        name: Schema.STRING.max(50),
     });
 
 export const PRICE_CREATE_SCHEMA = Joi
