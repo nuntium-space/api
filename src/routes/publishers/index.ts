@@ -88,7 +88,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(PUBLISHER_SCHEMA).required(),
+                schema: Schema.ARRAY(PUBLISHER_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
@@ -115,7 +115,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(PUBLISHER_SCHEMA).required(),
+                schema: Schema.ARRAY(PUBLISHER_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>

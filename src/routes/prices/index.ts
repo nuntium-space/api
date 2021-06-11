@@ -48,7 +48,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(PRICE_SCHEMA).required(),
+                schema: Schema.ARRAY(PRICE_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>

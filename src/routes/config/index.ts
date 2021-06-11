@@ -10,7 +10,7 @@ export default <ServerRoute[]>[
         path: "/config/currencies",
         options: {
             response: {
-                schema: Joi.array().items(Joi.object({
+                schema: Schema.ARRAY(Joi.object({
                     name: CURRENCY_SCHEMA.required(),
                     min: MONEY_SCHEMA.required(),
                 })).required(),
@@ -26,7 +26,7 @@ export default <ServerRoute[]>[
         path: "/config/languages",
         options: {
             response: {
-                schema: Joi.array().items(Joi.object({
+                schema: Schema.ARRAY(Joi.object({
                     id: LANGUAGE_SCHEMA.required(),
                     display_name: Schema.STRING.required(),
                 })).required(),

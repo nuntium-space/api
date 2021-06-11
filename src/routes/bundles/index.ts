@@ -47,7 +47,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+                schema: Schema.ARRAY(BUNDLE_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
@@ -79,7 +79,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(BUNDLE_SCHEMA).required(),
+                schema: Schema.ARRAY(BUNDLE_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>

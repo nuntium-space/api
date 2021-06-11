@@ -46,7 +46,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(AUTHOR_SCHEMA).required(),
+                schema: Schema.ARRAY(AUTHOR_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>
@@ -79,7 +79,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(AUTHOR_SCHEMA).required(),
+                schema: Schema.ARRAY(AUTHOR_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>

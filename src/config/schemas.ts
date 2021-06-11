@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { Article } from "../models/Article";
 import { Config } from "./Config";
 import { Schema } from "./Schema";
 
@@ -15,7 +16,7 @@ export const LANGUAGE_SCHEMA = Schema.STRING.valid(...Config.LANGUAGES.map(c => 
 
 export const NOT_EXPANDED_RESOURCE_SCHEMA = (schema: Joi.Schema) => Joi.object({ id: schema });
 
-export const EXPAND_QUERY_SCHEMA = Joi.array().items(Schema.STRING);
+export const EXPAND_QUERY_SCHEMA = Schema.ARRAY(Schema.STRING);
 
 /*
 ----------------
@@ -79,23 +80,6 @@ export const AUTHOR_SCHEMA = Joi
             .required(),
     });
 
-export const ARTICLE_SCHEMA = Joi
-    .object({
-        id: Schema.ID.ARTICLE.required(),
-        title: Schema.STRING.max(50).required(),
-        content: Schema.STRING.allow("").required(),
-        reading_time: Joi.number().integer().min(0).required(),
-        author: Joi
-            .alternatives()
-            .try(
-                AUTHOR_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.AUTHOR),
-            )
-            .required(),
-        created_at: Schema.DATETIME.required(),
-        updated_at: Schema.DATETIME.required(),
-    });
-
 export const COMMENT_SCHEMA = Joi
     .object({
         id: Schema.ID.COMMENT.required(),
@@ -110,7 +94,7 @@ export const COMMENT_SCHEMA = Joi
         article: Joi
             .alternatives()
             .try(
-                ARTICLE_SCHEMA,
+                Article.SCHEMA.OBJ,
                 NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.ARTICLE),
             )
             .required(),
@@ -244,18 +228,6 @@ export const AUTHOR_CREATE_SCHEMA = Joi
 export const SESSION_CREATE_SCHEMA = Joi
     .object({
         email: Schema.EMAIL.required(),
-    });
-
-export const ARTICLE_CREATE_SCHEMA = Joi
-    .object({
-        title: Schema.STRING.max(50).required(),
-        content: Schema.STRING.required(),
-    });
-
-export const ARTICLE_UPDATE_SCHEMA = Joi
-    .object({
-        title: Schema.STRING.max(50),
-        content: Schema.STRING,
     });
 
 export const COMMENT_CREATE_SCHEMA = Joi

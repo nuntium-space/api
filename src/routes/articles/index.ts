@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { ARTICLE_CREATE_SCHEMA, ARTICLE_SCHEMA, ARTICLE_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA } from "../../config/schemas";
+import { EXPAND_QUERY_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
@@ -23,7 +23,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: ARTICLE_SCHEMA,
+                schema: Article.SCHEMA,
             },
         },
         handler: async (request, h) =>
@@ -63,7 +63,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(ARTICLE_SCHEMA).required(),
+                schema: Schema.ARRAY(Article.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -93,10 +93,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: EXPAND_QUERY_SCHEMA,
                 }),
-                payload: ARTICLE_CREATE_SCHEMA,
+                payload: Article.SCHEMA.CREATE,
             },
             response: {
-                schema: ARTICLE_SCHEMA,
+                schema: Article.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -146,10 +146,10 @@ export default <ServerRoute[]>[
                     expand: EXPAND_QUERY_SCHEMA,
                     format: Schema.STRING.allow("raw", "html"),
                 }),
-                payload: ARTICLE_UPDATE_SCHEMA,
+                payload: Article.SCHEMA.UPDATE,
             },
             response: {
-                schema: ARTICLE_SCHEMA,
+                schema: Article.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

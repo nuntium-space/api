@@ -122,7 +122,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(ORGANIZATION_SCHEMA).required(),
+                schema: Schema.ARRAY(ORGANIZATION_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>

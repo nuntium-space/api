@@ -1,9 +1,12 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import marked from "marked";
 import readingTime from "reading-time";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
+import { AUTHOR_SCHEMA, NOT_EXPANDED_RESOURCE_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author, ISerializedAuthor } from "./Author";
@@ -47,19 +50,14 @@ export class Article implements ISerializable<ISerializedArticle>
 {
     private constructor
     (
-        private readonly _id: string,
+        public readonly id: string,
         private _title: string,
         private _content: string,
-        private _author: Author | INotExpandedResource,
-        private _created_at: Date,
+        public readonly author: Author | INotExpandedResource,
+        public readonly created_at: Date,
         private _updated_at: Date,
     )
     {}
-
-    public get id(): string
-    {
-        return this._id;
-    }
 
     public get title(): string
     {
@@ -71,20 +69,14 @@ export class Article implements ISerializable<ISerializedArticle>
         return this._content;
     }
 
-    public get author(): Author | INotExpandedResource
-    {
-        return this._author;
-    }
-
-    public get created_at(): Date
-    {
-        return this._created_at;
-    }
-
     public get updated_at(): Date
     {
         return this._updated_at;
     }
+
+    //////////
+    // CRUD //
+    //////////
 
     public static async create(data: ICreateArticle, author: Author, expand?: string[]): Promise<Article>
     {
@@ -249,6 +241,10 @@ export class Article implements ISerializable<ISerializedArticle>
         client.release();
     }
 
+    ///////////////
+    // UTILITIES //
+    ///////////////
+
     public static async forFeed(user: User, options: {
         limit: number,
         offset: number,
@@ -309,6 +305,10 @@ export class Article implements ISerializable<ISerializedArticle>
         return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
     }
 
+    ///////////////////
+    // SERIALIZATION //
+    ///////////////////
+
     public serialize(options?: {
         for?: User | INotExpandedResource,
         /**
@@ -350,7 +350,7 @@ export class Article implements ISerializable<ISerializedArticle>
                 expand
                     .filter(e => e.startsWith("author."))
                     .map(e => e.replace("author.", "")),
-              )
+                )
             : { id: data.author };
 
         return new Article(
@@ -362,4 +362,34 @@ export class Article implements ISerializable<ISerializedArticle>
             data.updated_at,
         );
     }
+
+    /////////////
+    // SCHEMAS //
+    /////////////
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.ARTICLE.required(),
+            title: Schema.STRING.max(50).required(),
+            content: Schema.STRING.allow("").required(),
+            reading_time: Joi.number().integer().min(0).required(),
+            author: Joi
+                .alternatives()
+                .try(
+                    AUTHOR_SCHEMA,
+                    NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.AUTHOR),
+                )
+                .required(),
+            created_at: Schema.DATETIME.required(),
+            updated_at: Schema.DATETIME.required(),
+        }),
+        CREATE: Joi.object({
+            title: Schema.STRING.max(50).required(),
+            content: Schema.STRING.required(),
+        }),
+        UPDATE: Joi.object({
+            title: Schema.STRING.max(50),
+            content: Schema.STRING,
+        }),
+    } as const;
 }

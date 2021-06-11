@@ -18,7 +18,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Joi.array().items(PAYMENT_METHOD_SCHEMA).required(),
+                schema: Schema.ARRAY(PAYMENT_METHOD_SCHEMA).required(),
             },
         },
         handler: async (request, h) =>

@@ -39,6 +39,10 @@ export class Account implements ISerializable<ISerializedAccount>
     )
     {}
 
+    //////////
+    // CRUD //
+    //////////
+
     public static async create(data: ICreateAccount): Promise<Account>
     {
         const result = await Database.pool
@@ -80,6 +84,18 @@ export class Account implements ISerializable<ISerializedAccount>
         return Account.deserialize(result.rows[0]);
     }
 
+    public async delete(): Promise<void>
+    {
+        await Database.pool.query(
+            `delete from "accounts" where "id" = $1`,
+            [ this.id ],
+        );
+    }
+
+    ///////////////
+    // UTILITIES //
+    ///////////////
+
     public static async exists(user: User, type: string): Promise<boolean>
     {
         const result = await Database.pool.query(
@@ -90,13 +106,9 @@ export class Account implements ISerializable<ISerializedAccount>
         return result.rows[0].count > 0;
     }
 
-    public async delete(): Promise<void>
-    {
-        await Database.pool.query(
-            `delete from "accounts" where "id" = $1`,
-            [ this.id ],
-        );
-    }
+    ///////////////////
+    // SERIALIZATION //
+    ///////////////////
 
     public serialize(): ISerializedAccount
     {
@@ -122,4 +134,10 @@ export class Account implements ISerializable<ISerializedAccount>
             data.external_id,
         );
     }
+
+    /////////////
+    // SCHEMAS //
+    /////////////
+
+    // TODO
 }
