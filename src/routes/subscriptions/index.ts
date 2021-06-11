@@ -3,7 +3,6 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
-import { Schema.EXPAND_QUERY, SUBSCRIPTION_CREATE_SCHEMA, SUBSCRIPTION_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
@@ -24,7 +23,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(SUBSCRIPTION_SCHEMA).required(),
+                schema: Schema.ARRAY(Subscription.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -52,7 +51,7 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: SUBSCRIPTION_CREATE_SCHEMA,
+                payload: Subscription.SCHEMA.CREATE,
             },
         },
         handler: async (request, h) =>

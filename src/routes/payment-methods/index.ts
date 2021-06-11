@@ -3,7 +3,6 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
-import { PAYMENT_METHOD_SCHEMA } from "../../config/schemas";
 import { PaymentMethod } from "../../models/PaymentMethod";
 import { Session } from "../../models/Session";
 
@@ -18,7 +17,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(PAYMENT_METHOD_SCHEMA).required(),
+                schema: Schema.ARRAY(PaymentMethod.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>

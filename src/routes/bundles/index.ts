@@ -2,7 +2,6 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { BUNDLE_CREATE_SCHEMA, BUNDLE_SCHEMA, BUNDLE_UPDATE_SCHEMA, Schema.EXPAND_QUERY } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
@@ -22,7 +21,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: BUNDLE_SCHEMA,
+                schema: Bundle.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -47,7 +46,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(BUNDLE_SCHEMA).required(),
+                schema: Schema.ARRAY(Bundle.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -79,7 +78,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(BUNDLE_SCHEMA).required(),
+                schema: Schema.ARRAY(Bundle.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -104,10 +103,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: BUNDLE_CREATE_SCHEMA,
+                payload: Bundle.SCHEMA.CREATE,
             },
             response: {
-                schema: BUNDLE_SCHEMA,
+                schema: Bundle.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -138,10 +137,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.BUNDLE.required(),
                 }),
-                payload: BUNDLE_UPDATE_SCHEMA,
+                payload: Bundle.SCHEMA.UPDATE,
             },
             response: {
-                schema: BUNDLE_SCHEMA,
+                schema: Bundle.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

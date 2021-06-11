@@ -3,7 +3,6 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
-import { ORGANIZATION_CREATE_SCHEMA, ORGANIZATION_SCHEMA, ORGANIZATION_UPDATE_SCHEMA } from "../../config/schemas";
 import { Organization } from "../../models/Organization";
 import { Session } from "../../models/Session";
 
@@ -18,7 +17,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: ORGANIZATION_SCHEMA,
+                schema: Organization.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -122,7 +121,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(ORGANIZATION_SCHEMA).required(),
+                schema: Schema.ARRAY(Organization.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -144,10 +143,10 @@ export default <ServerRoute[]>[
         path: "/organizations",
         options: {
             validate: {
-                payload: ORGANIZATION_CREATE_SCHEMA,
+                payload: Organization.SCHEMA.CREATE,
             },
             response: {
-                schema: ORGANIZATION_SCHEMA,
+                schema: Organization.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -167,10 +166,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.ORGANIZATION.required(),
                 }),
-                payload: ORGANIZATION_UPDATE_SCHEMA,
+                payload: Organization.SCHEMA.UPDATE,
             },
             response: {
-                schema: ORGANIZATION_SCHEMA,
+                schema: Organization.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

@@ -4,7 +4,6 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { PUBLISHER_CREATE_SCHEMA, PUBLISHER_SCHEMA, PUBLISHER_UPDATE_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
@@ -25,7 +24,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: PUBLISHER_SCHEMA,
+                schema: Publisher.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -88,7 +87,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(PUBLISHER_SCHEMA).required(),
+                schema: Schema.ARRAY(Publisher.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -115,7 +114,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(PUBLISHER_SCHEMA).required(),
+                schema: Schema.ARRAY(Publisher.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -194,10 +193,10 @@ export default <ServerRoute[]>[
         path: "/organizations/{id}/publishers",
         options: {
             validate: {
-                payload: PUBLISHER_CREATE_SCHEMA,
+                payload: Publisher.SCHEMA.CREATE,
             },
             response: {
-                schema: PUBLISHER_SCHEMA,
+                schema: Publisher.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -282,10 +281,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.PUBLISHER.required(),
                 }),
-                payload: PUBLISHER_UPDATE_SCHEMA,
+                payload: Publisher.SCHEMA.UPDATE,
             },
             response: {
-                schema: PUBLISHER_SCHEMA,
+                schema: Publisher.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

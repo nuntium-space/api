@@ -2,7 +2,6 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { COMMENT_CREATE_SCHEMA, COMMENT_SCHEMA, COMMENT_UPDATE_SCHEMA, Schema.EXPAND_QUERY } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Comment } from "../../models/Comment";
 import { Session } from "../../models/Session";
@@ -21,7 +20,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: COMMENT_SCHEMA,
+                schema: Comment.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -47,7 +46,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(COMMENT_SCHEMA).required(),
+                schema: Schema.ARRAY(Comment.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -75,10 +74,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: COMMENT_CREATE_SCHEMA,
+                payload: Comment.SCHEMA.CREATE,
             },
             response: {
-                schema: COMMENT_SCHEMA,
+                schema: Comment.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -105,10 +104,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.COMMENT.required(),
                 }),
-                payload: COMMENT_UPDATE_SCHEMA,
+                payload: Comment.SCHEMA.UPDATE,
             },
             response: {
-                schema: COMMENT_SCHEMA,
+                schema: Comment.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

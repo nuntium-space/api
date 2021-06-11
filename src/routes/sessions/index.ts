@@ -1,5 +1,4 @@
 import { ServerRoute } from "@hapi/hapi";
-import { SESSION_SCHEMA } from "../../config/schemas";
 import { Session } from "../../models/Session";
 
 export default <ServerRoute[]>[
@@ -8,7 +7,7 @@ export default <ServerRoute[]>[
         path: "/sessions/current",
         options: {
             response: {
-                schema: SESSION_SCHEMA,
+                schema: Session.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
