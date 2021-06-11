@@ -324,7 +324,8 @@ export default <ServerRoute[]>[
             response: {
                 schema: Joi.object({
                     url: Schema.STRING.required(),
-            })},
+                }),
+            },
         },
         handler: async (request, h) =>
         {
