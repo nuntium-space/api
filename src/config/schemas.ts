@@ -13,7 +13,7 @@ export const CURRENCY_SCHEMA = Schema.STRING.valid(...Config.CURRENCIES.map(c =>
 
 export const LANGUAGE_SCHEMA = Schema.STRING.valid(...Config.LANGUAGES.map(c => c.id));
 
-export const NOT_EXPANDED_RESOURCE_SCHEMA = (prefix: string) => Joi.object({ id: Schema.STRING.required() }); // TODO: Update this
+export const NOT_EXPANDED_RESOURCE_SCHEMA = (schema: Joi.Schema) => Joi.object({ id: schema });
 
 export const EXPAND_QUERY_SCHEMA = Joi.array().items(Schema.STRING);
 
@@ -67,14 +67,14 @@ export const AUTHOR_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
             )
             .required(),
         publisher: Joi
             .alternatives()
             .try(
                 PUBLISHER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.PUBLISHER),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.PUBLISHER),
             )
             .required(),
     });
@@ -89,7 +89,7 @@ export const ARTICLE_SCHEMA = Joi
             .alternatives()
             .try(
                 AUTHOR_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.AUTHOR),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.AUTHOR),
             )
             .required(),
         created_at: Schema.DATETIME.required(),
@@ -104,14 +104,14 @@ export const COMMENT_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
             )
             .required(),
         article: Joi
             .alternatives()
             .try(
                 ARTICLE_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ARTICLE),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.ARTICLE),
             )
             .required(),
         // Recursive schema
@@ -119,7 +119,7 @@ export const COMMENT_SCHEMA = Joi
             .alternatives()
             .try(
                 Joi.link("..."),
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.COMMENT),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.COMMENT),
                 null,
             )
             .required(),
@@ -136,7 +136,7 @@ export const BUNDLE_SCHEMA = Joi
             .alternatives()
             .try(
                 ORGANIZATION_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.ORGANIZATION),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.ORGANIZATION),
             )
             .required(),
         active: Joi.boolean().required(),
@@ -151,7 +151,7 @@ export const PRICE_SCHEMA = Joi
             .alternatives()
             .try(
                 BUNDLE_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.BUNDLE),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.BUNDLE),
             )
             .required(),
         active: Joi.boolean().required(),
@@ -165,14 +165,14 @@ export const SUBSCRIPTION_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
             )
             .required(),
         price: Joi
             .alternatives()
             .try(
                 PRICE_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.PRICE),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.PRICE),
             )
             .required(),
         current_period_end: Schema.DATETIME.required(),
@@ -189,7 +189,7 @@ export const PAYMENT_METHOD_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Config.ID_PREFIXES.USER),
+                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
             )
             .required(),
         __metadata: Joi.object({
