@@ -3,7 +3,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import path from "path";
 import Joi from "joi";
-import { LANGUAGE_SCHEMA } from "../../config/schemas";
+import { Schema } from "../../config/Schema";
 
 export default <ServerRoute[]>[
     {
@@ -13,7 +13,7 @@ export default <ServerRoute[]>[
             auth: false,
             validate: {
                 params: Joi.object({
-                    lang: LANGUAGE_SCHEMA.required(),
+                    lang: Schema.LANGUAGE.required(),
                 }),
             },
         },

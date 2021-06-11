@@ -3,7 +3,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
-import { USER_SCHEMA, USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA, USER_UPDATE_SCHEMA } from "../../config/schemas";
+import { USER_SETTINGS_SCHEMA, USER_SETTINGS_UPDATE_SCHEMA } from "../../config/schemas";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
 
@@ -18,7 +18,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: USER_SCHEMA,
+                schema: User.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -108,10 +108,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.USER.required(),
                 }),
-                payload: USER_UPDATE_SCHEMA,
+                payload: User.SCHEMA.UPDATE,
             },
             response: {
-                schema: USER_SCHEMA,
+                schema: User.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

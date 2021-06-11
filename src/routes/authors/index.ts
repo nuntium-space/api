@@ -2,7 +2,6 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { AUTHOR_CREATE_SCHEMA, AUTHOR_SCHEMA, Schema.EXPAND_QUERY } from "../../config/schemas";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
@@ -21,7 +20,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: AUTHOR_SCHEMA,
+                schema: Author.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -46,7 +45,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(AUTHOR_SCHEMA).required(),
+                schema: Schema.ARRAY(Author.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -79,7 +78,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(AUTHOR_SCHEMA).required(),
+                schema: Schema.ARRAY(Author.SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -107,10 +106,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: AUTHOR_CREATE_SCHEMA,
+                payload: Author.SCHEMA.CREATE,
             },
             response: {
-                schema: AUTHOR_SCHEMA,
+                schema: Author.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

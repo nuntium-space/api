@@ -4,7 +4,6 @@ import { ServerRoute } from "@hapi/hapi";
 import sendgrid from "@sendgrid/mail";
 import Joi from "joi";
 import { Config } from "../../config/Config";
-import { SESSION_CREATE_SCHEMA, SESSION_SCHEMA } from "../../config/schemas";
 import { Account } from "../../models/Account";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
@@ -73,7 +72,7 @@ export default <ServerRoute[]>[
             },
             response: {
                 schema: Joi.object({
-                    session: SESSION_SCHEMA.required(),
+                    session: Session.SCHEMA.OBJ.required(),
                 }),
             },
         },
@@ -116,7 +115,7 @@ export default <ServerRoute[]>[
         options: {
             auth: false,
             validate: {
-                payload: SESSION_CREATE_SCHEMA,
+                payload: Session.SCHEMA.CREATE,
             },
             response: {
                 schema: Joi.object({
