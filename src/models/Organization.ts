@@ -4,7 +4,6 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Schema } from "../config/Schema";
-import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedUser, User } from "./User";
@@ -224,7 +223,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
         OBJ: Joi.object({
             id: Schema.ID.ORGANIZATION.required(),
             name: Schema.STRING.max(50).required(),
-            owner: USER_SCHEMA.required(),
+            owner: User.SCHEMA.OBJ.required(),
             stripe_account_enabled: Joi.boolean().required(),
         }),
         CREATE: Joi.object({

@@ -3,7 +3,6 @@ import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Schema } from "../config/Schema";
-import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import { ISerializedPrice, Price } from "./Price";
 import { ISerializedUser, User } from "./User";
@@ -164,7 +163,7 @@ export class Subscription implements ISerializable<ISerializedSubscription>
             user: Joi
                 .alternatives()
                 .try(
-                    USER_SCHEMA,
+                    User.SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
                 )
                 .required(),
