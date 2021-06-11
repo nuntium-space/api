@@ -9,6 +9,8 @@ import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { ISerializedOrganization, Organization } from "./Organization";
 import { User } from "./User";
+import Joi from "joi";
+import { Schema } from "../config/Schema";
 
 interface IDatabasePublisher
 {
@@ -255,4 +257,27 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             data.dns_txt_value,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.PUBLISHER.required(),
+            name: Schema.STRING.max(50).required(),
+            url: Schema.URL.required(),
+            organization: Organization.SCHEMA.OBJ.required(),
+            verified: Joi.boolean().required(),
+            imageUrl: Schema.STRING.allow(null).required(),
+            __metadata: Joi.object({
+                is_author: Joi.boolean().required(),
+                is_subscribed: Joi.boolean().required(),
+            }),
+        }),
+        CREATE: Joi.object({
+            name: Schema.STRING.max(50).required(),
+            url: Schema.URL.required(),
+        }),
+        UPDATE: Joi.object({
+            name: Schema.STRING.max(50),
+            url: Schema.URL,
+        }),
+    } as const;
 }

@@ -4,7 +4,6 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Schema } from "../config/Schema";
-import { ORGANIZATION_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedOrganization, Organization } from "./Organization";
@@ -333,7 +332,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
             organization: Joi
                 .alternatives()
                 .try(
-                    ORGANIZATION_SCHEMA,
+                    Organization.SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
                 )
                 .required(),

@@ -4,7 +4,6 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Schema } from "../config/Schema";
-import { USER_SCHEMA, PUBLISHER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedPublisher, Publisher } from "./Publisher";
@@ -163,14 +162,14 @@ export class Author implements ISerializable<ISerializedAuthor>
             user: Joi
                 .alternatives()
                 .try(
-                    USER_SCHEMA,
+                    User.SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
                 )
                 .required(),
             publisher: Joi
                 .alternatives()
                 .try(
-                    PUBLISHER_SCHEMA,
+                    Publisher.SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
                 )
                 .required(),

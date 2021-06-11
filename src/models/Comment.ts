@@ -4,7 +4,6 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Schema } from "../config/Schema";
-import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Article, ISerializedArticle } from "./Article";
@@ -296,7 +295,7 @@ export class Comment implements ISerializable<ISerializedComment>
             user: Joi
                 .alternatives()
                 .try(
-                    USER_SCHEMA,
+                    User.SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
                 )
                 .required(),

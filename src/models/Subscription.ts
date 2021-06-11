@@ -1,6 +1,9 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
+import { Schema } from "../config/Schema";
+import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import { ISerializedPrice, Price } from "./Price";
 import { ISerializedUser, User } from "./User";
@@ -153,4 +156,31 @@ export class Subscription implements ISerializable<ISerializedSubscription>
             data.stripe_subscription_id,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.SUBSCRIPTION.required(),
+            status: Schema.STRING.required(),
+            user: Joi
+                .alternatives()
+                .try(
+                    USER_SCHEMA,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
+                )
+                .required(),
+            price: Joi
+                .alternatives()
+                .try(
+                    Price.SCHEMA.OBJ,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PRICE),
+                )
+                .required(),
+            current_period_end: Schema.DATETIME.required(),
+            cancel_at_period_end: Joi.boolean().required(),
+            deleted: Joi.boolean().required(),
+        }),
+        CREATE: Joi.object({
+            price: Schema.ID.PRICE.required(),
+        }),
+    } as const;
 }

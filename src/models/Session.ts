@@ -1,7 +1,10 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
+import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedUser, User } from "./User";
@@ -122,4 +125,15 @@ export class Session implements ISerializable<ISerializedSession>
             data.expires_at,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.SESSION.required(),
+            user: USER_SCHEMA.required(),
+            expires_at: Schema.DATETIME.required(),
+        }),
+        CREATE: Joi.object({
+            email: Schema.EMAIL.required(),
+        }),
+    } as const;
 }

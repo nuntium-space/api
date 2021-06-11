@@ -1,7 +1,9 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
@@ -570,4 +572,17 @@ export class User implements ISerializable<ISerializedUser>
             data.stripe_customer_id,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.USER.required(),
+            username: Schema.STRING.max(30).allow(null).required(),
+            email: Schema.EMAIL,
+            has_default_payment_method: Joi.boolean(),
+        }),
+        UPDATE: Joi.object({
+            username: Schema.STRING.max(30),
+            email: Schema.EMAIL,
+        }),
+    } as const;
 }

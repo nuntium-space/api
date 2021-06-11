@@ -1,7 +1,10 @@
 import Boom from "@hapi/boom";
+import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Schema } from "../config/Schema";
+import { USER_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { ISerializedUser, User } from "./User";
@@ -216,4 +219,19 @@ export class Organization implements ISerializable<ISerializedOrganization>
             data.stripe_account_enabled,
         );
     }
+
+    public static readonly SCHEMA = {
+        OBJ: Joi.object({
+            id: Schema.ID.ORGANIZATION.required(),
+            name: Schema.STRING.max(50).required(),
+            owner: USER_SCHEMA.required(),
+            stripe_account_enabled: Joi.boolean().required(),
+        }),
+        CREATE: Joi.object({
+            name: Schema.STRING.max(50).required(),
+        }),
+        UPDATE: Joi.object({
+            name: Schema.STRING.max(50),
+        }),
+    } as const;
 }

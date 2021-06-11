@@ -6,7 +6,6 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Schema } from "../config/Schema";
-import { AUTHOR_SCHEMA } from "../config/schemas";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author, ISerializedAuthor } from "./Author";
@@ -376,7 +375,7 @@ export class Article implements ISerializable<ISerializedArticle>
             author: Joi
                 .alternatives()
                 .try(
-                    AUTHOR_SCHEMA,
+                    Author.SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR),
                 )
                 .required(),
