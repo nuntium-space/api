@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { AUTHOR_CREATE_SCHEMA, AUTHOR_SCHEMA, EXPAND_QUERY_SCHEMA } from "../../config/schemas";
+import { AUTHOR_CREATE_SCHEMA, AUTHOR_SCHEMA, Schema.EXPAND_QUERY } from "../../config/schemas";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
@@ -17,7 +17,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.AUTHOR.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -42,7 +42,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.PUBLISHER.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -75,7 +75,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.USER.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -105,7 +105,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.PUBLISHER.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
                 payload: AUTHOR_CREATE_SCHEMA,
             },

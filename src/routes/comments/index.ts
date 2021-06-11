@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { COMMENT_CREATE_SCHEMA, COMMENT_SCHEMA, COMMENT_UPDATE_SCHEMA, EXPAND_QUERY_SCHEMA } from "../../config/schemas";
+import { COMMENT_CREATE_SCHEMA, COMMENT_SCHEMA, COMMENT_UPDATE_SCHEMA, Schema.EXPAND_QUERY } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Comment } from "../../models/Comment";
 import { Session } from "../../models/Session";
@@ -17,7 +17,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.COMMENT.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -43,7 +43,7 @@ export default <ServerRoute[]>[
                 }),
                 query: Joi.object({
                     parent: Schema.ID.COMMENT,
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -73,7 +73,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
                 payload: COMMENT_CREATE_SCHEMA,
             },

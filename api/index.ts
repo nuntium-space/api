@@ -7,7 +7,6 @@ import Hapi from "@hapi/hapi";
 import Joi, { ValidationError } from "joi";
 import qs from "qs";
 import { Config } from "../src/config/Config";
-import { EXPAND_QUERY_SCHEMA } from "../src/config/schemas";
 import { Article } from "../src/models/Article";
 import { Session } from "../src/models/Session";
 import Database from "../src/utilities/Database";
@@ -182,7 +181,7 @@ const init = async () =>
                     query: Schema.STRING.required(),
                     limit: Joi.number().integer().min(0).max(30).required(),
                     offset: Joi.number().integer().min(0).required(),
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -228,7 +227,7 @@ const init = async () =>
                 query: Joi.object({
                     limit: Joi.number().integer().min(0).max(30).required(),
                     offset: Joi.number().integer().min(0).required(),
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {

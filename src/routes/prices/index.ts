@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { EXPAND_QUERY_SCHEMA, PRICE_CREATE_SCHEMA, PRICE_SCHEMA } from "../../config/schemas";
+import { Schema.EXPAND_QUERY, PRICE_CREATE_SCHEMA, PRICE_SCHEMA } from "../../config/schemas";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
@@ -18,7 +18,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.PRICE.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -44,7 +44,7 @@ export default <ServerRoute[]>[
                 }),
                 query: Joi.object({
                     active: Joi.boolean(),
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -74,7 +74,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.BUNDLE.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
                 payload: PRICE_CREATE_SCHEMA,
             },

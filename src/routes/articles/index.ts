@@ -2,7 +2,6 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
-import { EXPAND_QUERY_SCHEMA } from "../../config/schemas";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
@@ -18,7 +17,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                     format: Schema.STRING.allow("raw", "html"),
                 }),
             },
@@ -59,7 +58,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.PUBLISHER.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
             },
             response: {
@@ -91,7 +90,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.AUTHOR.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                 }),
                 payload: Article.SCHEMA.CREATE,
             },
@@ -143,7 +142,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.ARTICLE.required(),
                 }),
                 query: Joi.object({
-                    expand: EXPAND_QUERY_SCHEMA,
+                    expand: Schema.EXPAND_QUERY,
                     format: Schema.STRING.allow("raw", "html"),
                 }),
                 payload: Article.SCHEMA.UPDATE,

@@ -36,7 +36,8 @@ export class Schema
 
     public static readonly FISCAL_NUMBER = Schema.STRING.uppercase().pattern(/^[A-Z]{6}[0-9]{2}[ABCDEHLMPRST][0-9]{2}[A-Z][0-9]{3}[A-Z]$/);
 
-    public static readonly MONEY = Joi.number().precision(2);
+    public static readonly MONEY = Joi.number().integer().min(0);
+    public static readonly CURRENCY = Schema.STRING.valid(...Config.CURRENCIES.map(_ => _.name)).lowercase();
 
     public static readonly LATITUDE = Joi.number().min(-90).max(90);
     public static readonly LONGITUDE = Joi.number().min(-180).max(180);
@@ -50,4 +51,9 @@ export class Schema
     public static readonly BOOLEAN = Joi.boolean();
 
     public static readonly NULLABLE = (type: BaseJoi.Schema) => type.allow(null);
+
+    public static readonly LANGUAGE = Schema.STRING.valid(...Config.LANGUAGES.map(_ => _.id));
+
+    public static readonly EXPAND_QUERY = Schema.ARRAY(Schema.STRING);
+    public static readonly NOT_EXPANDED_RESOURCE = (schema: BaseJoi.StringSchema) => Joi.object({ id: schema.required() });
 }

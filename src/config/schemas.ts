@@ -1,22 +1,6 @@
 import Joi from "joi";
 import { Article } from "../models/Article";
-import { Config } from "./Config";
 import { Schema } from "./Schema";
-
-/*
----------------------
-MISCELLANEOUS SCHEMAS
----------------------
-*/
-
-export const MONEY_SCHEMA = Joi.number().integer().min(0);
-export const CURRENCY_SCHEMA = Schema.STRING.valid(...Config.CURRENCIES.map(c => c.name)).lowercase();
-
-export const LANGUAGE_SCHEMA = Schema.STRING.valid(...Config.LANGUAGES.map(c => c.id));
-
-export const NOT_EXPANDED_RESOURCE_SCHEMA = (schema: Joi.Schema) => Joi.object({ id: schema });
-
-export const EXPAND_QUERY_SCHEMA = Schema.ARRAY(Schema.STRING);
 
 /*
 ----------------
@@ -68,14 +52,14 @@ export const AUTHOR_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
             )
             .required(),
         publisher: Joi
             .alternatives()
             .try(
                 PUBLISHER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.PUBLISHER),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
             )
             .required(),
     });
@@ -88,14 +72,14 @@ export const COMMENT_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
             )
             .required(),
         article: Joi
             .alternatives()
             .try(
                 Article.SCHEMA.OBJ,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.ARTICLE),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
             )
             .required(),
         // Recursive schema
@@ -103,7 +87,7 @@ export const COMMENT_SCHEMA = Joi
             .alternatives()
             .try(
                 Joi.link("..."),
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.COMMENT),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.COMMENT),
                 null,
             )
             .required(),
@@ -120,7 +104,7 @@ export const BUNDLE_SCHEMA = Joi
             .alternatives()
             .try(
                 ORGANIZATION_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.ORGANIZATION),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
             )
             .required(),
         active: Joi.boolean().required(),
@@ -129,13 +113,13 @@ export const BUNDLE_SCHEMA = Joi
 export const PRICE_SCHEMA = Joi
     .object({
         id: Schema.ID.PRICE.required(),
-        amount: MONEY_SCHEMA.required(),
-        currency: CURRENCY_SCHEMA.required(),
+        amount: Schema.MONEY.required(),
+        currency: Schema.CURRENCY.required(),
         bundle: Joi
             .alternatives()
             .try(
                 BUNDLE_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.BUNDLE),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.BUNDLE),
             )
             .required(),
         active: Joi.boolean().required(),
@@ -149,14 +133,14 @@ export const SUBSCRIPTION_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
             )
             .required(),
         price: Joi
             .alternatives()
             .try(
                 PRICE_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.PRICE),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PRICE),
             )
             .required(),
         current_period_end: Schema.DATETIME.required(),
@@ -173,7 +157,7 @@ export const PAYMENT_METHOD_SCHEMA = Joi
             .alternatives()
             .try(
                 USER_SCHEMA,
-                NOT_EXPANDED_RESOURCE_SCHEMA(Schema.ID.USER),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
             )
             .required(),
         __metadata: Joi.object({
@@ -183,7 +167,7 @@ export const PAYMENT_METHOD_SCHEMA = Joi
 
 export const USER_SETTINGS_SCHEMA = Joi
     .object({
-        language: LANGUAGE_SCHEMA.allow(null).required(),
+        language: Schema.LANGUAGE.allow(null).required(),
     });
 
 /*
@@ -253,8 +237,8 @@ export const BUNDLE_UPDATE_SCHEMA = Joi
 
 export const PRICE_CREATE_SCHEMA = Joi
     .object({
-        amount: MONEY_SCHEMA.required(),
-        currency: CURRENCY_SCHEMA.required(),
+        amount: Schema.MONEY.required(),
+        currency: Schema.CURRENCY.required(),
     });
 
 export const SUBSCRIPTION_CREATE_SCHEMA = Joi
@@ -264,5 +248,5 @@ export const SUBSCRIPTION_CREATE_SCHEMA = Joi
 
 export const USER_SETTINGS_UPDATE_SCHEMA = Joi
     .object({
-        language: LANGUAGE_SCHEMA,
+        language: Schema.LANGUAGE,
     });
