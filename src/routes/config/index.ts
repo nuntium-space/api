@@ -1,6 +1,5 @@
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
-import { CURRENCY_SCHEMA, LANGUAGE_SCHEMA, MONEY_SCHEMA } from "../../config/schemas";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 
@@ -11,8 +10,8 @@ export default <ServerRoute[]>[
         options: {
             response: {
                 schema: Schema.ARRAY(Joi.object({
-                    name: CURRENCY_SCHEMA.required(),
-                    min: MONEY_SCHEMA.required(),
+                    name: Schema.CURRENCY.required(),
+                    min: Schema.MONEY.required(),
                 })).required(),
             },
         },
@@ -27,7 +26,7 @@ export default <ServerRoute[]>[
         options: {
             response: {
                 schema: Schema.ARRAY(Joi.object({
-                    id: LANGUAGE_SCHEMA.required(),
+                    id: Schema.LANGUAGE.required(),
                     display_name: Schema.STRING.required(),
                 })).required(),
             },
