@@ -115,6 +115,32 @@ export class PaymentMethod implements ISerializable<ISerializedPaymentMethod>
         return Promise.all(result.rows.map(row => PaymentMethod.deserialize(row, expand)));
     }
 
+    public async setAsDefault(): Promise<void>
+    {
+        let user: User;
+
+        if (!(this.user instanceof User))
+        {
+            user = await User.retrieve(this.user.id);
+        }
+        else
+        {
+            user = this.user;
+        }
+
+        await user.removeDefaultPaymentMethod();
+
+        await Database.pool
+            .query(
+                `insert into "default_payment_methods" ("user", "payment_method") values ($1, $2)`,
+                [ this.user.id, this.id ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badImplementation();
+            });
+    }
+
     public serialize(options?: {
         for?: User | INotExpandedResource,
     }): ISerializedPaymentMethod

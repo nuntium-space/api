@@ -22,7 +22,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Article.SCHEMA,
+                schema: Article.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

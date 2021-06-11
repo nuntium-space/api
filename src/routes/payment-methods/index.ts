@@ -31,10 +31,12 @@ export default <ServerRoute[]>[
 
             const paymentMethods = await PaymentMethod.forUser(authenticatedUser);
 
+            const defaultPaymentMethod = await PaymentMethod.retrieveDefaultForUser(authenticatedUser.id);
+
             return paymentMethods.map(paymentMethod => ({
                 ...paymentMethod.serialize({ for: authenticatedUser }),
                 __metadata: {
-                    is_default: authenticatedUser.default_payment_method?.id === paymentMethod.id,
+                    is_default: defaultPaymentMethod?.id === paymentMethod.id,
                 },
             }));
         },
@@ -151,13 +153,15 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
+            const defaultPaymentMethod = await PaymentMethod.retrieveDefaultForUser(authenticatedUser.id);
+
             /**
              * The default payment method cannot be deleted if
              * the user has at least one active subscription
              */
             if
             (
-                authenticatedUser.default_payment_method?.id === paymentMethod.id
+                defaultPaymentMethod?.id === paymentMethod.id
                 && await authenticatedUser.hasActiveSubscriptions()
             )
             {

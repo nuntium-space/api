@@ -3,6 +3,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Stripe from "stripe";
 import { Config } from "../../config/Config";
 import { Organization } from "../../models/Organization";
+import { PaymentMethod } from "../../models/PaymentMethod";
 import { Subscription } from "../../models/Subscription";
 import { User } from "../../models/User";
 import Database from "../../utilities/Database";
@@ -87,6 +88,8 @@ export default <ServerRoute[]>[
 
                     await user.update({ email: customer.email });
 
+                    let paymentMethod: PaymentMethod | null = null;
+
                     if (customer.invoice_settings.default_payment_method !== null)
                     {
                         if (typeof customer.invoice_settings.default_payment_method !== "string")
@@ -94,7 +97,9 @@ export default <ServerRoute[]>[
                             throw Boom.badImplementation();
                         }
 
-                        await user.setDefaultPaymentMethod(customer.invoice_settings.default_payment_method);
+                        paymentMethod = await PaymentMethod.retrieveWithStripeId(customer.invoice_settings.default_payment_method);
+
+                        await paymentMethod.setAsDefault();
                     }
                     else
                     {

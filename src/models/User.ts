@@ -7,7 +7,6 @@ import { Schema } from "../config/Schema";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
-import { PaymentMethod } from "./PaymentMethod";
 import { Publisher } from "./Publisher";
 
 interface IDatabaseUser
@@ -55,7 +54,6 @@ export class User implements ISerializable<ISerializedUser>
         public readonly id: string,
         private _username: string | null,
         private _email: string,
-        public readonly default_payment_method: PaymentMethod | null,
         public readonly stripe_customer_id: string | null,
     )
     {}
@@ -269,23 +267,6 @@ export class User implements ISerializable<ISerializedUser>
             .query(
                 `delete from "default_payment_methods" where "user" = $1`,
                 [ this.id ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badImplementation();
-            });
-    }
-
-    public async setDefaultPaymentMethod(stripePaymentMethodId: string): Promise<void>
-    {
-        const paymentMethod = await PaymentMethod.retrieveWithStripeId(stripePaymentMethodId);
-
-        await this.removeDefaultPaymentMethod();
-
-        await Database.pool
-            .query(
-                `insert into "default_payment_methods" ("user", "payment_method") values ($1, $2)`,
-                [ this.id, paymentMethod.id ],
             )
             .catch(() =>
             {
@@ -553,7 +534,6 @@ export class User implements ISerializable<ISerializedUser>
             response = {
                 ...response,
                 email: this.email,
-                has_default_payment_method: this.default_payment_method !== null
             };
         }
 
@@ -562,13 +542,10 @@ export class User implements ISerializable<ISerializedUser>
 
     private static async deserialize(data: IDatabaseUser): Promise<User>
     {
-        const paymentMethod = await PaymentMethod.retrieveDefaultForUser(data.id);
-
         return new User(
             data.id,
             data.username,
             data.email,
-            paymentMethod,
             data.stripe_customer_id,
         );
     }
@@ -578,7 +555,6 @@ export class User implements ISerializable<ISerializedUser>
             id: Schema.ID.USER.required(),
             username: Schema.STRING.max(30).allow(null).required(),
             email: Schema.EMAIL.required(),
-            has_default_payment_method: Joi.boolean().required(),
         }),
         UPDATE: Joi.object({
             username: Schema.STRING.max(30),
