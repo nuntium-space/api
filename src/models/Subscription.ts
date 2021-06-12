@@ -175,8 +175,8 @@ export class Subscription implements ISerializable<ISerializedSubscription>
                 )
                 .required(),
             current_period_end: Schema.DATETIME.required(),
-            cancel_at_period_end: Joi.boolean().required(),
-            deleted: Joi.boolean().required(),
+            cancel_at_period_end: Schema.BOOLEAN.required(),
+            deleted: Schema.BOOLEAN.required(),
         }),
         CREATE: Joi.object({
             price: Schema.ID.PRICE.required(),

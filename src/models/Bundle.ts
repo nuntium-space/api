@@ -336,13 +336,14 @@ export class Bundle implements ISerializable<ISerializedBundle>
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
                 )
                 .required(),
-            active: Joi.boolean().required(),
+            active: Schema.BOOLEAN.required(),
         }),
         CREATE: Joi.object({
             name: Schema.STRING.max(50).required(),
         }),
         UPDATE: Joi.object({
             name: Schema.STRING.max(50),
+            active: Schema.BOOLEAN.optional(),
         }),
     } as const;
 }

@@ -224,7 +224,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
             id: Schema.ID.ORGANIZATION.required(),
             name: Schema.STRING.max(50).required(),
             owner: User.SCHEMA.OBJ.required(),
-            stripe_account_enabled: Joi.boolean().required(),
+            stripe_account_enabled: Schema.BOOLEAN.required(),
         }),
         CREATE: Joi.object({
             name: Schema.STRING.max(50).required(),

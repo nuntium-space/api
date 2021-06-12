@@ -264,11 +264,11 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             name: Schema.STRING.max(50).required(),
             url: Schema.URL.required(),
             organization: Organization.SCHEMA.OBJ.required(),
-            verified: Joi.boolean().required(),
+            verified: Schema.BOOLEAN.required(),
             imageUrl: Schema.STRING.allow(null).required(),
             __metadata: Joi.object({
-                is_author: Joi.boolean().required(),
-                is_subscribed: Joi.boolean().required(),
+                is_author: Schema.BOOLEAN.required(),
+                is_subscribed: Schema.BOOLEAN.required(),
             }),
         }),
         CREATE: Joi.object({

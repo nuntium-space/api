@@ -246,7 +246,7 @@ export class Price implements ISerializable<ISerializedPrice>
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.BUNDLE),
                 )
                 .required(),
-            active: Joi.boolean().required(),
+            active: Schema.BOOLEAN.required(),
         }),
         CREATE: Joi.object({
             amount: Schema.MONEY.required(),

@@ -42,7 +42,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.BUNDLE.required(),
                 }),
                 query: Joi.object({
-                    active: Joi.boolean(),
+                    active: Schema.BOOLEAN,
                     expand: Schema.EXPAND_QUERY,
                 }),
             },

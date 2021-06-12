@@ -183,7 +183,7 @@ export class PaymentMethod implements ISerializable<ISerializedPaymentMethod>
                 )
                 .required(),
             __metadata: Joi.object({
-                is_default: Joi.boolean().required(),
+                is_default: Schema.BOOLEAN.required(),
             }),
         }),
     } as const;
