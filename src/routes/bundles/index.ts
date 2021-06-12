@@ -164,35 +164,4 @@ export default <ServerRoute[]>[
             return bundle.serialize({ for: authenticatedUser });
         },
     },
-    {
-        method: "DELETE",
-        path: "/bundles/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.BUNDLE.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const bundle = await Bundle.retrieve(request.params.id, [ "organization" ]);
-
-            if (!(bundle.organization instanceof Organization))
-            {
-                throw Boom.badImplementation();
-            }
-
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
-
-            if (bundle.organization.owner.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await bundle.delete();
-
-            return h.response();
-        },
-    },
 ];

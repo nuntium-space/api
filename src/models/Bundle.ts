@@ -27,6 +27,7 @@ interface ICreateBundle
 interface IUpdateBundle
 {
     name?: string,
+    active?: boolean,
 }
 
 export interface ISerializedBundle
@@ -44,7 +45,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
         public readonly id: string,
         private _name: string,
         public readonly organization: Organization | INotExpandedResource,
-        public readonly active: boolean,
+        public _active: boolean,
         public readonly stripe_product_id: string | null,
     )
     {}
@@ -52,6 +53,11 @@ export class Bundle implements ISerializable<ISerializedBundle>
     public get name(): string
     {
         return this._name;
+    }
+
+    public get active(): boolean
+    {
+        return this._active;
     }
 
     public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
@@ -146,6 +152,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
         }
 
         this._name = data.name ?? this.name;
+        this._active = data.active ?? this.active;
 
         const client = await Database.pool.connect();
 
@@ -153,8 +160,15 @@ export class Bundle implements ISerializable<ISerializedBundle>
 
         await client
             .query(
-                `update "bundles" set "name" = $1 where "id" = $2`,
-                [ this.name, this.id ],
+                `
+                update "bundles"
+                set
+                    "name" = $1,
+                    "active" = $2
+                where
+                    "id" = $3
+                `,
+                [ this.name, this.active, this.id ],
             )
             .catch(async () =>
             {
@@ -168,41 +182,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
                 this.stripe_product_id,
                 {
                     name: this.name,
-                },
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badRequest();
-            });
-
-        await client.query("commit");
-
-        client.release();
-    }
-
-    public async delete(): Promise<void>
-    {
-        if (!this.stripe_product_id)
-        {
-            throw Boom.badImplementation();
-        }
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        await client.query(
-            `update "bundles" set "active" = $1 where "id" = $2`,
-            [ false, this.id ],
-        );
-
-        await Config.STRIPE.products
-            .update(
-                this.stripe_product_id,
-                {
-                    active: false,
+                    active: this.active,
                 },
             )
             .catch(async () =>
