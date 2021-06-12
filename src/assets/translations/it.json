@@ -66,18 +66,6 @@
                 "empty": "Non hai nessun editore da aggiungere"
             },
             "empty": "Non hai aggiunto nessun editore"
-        },
-        "subscribe": {
-            "__title": "Abbonati",
-            "billing_period": {
-                "month": "mese"
-            },
-            "choose_option": "Scegli un'opzione",
-            "no_pm": {
-                "msg": "Prima di abbonarti a <b>{{ BUNDLE_NAME }}</b> devi impostare un metodo di pagamento predefinito",
-                "go_to_settings": "Vai alle Impostazioni"
-            },
-            "submit": "Abbonati"
         }
     },
     "components": {
