@@ -25,6 +25,11 @@ interface ICreatePrice
     currency: string,
 }
 
+interface IUpdatePrice
+{
+    active?: boolean,
+}
+
 export interface ISerializedPrice
 {
     id: string,
@@ -42,10 +47,15 @@ export class Price implements ISerializable<ISerializedPrice>
         public readonly amount: number,
         public readonly currency: string,
         public readonly bundle: Bundle | INotExpandedResource,
-        public readonly active: boolean,
+        private _active: boolean,
         public readonly stripe_price_id: string | null,
     )
     {}
+
+    public get active(): boolean
+    {
+        return this._active;
+    }
 
     public static async create(data: ICreatePrice, bundle: Bundle, expand?: string[]): Promise<Price>
     {
@@ -149,12 +159,14 @@ export class Price implements ISerializable<ISerializedPrice>
         return Price.deserialize(result.rows[0], expand);
     }
 
-    public async delete(): Promise<void>
+    public async update(data: IUpdatePrice): Promise<void>
     {
         if (!this.stripe_price_id)
         {
             throw Boom.badImplementation();
         }
+
+        this._active = data.active ?? this.active;
 
         const client = await Database.pool.connect();
 
@@ -162,14 +174,14 @@ export class Price implements ISerializable<ISerializedPrice>
 
         await client.query(
             `update "prices" set "active" = $1 where "id" = $2`,
-            [ false, this.id ],
+            [ this.active, this.id ],
         );
 
         await Config.STRIPE.prices
             .update(
                 this.stripe_price_id,
                 {
-                    active: false,
+                    active: this.active,
                 },
             )
             .catch(async () =>
@@ -251,6 +263,9 @@ export class Price implements ISerializable<ISerializedPrice>
         CREATE: Joi.object({
             amount: Schema.MONEY.required(),
             currency: Schema.CURRENCY.required(),
+        }),
+        UPDATE: Joi.object({
+            active: Schema.BOOLEAN.optional(),
         }),
     } as const;
 }

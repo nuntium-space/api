@@ -107,13 +107,17 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "DELETE",
+        method: "PATCH",
         path: "/prices/{id}",
         options: {
             validate: {
                 params: Joi.object({
                     id: Schema.ID.PRICE.required(),
                 }),
+                payload: Price.SCHEMA.UPDATE,
+            },
+            response: {
+                schema: Price.SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -136,9 +140,9 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            await price.delete();
+            await price.update(request.payload as any);
 
-            return h.response();
+            return price.serialize({ for: authenticatedUser });
         },
     },
 ];
