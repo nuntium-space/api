@@ -176,8 +176,8 @@
     "home": {
         "hero": {
             "create_account": "Create an account",
-            "headline": "A fact-checked news-only social network",
-            "subheadline": "The reliability of newspapers with the scale of the Internet"
+            "headline": "News from around the world you can trust.",
+            "subheadline": "Stop wasting time while reading the news. We check the sources so you don't have to."
         }
     },
     "organization": {
