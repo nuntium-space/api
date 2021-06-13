@@ -12,6 +12,7 @@ import { Publisher } from "./Publisher";
 interface IDatabaseUser
 {
     id: string,
+    full_name: string | null,
     username: string | null,
     email: string,
     stripe_customer_id: string | null,
@@ -19,12 +20,14 @@ interface IDatabaseUser
 
 interface ICreateUser
 {
+    full_name?: string,
     username?: string,
     email: string,
 }
 
 interface IUpdateUser
 {
+    full_name?: string,
     username?: string,
     email?: string,
 }
@@ -42,9 +45,9 @@ interface IUpdateUserSettings
 export interface ISerializedUser
 {
     id: string,
+    full_name: string | null,
     username: string | null,
     email: string,
-    has_default_payment_method: boolean,
 }
 
 export class User implements ISerializable<ISerializedUser>
