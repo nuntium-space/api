@@ -568,7 +568,7 @@ export class User implements ISerializable<ISerializedUser>
     public static readonly SCHEMA = {
         OBJ: Joi.object({
             id: Schema.ID.USER.required(),
-            full_name: Schema.NULLABLE(Schema.STRING).required(),
+            full_name: Schema.NULLABLE(Schema.STRING).optional(),
             username: Schema.NULLABLE(Schema.STRING.max(30)).required(),
             email: Schema.EMAIL.optional(),
         }),
