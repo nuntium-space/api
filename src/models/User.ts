@@ -554,7 +554,7 @@ export class User implements ISerializable<ISerializedUser>
         OBJ: Joi.object({
             id: Schema.ID.USER.required(),
             username: Schema.STRING.max(30).allow(null).required(),
-            email: Schema.EMAIL.required(),
+            email: Schema.EMAIL.optional(),
         }),
         UPDATE: Joi.object({
             username: Schema.STRING.max(30),
