@@ -183,6 +183,7 @@ export class User implements ISerializable<ISerializedUser>
 
     public async update(data: IUpdateUser): Promise<void>
     {
+        this._full_name = data.full_name ?? this.full_name;
         this._username = data.username ?? this.username;
         this._email = data.email ?? this.email;
 
@@ -195,12 +196,14 @@ export class User implements ISerializable<ISerializedUser>
                 `
                 update "users"
                 set
-                    "username" = $1,
-                    "email" = $2
+                    "full_name" = $1,
+                    "username" = $2,
+                    "email" = $3
                 where
-                    "id" = $3
+                    "id" = $4
                 `,
                 [
+                    this.full_name,
                     this.username,
                     this.email,
                     this.id,
@@ -217,6 +220,7 @@ export class User implements ISerializable<ISerializedUser>
         {
             await Config.STRIPE.customers
                 .update(this.stripe_customer_id, {
+                    name: this.full_name ?? undefined,
                     email: this.email,
                 })
                 .catch(async () =>
