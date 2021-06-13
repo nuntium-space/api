@@ -52,7 +52,6 @@
                 "currency": "Currency",
                 "fee_msg": "We take a <b>20%</b> cut on every transaction"
             },
-            "archive": "Archive",
             "archived": "Archived",
             "billing_period": {
                 "month": "month"
@@ -160,12 +159,15 @@
     },
     "generic": {
         "add": "Add",
+        "archive": "Archive",
         "cancel": "Cancel",
         "create": "Create",
         "delete": "Delete",
         "edit": "Edit",
         "email": "Email",
+        "full_name": "Full name",
         "remove": "Remove",
+        "restore": "Restore",
         "sign_in": "Sign In",
         "sign_out": "Sign Out",
         "sign_up": "Sign Up",

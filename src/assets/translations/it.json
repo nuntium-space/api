@@ -52,7 +52,6 @@
                 "currency": "Valuta",
                 "fee_msg": "Noi ci teniamo il <b>20%</b> di ogni transazione"
             },
-            "archive": "Archivia",
             "archived": "Archiviato",
             "billing_period": {
                 "month": "mese"
@@ -160,12 +159,15 @@
     },
     "generic": {
         "add": "Aggiungi",
+        "archive": "Archivia",
         "cancel": "Annulla",
         "create": "Crea",
         "delete": "Elimina",
         "edit": "Modifica",
         "email": "Email",
+        "full_name": "Nome completo",
         "remove": "Rimuovi",
+        "restore": "Ripristina",
         "sign_in": "Accedi",
         "sign_out": "Esci",
         "sign_up": "Registrati",
