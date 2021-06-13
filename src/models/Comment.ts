@@ -321,7 +321,7 @@ export class Comment implements ISerializable<ISerializedComment>
         }),
         CREATE: Joi.object({
             content: Schema.STRING.required(),
-            parent: Schema.ID.COMMENT.allow(null).required(),
+            parent: Schema.NULLABLE(Schema.ID.COMMENT).required(),
         }),
         UPDATE: Joi.object({
             content: Schema.STRING,

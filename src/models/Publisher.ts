@@ -265,7 +265,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             url: Schema.URL.required(),
             organization: Organization.SCHEMA.OBJ.required(),
             verified: Schema.BOOLEAN.required(),
-            imageUrl: Schema.STRING.allow(null).required(),
+            imageUrl: Schema.NULLABLE(Schema.STRING).required(),
             __metadata: Joi.object({
                 is_author: Schema.BOOLEAN.required(),
                 is_subscribed: Schema.BOOLEAN.required(),

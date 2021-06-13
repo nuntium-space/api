@@ -43,7 +43,7 @@ export default <ServerRoute[]>[
             },
             response: {
                 schema: Joi.object({
-                    language: Schema.LANGUAGE.allow(null).required(),
+                    language: Schema.NULLABLE(Schema.LANGUAGE).required(),
                 }),
             },
         },
