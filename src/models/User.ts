@@ -55,11 +55,17 @@ export class User implements ISerializable<ISerializedUser>
     private constructor
     (
         public readonly id: string,
+        private _full_name: string | null,
         private _username: string | null,
         private _email: string,
         public readonly stripe_customer_id: string | null,
     )
     {}
+
+    public get full_name(): string | null
+    {
+        return this._full_name;
+    }
 
     public get username(): string | null
     {
@@ -536,6 +542,7 @@ export class User implements ISerializable<ISerializedUser>
         {
             response = {
                 ...response,
+                full_name: this.full_name,
                 email: this.email,
             };
         }
@@ -547,6 +554,7 @@ export class User implements ISerializable<ISerializedUser>
     {
         return new User(
             data.id,
+            data.full_name,
             data.username,
             data.email,
             data.stripe_customer_id,
@@ -556,10 +564,12 @@ export class User implements ISerializable<ISerializedUser>
     public static readonly SCHEMA = {
         OBJ: Joi.object({
             id: Schema.ID.USER.required(),
-            username: Schema.STRING.max(30).allow(null).required(),
+            full_name: Schema.NULLABLE(Schema.STRING).required(),
+            username: Schema.NULLABLE(Schema.STRING.max(30)).required(),
             email: Schema.EMAIL.optional(),
         }),
         UPDATE: Joi.object({
+            full_name: Schema.STRING,
             username: Schema.STRING.max(30),
             email: Schema.EMAIL,
         }),
