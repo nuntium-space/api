@@ -66,6 +66,13 @@
                 "empty": "Non hai nessun editore da aggiungere"
             },
             "empty": "Non hai aggiunto nessun editore"
+        },
+        "subscribe": {
+            "__title": "Abbonati",
+            "billing_period": {
+                "month": "mese"
+            },
+            "choose_option": "Scegli un'opzione"
         }
     },
     "components": {

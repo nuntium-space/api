@@ -66,6 +66,13 @@
                 "empty": "You don't have any publisher to add"
             },
             "empty": "You haven't added any publisher"
+        },
+        "subscribe": {
+            "__title": "Subscribe",
+            "billing_period": {
+                "month": "month"
+            },
+            "choose_option": "Choose an option"
         }
     },
     "components": {
