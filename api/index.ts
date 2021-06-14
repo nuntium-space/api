@@ -200,7 +200,7 @@ const init = async () =>
                     query: {
                         multi_match: {
                             query: request.query.query,
-                            fields: [ "title", "content" ],
+                            fields: [ "title" ],
                             fuzziness: "AUTO",
                         },
                     },

@@ -15,7 +15,7 @@ interface IDatabaseArticle
 {
     id: string,
     title: string,
-    content: string,
+    content: any,
     author: string,
     created_at: Date,
     updated_at: Date,
@@ -24,20 +24,20 @@ interface IDatabaseArticle
 interface ICreateArticle
 {
     title: string,
-    content: string,
+    content: any,
 }
 
 interface IUpdateArticle
 {
     title?: string,
-    content?: string,
+    content?: any,
 }
 
 export interface ISerializedArticle
 {
     id: string,
     title: string,
-    content: string,
+    content: any,
     reading_time: number,
     author: ISerializedAuthor | INotExpandedResource,
     created_at: string,
@@ -50,7 +50,7 @@ export class Article implements ISerializable<ISerializedArticle>
     (
         public readonly id: string,
         private _title: string,
-        private _content: string,
+        private _content: any,
         public readonly author: Author | INotExpandedResource,
         public readonly created_at: Date,
         private _updated_at: Date,
@@ -62,7 +62,7 @@ export class Article implements ISerializable<ISerializedArticle>
         return this._title;
     }
 
-    public get content(): string
+    public get content(): any
     {
         return this._content;
     }
@@ -113,7 +113,6 @@ export class Article implements ISerializable<ISerializedArticle>
                 id,
                 body: {
                     title: data.title,
-                    content: data.content,
                 },
             })
             .catch(async () =>
