@@ -278,12 +278,7 @@ export class Article implements ISerializable<ISerializedArticle>
                     options.limit,
                     options.offset,
                 ],
-            )
-            .catch(e =>
-            {
-                console.log(e);
-                throw Boom.notImplemented();
-            });
+            );
 
         return Promise.all(result.rows.map(row => Article.deserialize(row, options.expand)));
     }
@@ -323,7 +318,7 @@ export class Article implements ISerializable<ISerializedArticle>
     {
         options ??= {};
         options.includeContent ??= false;
-console.log(Utilities.extractTextFromEditorJson(this.content));
+
         return {
             id: this.id,
             title: this.title,
