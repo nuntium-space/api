@@ -192,7 +192,6 @@ export class Article implements ISerializable<ISerializedArticle>
                 body: {
                     doc: {
                         title: this.title,
-                        content: this.content,
                     },
                 },
             })
