@@ -247,35 +247,43 @@ export class Article implements ISerializable<ISerializedArticle>
         expand?: string[],
     }): Promise<Article[]>
     {
-        const result = await Database.pool.query(
-            `
-            select distinct art.*
-            from
-                "v_active_subscriptions" as s
-                inner join
-                "prices" as p
-				on s.price = p.id
-				inner join
-                "bundles_publishers" as bp
-                on p.bundle = bp.bundle
-                inner join
-                "authors" as aut
-                on aut.publisher = bp.publisher
-                inner join
-                "articles" as art
-                on art.author = aut.id
-            where
-                s.user = $1
-            order by "created_at" desc
-            limit $2
-            offset $3
-            `,
-            [
-                user.id,
-                options.limit,
-                options.offset,
-            ],
-        );
+        const result = await Database.pool
+            .query(
+                `
+                select
+                    distinct on ("art"."created_at", "art"."id")
+                    "art"."id", "art"."title", "art"."content", "art"."author", "art"."created_at", "art"."updated_at"
+                from
+                    "v_active_subscriptions" as "s"
+                    inner join
+                    "prices" as "p"
+                    on "s"."price" = "p"."id"
+                    inner join
+                    "bundles_publishers" as "bp"
+                    on "p"."bundle" = "bp"."bundle"
+                    inner join
+                    "authors" as "aut"
+                    on "aut"."publisher" = "bp"."publisher"
+                    inner join
+                    "articles" as "art"
+                    on "art"."author" = "aut"."id"
+                where
+                    "s"."user" = $1
+                order by "art"."created_at", "art"."id" desc
+                limit $2
+                offset $3
+                `,
+                [
+                    user.id,
+                    options.limit,
+                    options.offset,
+                ],
+            )
+            .catch(e =>
+            {
+                console.log(e);
+                throw Boom.notImplemented();
+            });
 
         return Promise.all(result.rows.map(row => Article.deserialize(row, options.expand)));
     }
