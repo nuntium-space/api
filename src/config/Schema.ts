@@ -56,4 +56,6 @@ export class Schema
 
     public static readonly EXPAND_QUERY = Schema.ARRAY(Schema.STRING);
     public static readonly NOT_EXPANDED_RESOURCE = (schema: BaseJoi.StringSchema) => Joi.object({ id: schema.required() });
+
+    public static readonly ARTICLE_CONTENT = Joi.object();
 }

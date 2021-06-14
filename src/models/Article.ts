@@ -1,6 +1,5 @@
 import Boom from "@hapi/boom";
 import Joi from "joi";
-import marked from "marked";
 import readingTime from "reading-time";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
@@ -314,24 +313,15 @@ export class Article implements ISerializable<ISerializedArticle>
          * @default false
          */
         includeContent?: boolean,
-        /**
-         * @default "raw"
-         */
-        format?: "raw" | "html",
     }): ISerializedArticle
     {
         options ??= {};
         options.includeContent ??= false;
-        options.format ??= "raw";
-
-        const content = options.format === "raw"
-            ? this.content
-            : marked(this.content);
 
         return {
             id: this.id,
             title: this.title,
-            content: options.includeContent ? content : "",
+            content: this.content,
             reading_time: Math.round(readingTime(this.content).minutes),
             author: this.author instanceof Author
                 ? this.author.serialize({ for: options.for })
@@ -370,7 +360,7 @@ export class Article implements ISerializable<ISerializedArticle>
         OBJ: Joi.object({
             id: Schema.ID.ARTICLE.required(),
             title: Schema.STRING.max(50).required(),
-            content: Schema.STRING.allow("").required(),
+            content: Schema.ARTICLE_CONTENT.required(),
             reading_time: Joi.number().integer().min(0).required(),
             author: Joi
                 .alternatives()
@@ -384,11 +374,11 @@ export class Article implements ISerializable<ISerializedArticle>
         }),
         CREATE: Joi.object({
             title: Schema.STRING.max(50).required(),
-            content: Schema.STRING.required(),
+            content: Schema.ARTICLE_CONTENT.required(),
         }),
         UPDATE: Joi.object({
             title: Schema.STRING.max(50),
-            content: Schema.STRING,
+            content: Schema.ARTICLE_CONTENT,
         }),
     } as const;
 }

@@ -125,7 +125,7 @@ create table "articles"
 (
     "id" id not null,
     "title" varchar(50) not null,
-    "content" text not null,
+    "content" json not null,
     "author" id not null,
     "created_at" timestamp not null default current_timestamp,
     "updated_at" timestamp not null default current_timestamp,
