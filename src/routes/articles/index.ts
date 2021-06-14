@@ -18,7 +18,6 @@ export default <ServerRoute[]>[
                 }),
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
-                    format: Schema.STRING.allow("raw", "html"),
                 }),
             },
             response: {
@@ -43,10 +42,7 @@ export default <ServerRoute[]>[
                 throw Boom.paymentRequired();
             }
     
-            return article.serialize({
-                includeContent: true,
-                format: request.query.format,
-            });
+            return article.serialize({ includeContent: true });
         },
     },
     {
@@ -143,7 +139,6 @@ export default <ServerRoute[]>[
                 }),
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
-                    format: Schema.STRING.allow("raw", "html"),
                 }),
                 payload: Article.SCHEMA.UPDATE,
             },
@@ -166,10 +161,7 @@ export default <ServerRoute[]>[
 
             await article.update(request.payload as any);
 
-            return article.serialize({
-                includeContent: true,
-                format: request.query.format,
-            });
+            return article.serialize({ includeContent: true });
         },
     },
     {
