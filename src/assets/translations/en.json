@@ -98,6 +98,18 @@
                 "updated_on": "Updated on"
             }
         },
+        "editor": {
+            "bold": "Bold",
+            "italic": "Italic",
+            "redo": "Redo",
+            "strike": "Strike",
+            "style": {
+                "heading": "Heading",
+                "paragraph": "Paragraph"
+            },
+            "underline": "Underline",
+            "undo": "Undo"
+        },
         "header": {
             "search": {
                 "placeholder": "Search articles"

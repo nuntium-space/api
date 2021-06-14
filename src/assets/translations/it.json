@@ -98,6 +98,18 @@
                 "updated_on": "Aggiornato il"
             }
         },
+        "editor": {
+            "bold": "Grassetto",
+            "italic": "Corsivo",
+            "redo": "Ripeti",
+            "strike": "Barrato",
+            "style": {
+                "heading": "Titolo",
+                "paragraph": "Testo normale"
+            },
+            "underline": "Sottolinea",
+            "undo": "Annulla"
+        },
         "header": {
             "search": {
                 "placeholder": "Cerca articoli"
