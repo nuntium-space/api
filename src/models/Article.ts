@@ -323,12 +323,12 @@ export class Article implements ISerializable<ISerializedArticle>
     {
         options ??= {};
         options.includeContent ??= false;
-
+console.log(Utilities.extractTextFromEditorJson(this.content));
         return {
             id: this.id,
             title: this.title,
             content: this.content,
-            reading_time: Math.round(readingTime(this.content).minutes),
+            reading_time: Math.round(readingTime(Utilities.extractTextFromEditorJson(this.content)).minutes),
             author: this.author instanceof Author
                 ? this.author.serialize({ for: options.for })
                 : this.author,

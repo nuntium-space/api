@@ -16,4 +16,19 @@ export default class Utilities
 
         return amount;
     }
+
+    public static extractTextFromEditorJson(json: { text?: string, content?: any[] }): string
+    {
+        if (json.text)
+        {
+            return json.text;
+        }
+
+        if (!json.content)
+        {
+            return "";
+        }
+
+        return json.content.map(Utilities.extractTextFromEditorJson).flat().join(" ");
+    }
 }
