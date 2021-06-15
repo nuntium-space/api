@@ -3,7 +3,6 @@ import auth from "./auth";
 import authors from "./authors";
 import bundles from "./bundles";
 import comments from "./comments";
-import config from "./config";
 import organizations from "./organizations";
 import paymentMethods from "./payment-methods";
 import prices from "./prices";
@@ -20,7 +19,6 @@ export = [
     authors,
     bundles,
     comments,
-    config,
     organizations,
     paymentMethods,
     prices,
