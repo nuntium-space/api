@@ -118,7 +118,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const articles = await Article.retrieveRecent(request.params.id, request.query.expand);
+            const articles = await Article.retrieveRecent(authenticatedUser, request.query.expand);
 
             return articles.map(_ => _.serialize({ for: authenticatedUser }));
         },
