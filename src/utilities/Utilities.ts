@@ -1,4 +1,5 @@
 import cuid from "cuid";
+import readingTime from "reading-time";
 
 export default class Utilities
 {
@@ -15,6 +16,11 @@ export default class Utilities
         }
 
         return amount;
+    }
+
+    public static getArticleReadingTimeInMinutes(json: { text?: string, content?: any[] }): number
+    {
+        return Math.round(readingTime(Utilities.extractTextFromEditorJson(json)).minutes);
     }
 
     public static extractTextFromEditorJson(json: { text?: string, content?: any[] }): string

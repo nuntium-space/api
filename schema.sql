@@ -127,6 +127,7 @@ create table "articles"
     "title" varchar(50) not null,
     "content" json not null,
     "author" id not null,
+    "reading_time" int not null,
     "created_at" timestamp not null default current_timestamp,
     "updated_at" timestamp not null default current_timestamp,
 
@@ -135,6 +136,7 @@ create table "articles"
     foreign key ("author") references "authors" on update cascade on delete cascade,
 
     check ("id" like 'art_%'),
+    check ("reading_time" >= 0),
     check ("created_at" <= current_timestamp),
     check ("updated_at" >= "created_at")
 );

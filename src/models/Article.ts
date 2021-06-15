@@ -1,6 +1,5 @@
 import Boom from "@hapi/boom";
 import Joi from "joi";
-import readingTime from "reading-time";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -17,6 +16,7 @@ interface IDatabaseArticle
     title: string,
     content: any,
     author: string,
+    reading_time: number,
     created_at: Date,
     updated_at: Date,
 }
@@ -38,8 +38,8 @@ export interface ISerializedArticle
     id: string,
     title: string,
     content: any,
-    reading_time: number,
     author: ISerializedAuthor | INotExpandedResource,
+    reading_time: number,
     created_at: string,
     updated_at: string,
 }
@@ -52,6 +52,7 @@ export class Article implements ISerializable<ISerializedArticle>
         private _title: string,
         private _content: any,
         public readonly author: Author | INotExpandedResource,
+        private _reading_time: number,
         public readonly created_at: Date,
         private _updated_at: Date,
     )
@@ -65,6 +66,11 @@ export class Article implements ISerializable<ISerializedArticle>
     public get content(): any
     {
         return this._content;
+    }
+
+    public get reading_time(): number
+    {
+        return this._reading_time;
     }
 
     public get updated_at(): Date
@@ -88,9 +94,9 @@ export class Article implements ISerializable<ISerializedArticle>
             .query(
                 `
                 insert into "articles"
-                    ("id", "title", "content", "author")
+                    ("id", "title", "content", "author", "reading_time")
                 values
-                    ($1, $2, $3, $4)
+                    ($1, $2, $3, $4, $5)
                 returning *
                 `,
                 [
@@ -98,6 +104,7 @@ export class Article implements ISerializable<ISerializedArticle>
                     data.title,
                     data.content,
                     author.id,
+                    Utilities.getArticleReadingTimeInMinutes(data.content),
                 ],
             )
             .catch(async () =>
@@ -159,6 +166,7 @@ export class Article implements ISerializable<ISerializedArticle>
     {
         this._title = data.title ?? this.title;
         this._content = data.content ?? this.content;
+        this._reading_time = Utilities.getArticleReadingTimeInMinutes(this.content);
 
         const client = await Database.pool.connect();
 
@@ -170,14 +178,16 @@ export class Article implements ISerializable<ISerializedArticle>
                 update "articles"
                 set
                     "title" = $1,
-                    "content" = $2
+                    "content" = $2,
+                    "reading_time" = $3
                 where
-                    "id" = $3
+                    "id" = $4
                 returning "updated_at"
                 `,
                 [
                     this.title,
                     this.content,
+                    this.reading_time,
                     this.id,
                 ],
             )
@@ -325,7 +335,7 @@ export class Article implements ISerializable<ISerializedArticle>
             id: this.id,
             title: this.title,
             content: this.content,
-            reading_time: Math.round(readingTime(Utilities.extractTextFromEditorJson(this.content)).minutes),
+            reading_time: this.reading_time,
             author: this.author instanceof Author
                 ? this.author.serialize({ for: options.for })
                 : this.author,
@@ -350,6 +360,7 @@ export class Article implements ISerializable<ISerializedArticle>
             data.title,
             data.content,
             author,
+            parseInt(data.reading_time.toString()),
             data.created_at,
             data.updated_at,
         );
