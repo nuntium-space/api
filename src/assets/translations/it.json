@@ -264,7 +264,7 @@
         "how_to_subscribe": "Per vedere gli articoli di <b>{{ PUBLISHER_NAME }}</b> devi abbonarti ad un bundle che include questo editore",
         "new_article": {
             "title": "Titolo",
-            "content": "Contenuto"
+            "sources": "Fonti"
         },
         "not_subscribed": "Non sei abbonato a <b>{{ PUBLISHER_NAME }}</b>",
         "subscribe": {
