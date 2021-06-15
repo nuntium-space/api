@@ -113,6 +113,7 @@ export class Article implements ISerializable<ISerializedArticle>
                 id,
                 body: {
                     title: data.title,
+                    content: Utilities.extractTextFromEditorJson(data.content),
                 },
             })
             .catch(async () =>
@@ -192,6 +193,7 @@ export class Article implements ISerializable<ISerializedArticle>
                 body: {
                     doc: {
                         title: this.title,
+                        content: Utilities.extractTextFromEditorJson(this.content),
                     },
                 },
             })
