@@ -5,17 +5,17 @@ DOMAINS
 */
 
 /*
-    An id is made up of three parts:
-    - a prefix (3 characters)
-    - a separator (an underscore)
-    - a random string
+  An id is made up of three parts:
+  - a prefix (3 characters)
+  - a separator (an underscore)
+  - a random string
 */
 create domain "id" as varchar(300) check(value like '___\_%');
 
 /*
-    '320' is the maximum length of an email address as documented here:
+  '320' is the maximum length of an email address as documented here:
 
-    https://tools.ietf.org/html/rfc3696#section-3
+  https://tools.ietf.org/html/rfc3696#section-3
 */
 create domain "email_address" as varchar(320);
 
@@ -29,277 +29,291 @@ TABLES
 
 create table "users"
 (
-    "id" id not null,
-    "full_name" text,
-    "username" text,
-    "email" email_address not null,
-    "stripe_customer_id" text,
+  "id" id not null,
+  "full_name" text,
+  "username" text,
+  "email" email_address not null,
+  "stripe_customer_id" text,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("username"),
-    unique ("email"),
+  unique ("username"),
+  unique ("email"),
 
-    check ("id" like 'usr_%')
+  check ("id" like 'usr_%')
 );
 
 create table "account_types"
 (
-    "id" text not null,
+  "id" text not null,
 
-    primary key ("id")
+  primary key ("id")
 );
 
 create table "accounts"
 (
-    "id" id not null,
-    "user" id not null,
-    "type" text not null,
-    "external_id" text not null,
+  "id" id not null,
+  "user" id not null,
+  "type" text not null,
+  "external_id" text not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("user", "type"),
+  unique ("user", "type"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("type") references "account_types" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("type") references "account_types" on update cascade on delete cascade,
 
-    check ("id" like 'acc_%')
+  check ("id" like 'acc_%')
 );
 
 create table "organizations"
 (
-    "id" id not null,
-    "name" varchar(50) not null,
-    "user" id not null,
-    "stripe_account_id" text not null,
-    "stripe_account_enabled" boolean not null default false,
+  "id" id not null,
+  "name" varchar(50) not null,
+  "user" id not null,
+  "stripe_account_id" text not null,
+  "stripe_account_enabled" boolean not null default false,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("name"),
+  unique ("name"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
 
-    check ("id" like 'org_%')
+  check ("id" like 'org_%')
 );
 
 create table "publishers"
 (
-    "id" id not null,
-    "name" varchar(50) not null,
-    "url" url not null,
-    "organization" id not null,
-    "verified" boolean not null,
-    "has_image" boolean not null,
-    "dns_txt_value" text not null,
+  "id" id not null,
+  "name" varchar(50) not null,
+  "url" url not null,
+  "organization" id not null,
+  "verified" boolean not null,
+  "has_image" boolean not null,
+  "dns_txt_value" text not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("name"),
-    unique ("url"),
-    unique ("dns_txt_value"),
+  unique ("name"),
+  unique ("url"),
+  unique ("dns_txt_value"),
 
-    foreign key ("organization") references "organizations" on update cascade on delete cascade,
+  foreign key ("organization") references "organizations" on update cascade on delete cascade,
 
-    check ("id" like 'pub_%')
+  check ("id" like 'pub_%')
 );
 
 create table "authors"
 (
-    "id" id not null,
-    "user" id not null,
-    "publisher" id not null,
+  "id" id not null,
+  "user" id not null,
+  "publisher" id not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("user", "publisher"),
+  unique ("user", "publisher"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("publisher") references "publishers" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("publisher") references "publishers" on update cascade on delete cascade,
 
-    check ("id" like 'aut_%')
+  check ("id" like 'aut_%')
 );
 
 create table "articles"
 (
-    "id" id not null,
-    "title" varchar(50) not null,
-    "content" json not null,
-    "author" id not null,
-    "reading_time" int not null,
-    "created_at" timestamp not null default current_timestamp,
-    "updated_at" timestamp not null default current_timestamp,
+  "id" id not null,
+  "title" varchar(50) not null,
+  "content" json not null,
+  "author" id not null,
+  "reading_time" int not null,
+  "created_at" timestamp not null default current_timestamp,
+  "updated_at" timestamp not null default current_timestamp,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    foreign key ("author") references "authors" on update cascade on delete cascade,
+  foreign key ("author") references "authors" on update cascade on delete cascade,
 
-    check ("id" like 'art_%'),
-    check ("reading_time" >= 0),
-    check ("created_at" <= current_timestamp),
-    check ("updated_at" >= "created_at")
+  check ("id" like 'art_%'),
+  check ("reading_time" >= 0),
+  check ("created_at" <= current_timestamp),
+  check ("updated_at" >= "created_at")
 );
 
 create table "sessions"
 (
-    "id" id not null,
-    "user" id not null,
-    "expires_at" timestamp not null,
+  "id" id not null,
+  "user" id not null,
+  "expires_at" timestamp not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
 
-    check ("id" like 'ses_%'),
-    check ("expires_at" > current_timestamp)
+  check ("id" like 'ses_%'),
+  check ("expires_at" > current_timestamp)
 );
 
 create table "comments"
 (
-    "id" id not null,
-    "content" text not null,
-    "user" id not null,
-    "article" id not null,
-    "parent" id,
-    "created_at" timestamp not null default current_timestamp,
-    "updated_at" timestamp not null default current_timestamp,
+  "id" id not null,
+  "content" text not null,
+  "user" id not null,
+  "article" id not null,
+  "parent" id,
+  "created_at" timestamp not null default current_timestamp,
+  "updated_at" timestamp not null default current_timestamp,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("article") references "articles" on update cascade on delete cascade,
-    foreign key ("parent") references "comments" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("article") references "articles" on update cascade on delete cascade,
+  foreign key ("parent") references "comments" on update cascade on delete cascade,
 
-    check ("id" like 'cmt_%'),
-    check ("created_at" <= current_timestamp),
-    check ("updated_at" >= "created_at"),
-    check ("parent" <> "id")
+  check ("id" like 'cmt_%'),
+  check ("created_at" <= current_timestamp),
+  check ("updated_at" >= "created_at"),
+  check ("parent" <> "id")
 );
 
 create table "bundles"
 (
-    "id" id not null,
-    "name" varchar(50) not null,
-    "organization" id not null,
-    "active" boolean not null,
-    "stripe_product_id" text,
+  "id" id not null,
+  "name" varchar(50) not null,
+  "organization" id not null,
+  "active" boolean not null,
+  "stripe_product_id" text,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("name", "organization"),
+  unique ("name", "organization"),
 
-    foreign key ("organization") references "organizations" on update cascade,
+  foreign key ("organization") references "organizations" on update cascade,
 
-    check ("id" like 'bdl_%')
+  check ("id" like 'bdl_%')
 );
 
 create table "prices"
 (
-    "id" id not null,
-    "amount" int not null,
-    "currency" char(3) not null,
-    "bundle" id not null,
-    "active" boolean not null,
-    "stripe_price_id" text,
+  "id" id not null,
+  "amount" int not null,
+  "currency" char(3) not null,
+  "bundle" id not null,
+  "active" boolean not null,
+  "stripe_price_id" text,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    foreign key ("bundle") references "bundles" on update cascade on delete cascade,
+  foreign key ("bundle") references "bundles" on update cascade on delete cascade,
 
-    check ("id" like 'pri_%'),
-    check ("amount" >= 0)
+  check ("id" like 'pri_%'),
+  check ("amount" >= 0)
 );
 
 create table "bundles_publishers"
 (
-    "bundle" id not null,
-    "publisher" id not null,
+  "bundle" id not null,
+  "publisher" id not null,
 
-    primary key ("bundle", "publisher"),
+  primary key ("bundle", "publisher"),
 
-    foreign key ("bundle") references "bundles" on update cascade on delete cascade,
-    foreign key ("publisher") references "publishers" on update cascade on delete cascade
+  foreign key ("bundle") references "bundles" on update cascade on delete cascade,
+  foreign key ("publisher") references "publishers" on update cascade on delete cascade
 );
 
 create table "subscriptions"
 (
-    "id" id not null,
-    "status" text not null,
-    "user" id not null,
-    "price" id not null,
-    "current_period_end" timestamp not null,
-    "cancel_at_period_end" boolean not null,
-    "deleted" boolean not null,
-    "stripe_subscription_id" text not null,
+  "id" id not null,
+  "status" text not null,
+  "user" id not null,
+  "price" id not null,
+  "current_period_end" timestamp not null,
+  "cancel_at_period_end" boolean not null,
+  "deleted" boolean not null,
+  "stripe_subscription_id" text not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("stripe_subscription_id"),
+  unique ("stripe_subscription_id"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("price") references "prices" on update cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("price") references "prices" on update cascade,
 
-    check ("id" like 'sub_%')
+  check ("id" like 'sub_%')
 );
 
 create table "payment_methods"
 (
-    "id" id not null,
-    "type" text not null,
-    "data" json not null,
-    "user" id not null,
-    "stripe_id" text not null,
+  "id" id not null,
+  "type" text not null,
+  "data" json not null,
+  "user" id not null,
+  "stripe_id" text not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("stripe_id"),
+  unique ("stripe_id"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
 
-    check ("id" like 'pmt_%')
+  check ("id" like 'pmt_%')
 );
 
 create table "default_payment_methods"
 (
-    "user" id not null,
-    "payment_method" id not null,
+  "user" id not null,
+  "payment_method" id not null,
 
-    primary key ("user"),
+  primary key ("user"),
 
-    unique ("payment_method"),
+  unique ("payment_method"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("payment_method") references "payment_methods" on update cascade on delete cascade
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("payment_method") references "payment_methods" on update cascade on delete cascade
 );
 
 create table "user_settings"
 (
-    "user" id not null,
-    "language" text,
+  "user" id not null,
+  "language" text,
 
-    primary key ("user"),
+  primary key ("user"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade
+  foreign key ("user") references "users" on update cascade on delete cascade
 );
 
 create table "sign_in_requests"
 (
-    "id" id not null,
-    "token" text not null,
-    "user" id not null,
-    "session" id,
-    "expires_at" timestamp not null,
+  "id" id not null,
+  "token" text not null,
+  "user" id not null,
+  "session" id,
+  "expires_at" timestamp not null,
 
-    primary key ("id"),
+  primary key ("id"),
 
-    unique ("token"),
+  unique ("token"),
 
-    foreign key ("user") references "users" on update cascade on delete cascade,
-    foreign key ("session") references "sessions" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("session") references "sessions" on update cascade on delete cascade,
 
-    check ("id" like 'sir_%'),
-    check ("expires_at" > current_timestamp at time zone 'UTC')
+  check ("id" like 'sir_%'),
+  check ("expires_at" > current_timestamp at time zone 'UTC')
+);
+
+create table "article_views"
+(
+  "article" id not null,
+  "user" id not null,
+  "timestamp" timestamp not null default current_timestamp,
+
+  primary key ("article", "user", "timestamp"),
+
+  foreign key ("article") references "articles" on update cascade on delete cascade,
+  foreign key ("user") references "users" on update cascade on delete cascade,
+
+  check ("timestamp" = current_timestamp)
 );
 
 /*
@@ -313,8 +327,8 @@ as select * from "bundles" where "active" = true;
 
 create view "v_comments"
 as
-    select *, (select count(*) from "comments" where "parent" = "c"."id") as "reply_count"
-    from "comments" as c;
+  select *, (select count(*) from "comments" where "parent" = "c"."id") as "reply_count"
+  from "comments" as c;
 
 create view "v_active_subscriptions"
 as select * from "subscriptions" where "status" = 'active';
@@ -324,6 +338,13 @@ as select * from "subscriptions" where "status" = 'active';
 FUNCTIONS
 ---------
 */
+
+create function prevent_update()
+returns trigger as $$
+begin
+  raise exception '';
+end;
+$$ language plpgsql;
 
 create function trigger_update_updated_at()
 returns trigger as $$
@@ -345,6 +366,11 @@ for each row
 execute procedure trigger_update_updated_at();
 
 create trigger "update_updated_at"
+before update on "article_views"
+for each row
+execute procedure prevent_update();
+
+create trigger "update_updated_at"
 before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
@@ -357,6 +383,6 @@ INITIAL DATA
 
 insert into "account_types" ("id")
 values
-    ('facebook'),
-    ('google')
-    ('twitter');
+  ('facebook'),
+  ('google')
+  ('twitter');
