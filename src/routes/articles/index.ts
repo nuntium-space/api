@@ -1,6 +1,7 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
+import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
@@ -90,6 +91,36 @@ export default <ServerRoute[]>[
             const articles = await Article.forPublisher(publisher, request.query.expand);
 
             return articles.map(article => article.serialize({ for: authenticatedUser }));
+        },
+    },
+    {
+        method: "GET",
+        path: "/users/{id}/articles/recent",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.USER.required(),
+                }),
+                query: Joi.object({
+                    expand: Schema.EXPAND_QUERY,
+                }),
+            },
+            response: {
+                schema: Schema.ARRAY(Article.SCHEMA.OBJ).max(Config.RECENT_ARTICLES_MAX_LENGTH),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            if (authenticatedUser.id !== request.params.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const articles = await Article.retrieveRecent(request.params.id, request.query.expand);
+
+            return articles.map(_ => _.serialize());
         },
     },
     {
