@@ -171,9 +171,9 @@ export class Article implements ISerializable<ISerializedArticle>
                 "article_views" as "av"
                 inner join
                 "articles" as "a"
-                on "v"."article" = "a"."id"
+                on "av"."article" = "a"."id"
             where "av"."user" = $1
-            order by "timestamp" desc
+            order by "av"."timestamp" desc
             limit $2
             `,
             [
