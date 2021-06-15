@@ -6,6 +6,7 @@ import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
+import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
     {
@@ -41,7 +42,21 @@ export default <ServerRoute[]>[
             {
                 throw Boom.paymentRequired();
             }
-    
+
+            await Database.pool
+                .query(
+                    `
+                    insert into "article_views"
+                        ("article", "user")
+                    values
+                        ($1, $2)
+                    `,
+                    [
+                        article.id,
+                        authenticatedUser.id,
+                    ],
+                );
+
             return article.serialize({ includeContent: true });
         },
     },
