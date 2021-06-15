@@ -120,7 +120,7 @@ export default <ServerRoute[]>[
 
             const articles = await Article.retrieveRecent(request.params.id, request.query.expand);
 
-            return articles.map(_ => _.serialize());
+            return articles.map(_ => _.serialize({ for: authenticatedUser }));
         },
     },
     {
