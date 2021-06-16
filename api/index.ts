@@ -12,6 +12,7 @@ import { Session } from "../src/models/Session";
 import Database from "../src/utilities/Database";
 import routes from "../src/routes";
 import { Schema } from "../src/config/Schema";
+import { Publisher } from "../src/models/Publisher";
 
 const server = Hapi.server({
     port: process.env.PORT,
@@ -185,14 +186,17 @@ const init = async () =>
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Article.SCHEMA.OBJ).required(),
+                schema: Joi.object({
+                    articles: Schema.ARRAY(Article.SCHEMA.OBJ).required(),
+                    publishers: Schema.ARRAY(Publisher.SCHEMA.OBJ).required(),
+                }),
             },
         },
         handler: async (request, h) =>
         {
             const authenticatedUser = (request.auth.credentials.session as Session).user;
 
-            const result = await Config.ELASTICSEARCH.search({
+            const articlesResult = await Config.ELASTICSEARCH.search({
                 index: "articles",
                 size: request.query.limit,
                 from: request.query.offset,
@@ -208,11 +212,32 @@ const init = async () =>
                 },
             });
 
-            const ids = result.body.hits.hits.map((hit: any) => hit._id);
+            const publishersResult = await Config.ELASTICSEARCH.search({
+                index: "publishers",
+                size: request.query.limit,
+                from: request.query.offset,
+                body: {
+                    query: {
+                        multi_match: {
+                            query: request.query.query,
+                            fields: [ "name" ],
+                            fuzziness: "AUTO",
+                        },
+                    },
+                    stored_fields: [],
+                },
+            });
 
-            const articles = await Article.retrieveMultiple(ids, request.query.expand);
+            const articleIds: string[] = articlesResult.body.hits.hits.map((hit: any) => hit._id);
+            const articles = await Article.retrieveMultiple(articleIds, request.query.expand);
 
-            return articles.map(article => article.serialize({ for: authenticatedUser }));
+            const publisherIds: string[] = publishersResult.body.hits.hits.map((hit: any) => hit._id);
+            const publishers = await Publisher.retrieveMultiple(publisherIds, request.query.expand);
+
+            return {
+                articles: articles.map(_ => _.serialize({ for: authenticatedUser })),
+                publishers: publishers.map(_ => _.serialize({ for: authenticatedUser })),
+            };
         },
     });
 
