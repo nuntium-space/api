@@ -304,6 +304,15 @@ create table "sign_in_requests"
   check ("expires_at" > current_timestamp at time zone 'UTC')
 );
 
+/*
+  This table acts as the user's history (guess where the table's name came from).
+
+  It can be cleared if the user wants to.
+
+  This means we cannot rely on this table to calculate how many views an
+  article has (it would be too much work for the DB anyway), that is why
+  an article has the attribute 'view_count'.
+*/
 create table "user_history"
 (
   "user" id not null,
@@ -318,8 +327,20 @@ create table "user_history"
   check ("timestamp" = current_timestamp)
 );
 
+/*
+  This table cannot be cleared, unless the article a row refers to is deleted.
+
+  This can be used to provide time series data for each article, to maybe draw
+  a chart that shows the views for a certain period of time.
+*/
 create table "article_views"
 (
+  /*
+    Added because a primary key with just the
+    article id and the timestamp is not necessarily
+    enough: just think of two requests at the exact same time
+    from different users.
+  */
   "id" id not null,
   "article" id not null,
   "timestamp" timestamp not null default current_timestamp,
