@@ -214,7 +214,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
 
         await client.query("begin");
 
-        await Database.pool
+        await client
             .query(
                 `delete from "publishers" where "id" = $1`,
                 [ this.id ],
