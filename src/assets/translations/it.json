@@ -11,11 +11,6 @@
         "info": {
             "__title": "Info",
             "published": "Pubblicato",
-            "reading_time": {
-                "__title": "Tempo di lettura",
-                "less_than_a_minute": "meno di un minuto",
-                "minutes": "minuti"
-            },
             "updated": "Aggiornato"
         },
         "payment_required": {
@@ -81,11 +76,7 @@
         },
         "article_list": {
             "article": {
-                "for": "per",
-                "reading_time": {
-                    "less_than_a_minute": "meno di un minuto",
-                    "minutes": "minuti"
-                }
+                "for": "per"
             }
         },
         "comment_list": {
@@ -178,6 +169,11 @@
         "edit": "Modifica",
         "email": "Email",
         "full_name": "Nome completo",
+        "minute": {
+            "one": "minuto",
+            "many": "minuti"
+        },
+        "less_than_a_minute": "meno di un minuto",
         "remove": "Rimuovi",
         "restore": "Ripristina",
         "sign_in": "Accedi",

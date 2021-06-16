@@ -11,11 +11,6 @@
         "info": {
             "__title": "Info",
             "published": "Published",
-            "reading_time": {
-                "__title": "Reading Time",
-                "less_than_a_minute": "less than a minute",
-                "minutes": "minutes"
-            },
             "updated": "Updated"
         },
         "payment_required": {
@@ -81,11 +76,7 @@
         },
         "article_list": {
             "article": {
-                "for": "for",
-                "reading_time": {
-                    "less_than_a_minute": "less than a minute",
-                    "minutes": "minutes"
-                }
+                "for": "for"
             }
         },
         "comment_list": {
@@ -178,6 +169,11 @@
         "edit": "Edit",
         "email": "Email",
         "full_name": "Full name",
+        "minute": {
+            "one": "minute",
+            "many": "minutes"
+        },
+        "less_than_a_minute": "less than a minute",
         "remove": "Remove",
         "restore": "Restore",
         "sign_in": "Sign In",
