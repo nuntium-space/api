@@ -193,6 +193,9 @@ export class Comment implements ISerializable<ISerializedComment>
 
     public async delete(): Promise<void>
     {
+        // TODO:
+        // Decrement article comment_count
+
         await Database.pool.query(
             `delete from "comments" where "id" = $1`,
             [ this.id ],
