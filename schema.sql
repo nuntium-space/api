@@ -318,6 +318,20 @@ create table "user_history"
   check ("timestamp" = current_timestamp)
 );
 
+create table "article_views"
+(
+  "id" id not null,
+  "article" id not null,
+  "timestamp" timestamp not null default current_timestamp,
+
+  primary key ("id"),
+
+  foreign key ("article") references "articles" on update cascade on delete cascade,
+
+  check ("id" like 'avw_%'),
+  check ("timestamp" = current_timestamp)
+);
+
 /*
 -----
 VIEWS
@@ -371,6 +385,11 @@ create trigger "update_updated_at"
 before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
+
+create trigger "prevent_update"
+before update on "article_views"
+for each row
+execute procedure prevent_update();
 
 create trigger "prevent_update"
 before update on "user_history"
