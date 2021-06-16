@@ -11,6 +11,7 @@
         "info": {
             "__title": "Info",
             "published": "Published",
+            "reading_time": "Reading time",
             "updated": "Updated"
         },
         "payment_required": {

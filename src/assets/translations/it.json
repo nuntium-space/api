@@ -11,6 +11,7 @@
         "info": {
             "__title": "Info",
             "published": "Pubblicato",
+            "reading_time": "Tempo di lettura",
             "updated": "Aggiornato"
         },
         "payment_required": {
