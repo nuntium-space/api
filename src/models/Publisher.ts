@@ -81,7 +81,13 @@ export class Publisher implements ISerializable<ISerializedPublisher>
 
     public static async create(data: ICreatePublisher, organization: Organization): Promise<Publisher>
     {
-        const result = await Database.pool
+        const id = Utilities.id(Config.ID_PREFIXES.PUBLISHER);
+
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        const result = await client
             .query(
                 `
                 insert into "publishers"
@@ -91,7 +97,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.PUBLISHER),
+                    id,
                     data.name,
                     data.url,
                     organization.id,
@@ -100,10 +106,31 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     crypto.randomBytes(Config.PUBLISHER_DNS_TXT_VALUE_BYTES).toString("hex"),
                 ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
+
+        await Config.ELASTICSEARCH
+            .index({
+                index: "publishers",
+                id,
+                body: {
+                    name: data.name,
+                },
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
+
+        client.release();
 
         return Publisher.deserialize(result.rows[0]);
     }
@@ -130,7 +157,11 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         this._name = data.name ?? this.name;
         this._url = data.url ?? this.url;
 
-        await Database.pool
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client
             .query(
                 `
                 update "publishers"
@@ -148,18 +179,68 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     this.id,
                 ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
+
+        await Config.ELASTICSEARCH
+            .update({
+                index: "publishers",
+                id: this.id,
+                body: {
+                    doc: {
+                        name: this.name,
+                    },
+                },
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public async delete(): Promise<void>
     {
-        await Database.pool.query(
-            `delete from "publishers" where "id" = $1`,
-            [ this.id ],
-        );
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await Database.pool
+            .query(
+                `delete from "publishers" where "id" = $1`,
+                [ this.id ],
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await Config.ELASTICSEARCH
+            .delete({
+                index: "publishers",
+                id: this.id,
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public static async forBundle(bundle: Bundle): Promise<Publisher[]>
