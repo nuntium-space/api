@@ -128,6 +128,8 @@ create table "articles"
   "content" json not null,
   "author" id not null,
   "reading_time" int not null,
+  "view_count" int not null default 0,
+  "comment_count" int not null default 0,
   "created_at" timestamp not null default current_timestamp,
   "updated_at" timestamp not null default current_timestamp,
 
@@ -302,7 +304,7 @@ create table "sign_in_requests"
   check ("expires_at" > current_timestamp at time zone 'UTC')
 );
 
-create table "article_views"
+create table "article_view_history"
 (
   "article" id not null,
   "user" id not null,
