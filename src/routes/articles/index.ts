@@ -12,6 +12,28 @@ import Database from "../../utilities/Database";
 export default <ServerRoute[]>[
     {
         method: "GET",
+        path: "/articles/trending",
+        options: {
+            validate: {
+                query: Joi.object({
+                    expand: Schema.EXPAND_QUERY,
+                }),
+            },
+            response: {
+                schema: Schema.ARRAY(Article.SCHEMA.OBJ).max(Config.TRENDING_ARTICLES_MAX_LENGTH),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            const articles = await Article.trending(request.query.expand);
+
+            return articles.map(_ => _.serialize({ for: authenticatedUser }));
+        },
+    },
+    {
+        method: "GET",
         path: "/articles/{id}",
         options: {
             validate: {

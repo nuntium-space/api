@@ -191,6 +191,40 @@ export class Article implements ISerializable<ISerializedArticle>
         return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
     }
 
+    public static async trending(expand?: string[]): Promise<Article[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select
+                a.*,
+                count(c.id) as "comment_count",
+                count(av.*) as "view_count",
+                (
+                    (count(c.id) * 0.2)
+                    + (count(av.*) * 0.1)
+                )
+                / (extract(day from current_timestamp - "a"."created_at") * 0.5 + 1)
+                    as "score"
+            from
+                articles as a
+                left outer join
+                article_views as av
+                on av.article = a.id
+                left outer join
+                comments as c
+                on c.article = a.id
+            group by a.id
+            order by score desc
+            limit $1
+            `,
+            [
+                Config.TRENDING_ARTICLES_MAX_LENGTH,
+            ],
+        );
+
+        return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
+    }
+
     public async update(data: IUpdateArticle): Promise<void>
     {
         this._title = data.title ?? this.title;
