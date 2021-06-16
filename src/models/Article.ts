@@ -397,7 +397,9 @@ export class Article implements ISerializable<ISerializedArticle>
         return {
             id: this.id,
             title: this.title,
-            content: this.content,
+            content: options.includeContent
+                ? this.content
+                : null,
             reading_time: this.reading_time,
             author: this.author instanceof Author
                 ? this.author.serialize({ for: options.for })
@@ -437,7 +439,7 @@ export class Article implements ISerializable<ISerializedArticle>
         OBJ: Joi.object({
             id: Schema.ID.ARTICLE.required(),
             title: Schema.STRING.max(50).required(),
-            content: Schema.ARTICLE_CONTENT.required(),
+            content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
             reading_time: Joi.number().integer().min(0).required(),
             author: Joi
                 .alternatives()
