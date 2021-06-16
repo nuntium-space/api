@@ -115,6 +115,9 @@ export class Comment implements ISerializable<ISerializedComment>
             ]);
         }
 
+        // TODO:
+        // Increment article comment_count
+
         const result = await Database.pool
             .query(
                 `

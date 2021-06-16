@@ -66,6 +66,9 @@ export default <ServerRoute[]>[
                 throw Boom.paymentRequired();
             }
 
+            // TODO:
+            // Increment article view_count
+
             await Database.pool
                 .query(
                     `

@@ -17,6 +17,8 @@ interface IDatabaseArticle
     content: any,
     author: string,
     reading_time: number,
+    view_count: number,
+    comment_count: number,
     created_at: Date,
     updated_at: Date,
 }
@@ -53,6 +55,8 @@ export class Article implements ISerializable<ISerializedArticle>
         private _content: any,
         public readonly author: Author | INotExpandedResource,
         private _reading_time: number,
+        public view_count: number,
+        public comment_count: number,
         public readonly created_at: Date,
         private _updated_at: Date,
     )
@@ -196,25 +200,16 @@ export class Article implements ISerializable<ISerializedArticle>
         const result = await Database.pool.query(
             `
             select
-                a.*,
-                count(c.id) as "comment_count",
-                count(av.*) as "view_count",
+                *,
                 (
-                    (count(c.id) * 0.2)
-                    + (count(av.*) * 0.1)
+                    ("comment_count" * 0.2)
+                    + ("view_count" * 0.1)
                 )
-                / (extract(day from current_timestamp - "a"."created_at") * 0.5 + 1)
+                / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
                     as "score"
-            from
-                articles as a
-                left outer join
-                article_views as av
-                on av.article = a.id
-                left outer join
-                comments as c
-                on c.article = a.id
-            group by a.id
-            order by score desc
+            from "articles"
+            group by "id"
+            order by "score" desc
             limit $1
             `,
             [
@@ -426,6 +421,8 @@ export class Article implements ISerializable<ISerializedArticle>
             data.content,
             author,
             parseInt(data.reading_time.toString()),
+            parseInt(data.view_count.toString()),
+            parseInt(data.comment_count.toString()),
             data.created_at,
             data.updated_at,
         );
