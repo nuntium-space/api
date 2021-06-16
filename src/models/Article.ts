@@ -174,7 +174,7 @@ export class Article implements ISerializable<ISerializedArticle>
             (
                 select "a".*, max("av"."timestamp") as "last_viewed"
                 from
-                    "article_view_history" as "av"
+                    "user_history" as "av"
                     inner join
                     "articles" as "a"
                     on "av"."article" = "a"."id"

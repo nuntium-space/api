@@ -72,7 +72,7 @@ export default <ServerRoute[]>[
             await Database.pool
                 .query(
                     `
-                    insert into "article_view_history"
+                    insert into "user_history"
                         ("article", "user")
                     values
                         ($1, $2)

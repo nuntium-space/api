@@ -304,16 +304,16 @@ create table "sign_in_requests"
   check ("expires_at" > current_timestamp at time zone 'UTC')
 );
 
-create table "article_view_history"
+create table "user_history"
 (
-  "article" id not null,
   "user" id not null,
+  "article" id not null,
   "timestamp" timestamp not null default current_timestamp,
 
   primary key ("article", "user", "timestamp"),
 
-  foreign key ("article") references "articles" on update cascade on delete cascade,
   foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("article") references "articles" on update cascade on delete cascade,
 
   check ("timestamp" = current_timestamp)
 );
@@ -368,14 +368,14 @@ for each row
 execute procedure trigger_update_updated_at();
 
 create trigger "update_updated_at"
-before update on "article_views"
-for each row
-execute procedure prevent_update();
-
-create trigger "update_updated_at"
 before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
+
+create trigger "prevent_update"
+before update on "user_history"
+for each row
+execute procedure prevent_update();
 
 /*
 ------------
