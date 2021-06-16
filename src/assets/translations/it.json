@@ -157,8 +157,9 @@
     },
     "feed": {
         "empty": {
-            "title": "Congratulazioni,",
-            "subtitle": "Ti mancano solo pochi secondi per poter leggere le notizie che ti piacciono da fonti di cui ti puoi fidare"
+            "title": "Cominciamo a riempire questo vuoto.",
+            "subtitle": "Cerca articoli, editori o autori specifici oppure esplora per scoprire tutto quello che puoi trovare su nuntium.",
+            "explore": "Esplora"
         }
     },
     "generic": {
