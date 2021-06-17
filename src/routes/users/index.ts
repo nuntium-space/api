@@ -169,18 +169,16 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const user = await User.retrieve(request.params.id);
-
             const authenticatedUser = (request.auth.credentials.session as Session).user;
 
-            if (user.id !== authenticatedUser.id)
+            if (request.params.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
 
-            await user.update(request.payload as any);
+            await authenticatedUser.update(request.payload as any);
 
-            return user.serialize({ for: authenticatedUser });
+            return authenticatedUser.serialize({ for: authenticatedUser });
         },
     },
     {
@@ -222,16 +220,14 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const user = await User.retrieve(request.params.id);
-
             const authenticatedUser = (request.auth.credentials.session as Session).user;
 
-            if (user.id !== authenticatedUser.id)
+            if (request.params.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
 
-            await user.delete();
+            await authenticatedUser.delete();
 
             return h.response();
         },
