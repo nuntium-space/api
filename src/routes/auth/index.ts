@@ -217,6 +217,7 @@ export default <ServerRoute[]>[
             const profile: {
                 id: string,
                 email: string,
+                displayName: string,
             } = request.auth.credentials.profile as any;
 
             let user: User;
@@ -227,7 +228,10 @@ export default <ServerRoute[]>[
             }
             else
             {
-                user = await User.create({ email: profile.email });
+                user = await User.create({
+                    email: profile.email,
+                    full_name: profile.displayName,
+                });
             }
 
             if (!await Account.exists(user, "facebook"))
@@ -262,6 +266,7 @@ export default <ServerRoute[]>[
             const profile: {
                 id: string,
                 email: string,
+                displayName: string,
             } = request.auth.credentials.profile as any;
 
             let user: User;
@@ -272,7 +277,10 @@ export default <ServerRoute[]>[
             }
             else
             {
-                user = await User.create({ email: profile.email });
+                user = await User.create({
+                    email: profile.email,
+                    full_name: profile.displayName,
+                });
             }
 
             if (!await Account.exists(user, "google"))

@@ -77,13 +77,14 @@ export class User implements ISerializable<ISerializedUser>
             .query(
                 `
                 insert into "users"
-                    ("id", "email")
+                    ("id", "full_name", "email")
                 values
-                    ($1, $2)
+                    ($1, $2, $3)
                 returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.USER),
+                    data.full_name,
                     data.email,
                 ],
             )
