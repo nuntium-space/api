@@ -63,7 +63,9 @@ export default <ServerRoute[]>[
 
             if (!await authenticatedUser.isSubscribedToPublisher(author.publisher))
             {
-                throw Boom.paymentRequired();
+                return h
+                    .response(article.serialize({ for: authenticatedUser })) // Only the metadata (content is excluded by default)
+                    .code(402); // Payment Required
             }
 
             // TODO:
@@ -83,7 +85,10 @@ export default <ServerRoute[]>[
                     ],
                 );
 
-            return article.serialize({ includeContent: true });
+            return article.serialize({
+                for: authenticatedUser,
+                includeContent: true,
+            });
         },
     },
     {
