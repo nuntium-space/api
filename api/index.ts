@@ -196,43 +196,45 @@ const init = async () =>
         {
             const authenticatedUser = (request.auth.credentials.session as Session).user;
 
-            const articlesResult = await Config.ELASTICSEARCH.search({
-                index: "articles",
-                size: request.query.limit,
-                from: request.query.offset,
-                body: {
-                    query: {
-                        multi_match: {
-                            query: request.query.query,
-                            fields: [ "title", "content" ],
-                            fuzziness: "AUTO",
+            const articlesResult = await Config.ELASTICSEARCH
+                .search({
+                    index: "articles",
+                    size: request.query.limit,
+                    from: request.query.offset,
+                    body: {
+                        query: {
+                            multi_match: {
+                                query: request.query.query,
+                                fields: [ "title", "content" ],
+                                fuzziness: "AUTO",
+                            },
                         },
+                        stored_fields: [],
                     },
-                    stored_fields: [],
-                },
-            });
+                });
 
-            const publishersResult = await Config.ELASTICSEARCH.search({
-                index: "publishers",
-                size: request.query.limit,
-                from: request.query.offset,
-                body: {
-                    query: {
-                        multi_match: {
-                            query: request.query.query,
-                            fields: [ "name" ],
-                            fuzziness: "AUTO",
+            const publishersResult = await Config.ELASTICSEARCH
+                .search({
+                    index: "publishers",
+                    size: request.query.limit,
+                    from: request.query.offset,
+                    body: {
+                        query: {
+                            multi_match: {
+                                query: request.query.query,
+                                fields: [ "name" ],
+                                fuzziness: "AUTO",
+                            },
                         },
+                        stored_fields: [],
                     },
-                    stored_fields: [],
-                },
-            });
+                });
 
             const articleIds: string[] = articlesResult.body.hits.hits.map((hit: any) => hit._id);
             const articles = await Article.retrieveMultiple(articleIds, request.query.expand);
 
             const publisherIds: string[] = publishersResult.body.hits.hits.map((hit: any) => hit._id);
-            const publishers = await Publisher.retrieveMultiple(publisherIds, request.query.expand);
+            const publishers = await Publisher.retrieveMultiple(publisherIds);
 
             return {
                 articles: articles.map(_ => _.serialize({ for: authenticatedUser })),

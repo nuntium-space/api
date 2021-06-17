@@ -150,6 +150,17 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         return Publisher.deserialize(result.rows[0]);
     }
 
+    public static async retrieveMultiple(ids: string[]): Promise<Publisher[]>
+    {
+        const result = await Database.pool
+            .query(
+                `select * from "publishers" where "id" = any ($1)`,
+                [ ids ],
+            );
+
+        return Promise.all(result.rows.map(Publisher.deserialize));
+    }
+
     public async update(data: IUpdatePublisher): Promise<void>
     {
         const shouldInvalidateDomainVerification = (data.url ?? this.url) !== this.url;
