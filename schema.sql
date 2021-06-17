@@ -424,5 +424,5 @@ INITIAL DATA
 insert into "account_types" ("id")
 values
   ('facebook'),
-  ('google')
+  ('google'),
   ('twitter');
