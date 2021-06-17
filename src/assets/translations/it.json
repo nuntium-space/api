@@ -102,10 +102,8 @@
             "underline": "Sottolinea",
             "undo": "Annulla"
         },
-        "header": {
-            "search": {
-                "placeholder": "Cerca articoli"
-            }
+        "search": {
+            "placeholder": "Cerca"
         },
         "stripe": {
             "connect_button": {
@@ -151,9 +149,16 @@
         }
     },
     "explore": {
+        "articles": "Articoli",
+        "publishers": "Editori",
+        "recently_viewed": "Visti di recente",
         "search": {
-            "empty": "Non ci sono risultati per <b>{{ QUERY }}</b>"
-        }
+            "empty": {
+                "articles": "Non ci sono articoli per il termine <b>{{ QUERY }}</b>",
+                "publishers": "Non ci sono editori per il termine <b>{{ QUERY }}</b>"
+            }
+        },
+        "trending": "Tendenze"
     },
     "feed": {
         "empty": {

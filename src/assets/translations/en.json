@@ -102,10 +102,8 @@
             "underline": "Underline",
             "undo": "Undo"
         },
-        "header": {
-            "search": {
-                "placeholder": "Search articles"
-            }
+        "search": {
+            "placeholder": "Search"
         },
         "stripe": {
             "connect_button": {
@@ -151,9 +149,16 @@
         }
     },
     "explore": {
+        "articles": "Articles",
+        "publishers": "Publishers",
+        "recently_viewed": "Recently viewed",
         "search": {
-            "empty": "No results for <b>{{ QUERY }}</b>"
-        }
+            "empty": {
+                "articles": "There are no articles for the query <b>{{ QUERY }}</b>",
+                "publishers": "There are no publishers for the query <b>{{ QUERY }}</b>"
+            }
+        },
+        "trending": "Trending"
     },
     "feed": {
         "empty": {
