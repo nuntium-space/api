@@ -3,8 +3,10 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
+import { Article } from "../../models/Article";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
+import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
     {
@@ -30,6 +32,56 @@ export default <ServerRoute[]>[
             }
 
             return authenticatedUser.serialize({ for: authenticatedUser });
+        },
+    },
+    {
+        method: "GET",
+        path: "/users/{id}/history",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.USER.required(),
+                }),
+            },
+            response: {
+                schema: Schema.ARRAY(
+                    Joi.object({
+                        article: Article.SCHEMA.OBJ.required(),
+                        timestamp: Schema.DATETIME.required(),
+                    }),
+                ),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const result = await Database.pool
+                .query(
+                    `
+                    select "article", "timestamp"
+                    from "user_history"
+                    where "user" = $1
+                    `,
+                    [ authenticatedUser.id ],
+                );
+
+            return Promise.all(
+                result.rows.map(async _ =>
+                {
+                    const article = await Article.retrieve(_.article);
+        
+                    return {
+                        article: article.serialize(),
+                        timestamp: _.timestamp,
+                    };
+                }),
+            );
         },
     },
     {
@@ -180,6 +232,37 @@ export default <ServerRoute[]>[
             }
 
             await user.delete();
+
+            return h.response();
+        },
+    },
+    {
+        method: "GET",
+        path: "/users/{id}/history",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.USER.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            if (request.params.id !== authenticatedUser.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await Database.pool
+                .query(
+                    `
+                    delete from "user_history"
+                    where "user" = $1
+                    `,
+                    [ authenticatedUser.id ],
+                );
 
             return h.response();
         },
