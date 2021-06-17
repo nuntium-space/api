@@ -186,6 +186,11 @@ export default <ServerRoute[]>[
                         .join("\n")
                         .replace("{{ API_HOST }}", Config.API_HOST)
                         .replace("{{ TOKEN }}", token),
+                    trackingSettings: {
+                        clickTracking: {
+                            enable: false,
+                        },
+                    },
                 })
                 .catch(async () =>
                 {
