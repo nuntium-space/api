@@ -351,6 +351,21 @@ create table "article_views"
   check ("timestamp" = current_timestamp)
 );
 
+create table "sources"
+(
+  "id" id not null,
+  "url" url not null,
+  "article" id not null,
+
+  primary key ("id"),
+
+  unique ("url", "article"),
+
+  foreign key ("article") references "articles" on update cascade on delete cascade,
+
+  check ("id" like 'src_%')
+);
+
 /*
 -----
 VIEWS
