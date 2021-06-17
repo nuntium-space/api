@@ -1,12 +1,16 @@
 import "dotenv/config";
 
+import AWS from "aws-sdk";
+import { Config } from "../src/config/Config";
+
+AWS.config.update({ credentials: Config.AWS_CREDENTIALS });
+
 import Bell from "@hapi/bell";
 import Boom from "@hapi/boom";
 import Cookie from "@hapi/cookie";
 import Hapi from "@hapi/hapi";
 import Joi, { ValidationError } from "joi";
 import qs from "qs";
-import { Config } from "../src/config/Config";
 import { Article } from "../src/models/Article";
 import { Session } from "../src/models/Session";
 import Database from "../src/utilities/Database";
@@ -18,7 +22,7 @@ const server = Hapi.server({
     port: process.env.PORT,
     routes: {
         cors: {
-            origin: [ Config.CLIENT_HOST ],
+            origin: [ Config.CLIENT_URL ],
             credentials: true,
         },
         validate: {
@@ -88,7 +92,7 @@ const init = async () =>
             name: "session_id",
             password: "password-should-be-32-characters",
             ttl: Config.SESSION_DURATION_IN_SECONDS * 1000,
-            domain: new URL(Config.CLIENT_HOST).hostname,
+            domain: new URL(Config.CLIENT_URL).hostname,
             path: "/",
             clearInvalid: true,
             isSameSite: "Strict",

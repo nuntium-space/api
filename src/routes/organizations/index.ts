@@ -64,8 +64,8 @@ export default <ServerRoute[]>[
                 .create({
                     account: organization.stripe_account_id,
                     type: "account_onboarding",
-                    refresh_url: `${Config.API_HOST}/organizations/${organization.id}`,
-                    return_url: `${Config.CLIENT_HOST}/organization/${organization.id}`,
+                    refresh_url: `${Config.API_URL}/organizations/${organization.id}`,
+                    return_url: `${Config.CLIENT_URL}/organization/${organization.id}`,
                 })
                 .catch(() =>
                 {

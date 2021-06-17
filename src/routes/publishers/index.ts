@@ -380,7 +380,6 @@ export default <ServerRoute[]>[
                 });
 
             const s3Client = new AWS.S3({
-                credentials: Config.AWS_CREDENTIALS,
                 endpoint: Config.AWS_ENDPOINT,
                 s3ForcePathStyle: true,
             });

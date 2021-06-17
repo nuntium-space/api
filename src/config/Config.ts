@@ -1,6 +1,9 @@
+import AWS from "aws-sdk";
 import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
 import { CredentialsOptions } from "aws-sdk/lib/credentials";
 import Stripe from "stripe";
+
+const createAwsElasticsearchConnector = require('aws-elasticsearch-connector')
 
 export class Config
 {
@@ -83,16 +86,12 @@ export class Config
 
     public static readonly STRIPE_CONNECT_FEE_PERCENT = 20;
 
-    public static readonly API_HOST = Config.IS_PRODUCTION
-        ? "https://api.nuntium.space"
-        : `http://localhost:${process.env.PORT}`;
-
-    public static readonly CLIENT_HOST = Config.IS_PRODUCTION
-        ? "https://nuntium.space"
-        : "http://localhost:4200";
+    public static readonly API_URL = process.env.API_URL as string;
+    public static readonly CLIENT_URL = process.env.CLIENT_URL as string;
 
     public static readonly ELASTICSEARCH = new ElasticSearchClient({
-        node: "http://localhost:9200",
+        ...createAwsElasticsearchConnector(AWS.config),
+        node: process.env.ELASTICSEARCH_URL,
     });
 
     public static readonly AWS_CREDENTIALS: CredentialsOptions = {

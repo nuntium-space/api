@@ -184,7 +184,7 @@ export default <ServerRoute[]>[
                     subject: `[nuntium] ${translations.auth.email.subject}`,
                     text: (translations.auth.email.lines as string[])
                         .join("\n")
-                        .replace("{{ API_HOST }}", Config.API_HOST)
+                        .replace("{{ API_URL }}", Config.API_URL)
                         .replace("{{ TOKEN }}", token),
                     trackingSettings: {
                         clickTracking: {
@@ -252,7 +252,7 @@ export default <ServerRoute[]>[
 
             request.cookieAuth.set({ id: session.id });
 
-            return h.redirect(Config.CLIENT_HOST);
+            return h.redirect(Config.CLIENT_URL);
         },
     },
     {
@@ -301,7 +301,7 @@ export default <ServerRoute[]>[
 
             request.cookieAuth.set({ id: session.id });
 
-            return h.redirect(Config.CLIENT_HOST);
+            return h.redirect(Config.CLIENT_URL);
         },
     },
     {
@@ -348,7 +348,7 @@ export default <ServerRoute[]>[
 
             request.cookieAuth.set({ id: session.id });
 
-            return h.redirect(Config.CLIENT_HOST);
+            return h.redirect(Config.CLIENT_URL);
         },
     },
 ];
