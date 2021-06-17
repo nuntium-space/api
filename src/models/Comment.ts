@@ -105,12 +105,12 @@ export class Comment implements ISerializable<ISerializedComment>
     {
         const user = await User.retrieve(data.user);
 
-        if (!user.username)
+        if (!user.full_name)
         {
             throw Boom.forbidden(undefined, [
                 {
                     field: "comment",
-                    error: "custom.comment.no_username",
+                    error: "custom.comment.no_full_name",
                 },
             ]);
         }

@@ -31,13 +31,11 @@ create table "users"
 (
   "id" id not null,
   "full_name" text,
-  "username" text,
   "email" email_address not null,
   "stripe_customer_id" text,
 
   primary key ("id"),
 
-  unique ("username"),
   unique ("email"),
 
   check ("id" like 'usr_%')

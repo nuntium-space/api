@@ -13,7 +13,6 @@ interface IDatabaseUser
 {
     id: string,
     full_name: string | null,
-    username: string | null,
     email: string,
     stripe_customer_id: string | null,
 }
@@ -21,14 +20,12 @@ interface IDatabaseUser
 interface ICreateUser
 {
     full_name?: string,
-    username?: string,
     email: string,
 }
 
 interface IUpdateUser
 {
     full_name?: string,
-    username?: string,
     email?: string,
 }
 
@@ -46,7 +43,6 @@ export interface ISerializedUser
 {
     id: string,
     full_name: string | null,
-    username: string | null,
     email: string,
 }
 
@@ -56,7 +52,6 @@ export class User implements ISerializable<ISerializedUser>
     (
         public readonly id: string,
         private _full_name: string | null,
-        private _username: string | null,
         private _email: string,
         public readonly stripe_customer_id: string | null,
     )
@@ -65,11 +60,6 @@ export class User implements ISerializable<ISerializedUser>
     public get full_name(): string | null
     {
         return this._full_name;
-    }
-
-    public get username(): string | null
-    {
-        return this._username;
     }
 
     public get email(): string
@@ -87,14 +77,13 @@ export class User implements ISerializable<ISerializedUser>
             .query(
                 `
                 insert into "users"
-                    ("id", "username", "email")
+                    ("id", "email")
                 values
-                    ($1, $2, $3)
+                    ($1, $2)
                 returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.USER),
-                    data.username ?? null,
                     data.email,
                 ],
             )
@@ -184,7 +173,6 @@ export class User implements ISerializable<ISerializedUser>
     public async update(data: IUpdateUser): Promise<void>
     {
         this._full_name = data.full_name ?? this.full_name;
-        this._username = data.username ?? this.username;
         this._email = data.email ?? this.email;
 
         const client = await Database.pool.connect();
@@ -197,14 +185,12 @@ export class User implements ISerializable<ISerializedUser>
                 update "users"
                 set
                     "full_name" = $1,
-                    "username" = $2,
-                    "email" = $3
+                    "email" = $2
                 where
-                    "id" = $4
+                    "id" = $3
                 `,
                 [
                     this.full_name,
-                    this.username,
                     this.email,
                     this.id,
                 ],
@@ -539,14 +525,13 @@ export class User implements ISerializable<ISerializedUser>
     {
         let response: any = {
             id: this.id,
-            username: this.username,
+            full_name: this.full_name,
         };
 
         if (options?.for?.id === this.id)
         {
             response = {
                 ...response,
-                full_name: this.full_name,
                 email: this.email,
             };
         }
@@ -559,7 +544,6 @@ export class User implements ISerializable<ISerializedUser>
         return new User(
             data.id,
             data.full_name,
-            data.username,
             data.email,
             data.stripe_customer_id,
         );
@@ -569,12 +553,10 @@ export class User implements ISerializable<ISerializedUser>
         OBJ: Joi.object({
             id: Schema.ID.USER.required(),
             full_name: Schema.NULLABLE(Schema.STRING).optional(),
-            username: Schema.NULLABLE(Schema.STRING.max(30)).required(),
             email: Schema.EMAIL.optional(),
         }),
         UPDATE: Joi.object({
             full_name: Schema.STRING,
-            username: Schema.STRING.max(30),
             email: Schema.EMAIL,
         }),
     } as const;

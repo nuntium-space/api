@@ -127,7 +127,7 @@
                 "already_exists": "A bundle with this name already exists for this organization"
             },
             "comment": {
-                "no_username": "You must set a username in order to be able to add a comment"
+                "no_full_name": "You must set your full name in order to be able to add a comment"
             },
             "organization": {
                 "already_exists": "An organization with this name already exists"
@@ -187,8 +187,7 @@
         "sign_out": "Sign Out",
         "sign_up": "Sign Up",
         "submit": "Submit",
-        "update": "Update",
-        "username": "Username"
+        "update": "Update"
     },
     "home": {
         "hero": {
