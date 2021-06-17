@@ -67,7 +67,8 @@
             "billing_period": {
                 "month": "mese"
             },
-            "choose_option": "Scegli un'opzione"
+            "choose_option": "Scegli un'opzione",
+            "included_publishers": "Editori inclusi"
         }
     },
     "components": {

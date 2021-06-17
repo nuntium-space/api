@@ -67,7 +67,8 @@
             "billing_period": {
                 "month": "month"
             },
-            "choose_option": "Choose an option"
+            "choose_option": "Choose an option",
+            "included_publishers": "Included publishers"
         }
     },
     "components": {
