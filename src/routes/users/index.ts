@@ -233,7 +233,7 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "GET",
+        method: "DELETE",
         path: "/users/{id}/history",
         options: {
             validate: {
