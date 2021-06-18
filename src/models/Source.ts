@@ -1,6 +1,6 @@
 import Boom from "@hapi/boom";
 import Joi from "joi";
-import { Client } from "pg";
+import { PoolClient } from "pg";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -16,7 +16,7 @@ interface IDatabaseSource
     article: string,
 }
 
-interface ICreateSource
+export interface ICreateSource
 {
     url: string,
 }
@@ -41,7 +41,7 @@ export class Source implements ISerializable<ISerializedSource>
     // CRUD //
     //////////
 
-    public static async createMultiple(data: ICreateSource[], article: Article, client: Client): Promise<void>
+    public static async createMultiple(data: ICreateSource[], articleId: string, client: PoolClient): Promise<void>
     {
         await Promise
             .all(data.map(_ =>
@@ -58,7 +58,7 @@ export class Source implements ISerializable<ISerializedSource>
                         [
                             Utilities.id(Config.ID_PREFIXES.SOURCE),
                             _.url,
-                            article.id,
+                            articleId,
                         ],
                     );
             }))

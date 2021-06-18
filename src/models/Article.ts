@@ -8,7 +8,7 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author, ISerializedAuthor } from "./Author";
 import { Publisher } from "./Publisher";
-import { Source } from "./Source";
+import { ICreateSource, Source } from "./Source";
 import { User } from "./User";
 
 interface IDatabaseArticle
@@ -28,12 +28,14 @@ interface ICreateArticle
 {
     title: string,
     content: any,
+    sources: ICreateSource[],
 }
 
 interface IUpdateArticle
 {
     title?: string,
     content?: any,
+    sources?: ICreateSource[],
 }
 
 export interface ISerializedArticle
@@ -134,6 +136,8 @@ export class Article implements ISerializable<ISerializedArticle>
 
                 throw Boom.badImplementation();
             });
+
+        await Source.createMultiple(data.sources, id, client);
 
         await client.query("commit");
 
