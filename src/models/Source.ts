@@ -86,7 +86,7 @@ export class Source implements ISerializable<ISerializedSource>
     // UTILITIES //
     ///////////////
 
-    public static async forArticle(article: Article): Promise<Source[]>
+    public static async forArticle(article: Article | string): Promise<Source[]>
     {
         const result = await Database.pool
             .query(
@@ -95,7 +95,11 @@ export class Source implements ISerializable<ISerializedSource>
                 from "sources"
                 where "article" = $1
                 `,
-                [ article.id ],
+                [
+                    article instanceof Article
+                        ? article.id
+                        : article,
+                ],
             );
 
         return Promise.all(result.rows.map(_ => Source.deserialize(_)));
