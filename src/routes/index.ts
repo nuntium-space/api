@@ -2,7 +2,6 @@ import articles from "./articles";
 import auth from "./auth";
 import authors from "./authors";
 import bundles from "./bundles";
-import comments from "./comments";
 import organizations from "./organizations";
 import paymentMethods from "./payment-methods";
 import prices from "./prices";
@@ -18,7 +17,6 @@ export = [
     auth,
     authors,
     bundles,
-    comments,
     organizations,
     paymentMethods,
     prices,

@@ -32,7 +32,6 @@ export class Config
         AUTHOR: "aut",
         ARTICLE: "art",
         SESSION: "ses",
-        COMMENT: "cmt",
         BUNDLE: "bdl",
         SUBSCRIPTION: "sub",
         PAYMENT_METHOD: "pmt",

@@ -155,28 +155,6 @@ create table "sessions"
   check ("expires_at" > current_timestamp)
 );
 
-create table "comments"
-(
-  "id" id not null,
-  "content" text not null,
-  "user" id not null,
-  "article" id not null,
-  "parent" id,
-  "created_at" timestamp not null default current_timestamp,
-  "updated_at" timestamp not null default current_timestamp,
-
-  primary key ("id"),
-
-  foreign key ("user") references "users" on update cascade on delete cascade,
-  foreign key ("article") references "articles" on update cascade on delete cascade,
-  foreign key ("parent") references "comments" on update cascade on delete cascade,
-
-  check ("id" like 'cmt_%'),
-  check ("created_at" <= current_timestamp),
-  check ("updated_at" >= "created_at"),
-  check ("parent" <> "id")
-);
-
 create table "bundles"
 (
   "id" id not null,
@@ -375,11 +353,6 @@ VIEWS
 create view "v_active_bundles"
 as select * from "bundles" where "active" = true;
 
-create view "v_comments"
-as
-  select *, (select count(*) from "comments" where "parent" = "c"."id") as "reply_count"
-  from "comments" as c;
-
 create view "v_active_subscriptions"
 as select * from "subscriptions" where "status" = 'active';
 
@@ -412,11 +385,6 @@ TRIGGERS
 
 create trigger "update_updated_at"
 before update on "articles"
-for each row
-execute procedure trigger_update_updated_at();
-
-create trigger "update_updated_at"
-before update on "comments"
 for each row
 execute procedure trigger_update_updated_at();
 
