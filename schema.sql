@@ -344,6 +344,31 @@ create table "sources"
   check ("id" like 'src_%')
 );
 
+create table "likes"
+(
+  "user" id not null,
+  "article" id not null,
+
+  primary key ("article", "user"),
+
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("article") references "articles" on update cascade on delete cascade
+);
+
+create table "bookmarks"
+(
+  "user" id not null,
+  "article" id not null,
+  "timestamp" timestamp not null default current_timestamp,
+
+  primary key ("article", "user"),
+
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("article") references "articles" on update cascade on delete cascade,
+
+  check ("timestamp" = current_timestamp)
+);
+
 /*
 -----
 VIEWS
@@ -390,6 +415,16 @@ execute procedure trigger_update_updated_at();
 
 create trigger "prevent_update"
 before update on "article_views"
+for each row
+execute procedure prevent_update();
+
+create trigger "prevent_update"
+before update on "bookmarks"
+for each row
+execute procedure prevent_update();
+
+create trigger "prevent_update"
+before update on "likes"
 for each row
 execute procedure prevent_update();
 
