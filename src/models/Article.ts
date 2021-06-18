@@ -277,6 +277,12 @@ export class Article implements ISerializable<ISerializedArticle>
                 throw Boom.badImplementation();
             });
 
+        if (data.sources)
+        {
+            await Source.deleteAll(this);
+            await Source.createMultiple(data.sources, this.id, client);
+        }
+
         await client.query("commit");
 
         client.release();

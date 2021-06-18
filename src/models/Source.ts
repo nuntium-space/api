@@ -70,12 +70,15 @@ export class Source implements ISerializable<ISerializedSource>
             });
     }
 
-    public async delete(): Promise<void>
+    public static async deleteAll(article: Article): Promise<void>
     {
         await Database.pool
             .query(
-                `delete from "sources" where "id" = $1`,
-                [ this.id ],
+                `
+                delete from "sources"
+                where "article" = $1
+                `,
+                [ article.id ],
             );
     }
 
