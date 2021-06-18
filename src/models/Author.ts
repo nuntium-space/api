@@ -96,6 +96,36 @@ export class Author implements ISerializable<ISerializedAuthor>
         return Author.deserialize(result.rows[0], expand);
     }
 
+    public static async retrieveWithUserAndPublisher(user: User | string, publisher: Publisher | string, expand?: string[]): Promise<Author>
+    {
+        const result = await Database.pool.query(
+            `
+            select *
+            from "authors"
+            where
+                "user" = $1
+                and
+                "publisher" = $2
+            limit 1
+            `,
+            [
+                user instanceof User
+                    ? user.id
+                    : user,
+                publisher instanceof Publisher
+                    ? publisher.id
+                    : publisher,
+            ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            throw Boom.notFound();
+        }
+
+        return Author.deserialize(result.rows[0], expand);
+    }
+
     public async delete(): Promise<void>
     {
         await Database.pool.query(

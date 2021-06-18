@@ -74,6 +74,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.USER.required(),
                 }),
                 query: Joi.object({
+                    publisher: Schema.ID.PUBLISHER.optional(),
                     expand: Schema.EXPAND_QUERY,
                 }),
             },
@@ -90,7 +91,9 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const authors = await Author.forUser(authenticatedUser, request.query.expand);
+            const authors = request.query.publisher
+                ? [ await Author.retrieveWithUserAndPublisher(authenticatedUser, request.query.publisher) ]
+                : await Author.forUser(authenticatedUser, request.query.expand);
 
             return authors.map(author => author.serialize({ for: authenticatedUser }));
         },
