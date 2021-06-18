@@ -6,7 +6,6 @@
         "author": {
             "__title": "Autore"
         },
-        "comments": "Commenti",
         "content": "Contenuto",
         "info": {
             "__title": "Info",
@@ -72,23 +71,9 @@
         }
     },
     "components": {
-        "add_comment": {
-            "__title": "Aggiungi un commento",
-            "submit": "Aggiungi commento"
-        },
         "article_list": {
             "article": {
                 "for": "per"
-            }
-        },
-        "comment_list": {
-            "comment": {
-                "actions": {
-                    "cancel": "Annulla",
-                    "reply": "Rispondi"
-                },
-                "replies": "Risposte",
-                "updated_on": "Aggiornato il"
             }
         },
         "editor": {
@@ -126,9 +111,6 @@
         "custom": {
             "bundle": {
                 "already_exists": "Un bundle con questo nome esiste già per questa organizzazione"
-            },
-            "comment": {
-                "no_full_name": "Devi impostare il tuo nome completo per poter aggiungere un commento"
             },
             "organization": {
                 "already_exists": "Un'organizzazione con questo nome esiste già"
