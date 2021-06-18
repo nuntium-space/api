@@ -8,6 +8,7 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author, ISerializedAuthor } from "./Author";
 import { Publisher } from "./Publisher";
+import { Source } from "./Source";
 import { User } from "./User";
 
 interface IDatabaseArticle
@@ -451,6 +452,7 @@ export class Article implements ISerializable<ISerializedArticle>
         CREATE: Joi.object({
             title: Schema.STRING.max(50).required(),
             content: Schema.ARTICLE_CONTENT.required(),
+            sources: Schema.ARRAY(Source.SCHEMA.CREATE).required(),
         }),
         UPDATE: Joi.object({
             title: Schema.STRING.max(50),

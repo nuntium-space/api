@@ -39,6 +39,7 @@ export class Config
         PRICE: "pri",
         ACCOUNT: "acc",
         SIGN_IN_REQUEST: "sir",
+        SOURCE: "src",
     };
 
     public static readonly LANGUAGES = [
