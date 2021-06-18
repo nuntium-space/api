@@ -1,6 +1,7 @@
 import articles from "./articles";
 import auth from "./auth";
 import authors from "./authors";
+import bookmarks from "./bookmarks";
 import bundles from "./bundles";
 import organizations from "./organizations";
 import paymentMethods from "./payment-methods";
@@ -16,6 +17,7 @@ export = [
     articles,
     auth,
     authors,
+    bookmarks,
     bundles,
     organizations,
     paymentMethods,
