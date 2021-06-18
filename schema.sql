@@ -127,7 +127,7 @@ create table "articles"
   "author" id not null,
   "reading_time" int not null,
   "view_count" int not null default 0,
-  "comment_count" int not null default 0,
+  "like_count" int not null default 0,
   "created_at" timestamp not null default current_timestamp,
   "updated_at" timestamp not null default current_timestamp,
 
