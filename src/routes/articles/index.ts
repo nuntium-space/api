@@ -30,7 +30,7 @@ export default <ServerRoute[]>[
 
             const articles = await Article.trending(request.query.expand);
 
-            return articles.map(_ => _.serialize({ for: authenticatedUser }));
+            return Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser })));
         },
     },
     {
@@ -122,7 +122,7 @@ export default <ServerRoute[]>[
 
             const articles = await Article.forPublisher(publisher, request.query.expand);
 
-            return articles.map(article => article.serialize({ for: authenticatedUser }));
+            return Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser })));
         },
     },
     {
@@ -152,7 +152,7 @@ export default <ServerRoute[]>[
 
             const articles = await Article.retrieveRecent(authenticatedUser, request.query.expand);
 
-            return articles.map(_ => _.serialize({ for: authenticatedUser }));
+            return Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser })));
         },
     },
     {

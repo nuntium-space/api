@@ -243,7 +243,7 @@ const init = async () =>
             const publishers = await Publisher.retrieveMultiple(publisherIds);
 
             return {
-                articles: articles.map(_ => _.serialize({ for: authenticatedUser })),
+                articles: await Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser }))),
                 publishers: publishers.map(_ => _.serialize({ for: authenticatedUser })),
             };
         },
