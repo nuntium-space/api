@@ -37,7 +37,7 @@ export const AUTHOR_SCHEMA = {
         publisher: Joi
             .alternatives()
             .try(
-                Publisher.SCHEMA.OBJ,
+                PUBLISHER_SCHEMA.OBJ,
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
             )
             .required(),

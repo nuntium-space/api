@@ -10,6 +10,7 @@ import { User } from "../../models/User";
 import Database from "../../utilities/Database";
 import Utilities from "../../utilities/Utilities";
 import { Schema } from "../../config/Schema";
+import { SESSION_SCHEMA } from "../../types/session";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
@@ -72,7 +73,7 @@ export default <ServerRoute[]>[
             },
             response: {
                 schema: Joi.object({
-                    session: Session.SCHEMA.OBJ.required(),
+                    session: SESSION_SCHEMA.OBJ.required(),
                 }),
             },
         },
@@ -115,7 +116,7 @@ export default <ServerRoute[]>[
         options: {
             auth: false,
             validate: {
-                payload: Session.SCHEMA.CREATE,
+                payload: SESSION_SCHEMA.CREATE,
             },
             response: {
                 schema: Joi.object({

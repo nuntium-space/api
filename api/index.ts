@@ -18,6 +18,7 @@ import routes from "../src/routes";
 import { Schema } from "../src/config/Schema";
 import { Publisher } from "../src/models/Publisher";
 import { ARTICLE_SCHEMA } from "../src/types/article";
+import { PUBLISHER_SCHEMA } from "../src/types/publisher";
 
 const server = Hapi.server({
     port: process.env.PORT,
@@ -193,7 +194,7 @@ const init = async () =>
             response: {
                 schema: Joi.object({
                     articles: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).required(),
-                    publishers: Schema.ARRAY(Publisher.SCHEMA.OBJ).required(),
+                    publishers: Schema.ARRAY(PUBLISHER_SCHEMA.OBJ).required(),
                 }),
             },
         },

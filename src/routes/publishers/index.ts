@@ -12,6 +12,7 @@ import imageType from "image-type";
 import imageSize from "image-size";
 import { Session } from "../../models/Session";
 import { Schema } from "../../config/Schema";
+import { PUBLISHER_SCHEMA } from "../../types/publisher";
 
 export default <ServerRoute[]>[
     {
@@ -24,7 +25,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Publisher.SCHEMA.OBJ,
+                schema: PUBLISHER_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -87,7 +88,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Publisher.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(PUBLISHER_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -114,7 +115,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Publisher.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(PUBLISHER_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -193,10 +194,10 @@ export default <ServerRoute[]>[
         path: "/organizations/{id}/publishers",
         options: {
             validate: {
-                payload: Publisher.SCHEMA.CREATE,
+                payload: PUBLISHER_SCHEMA.CREATE,
             },
             response: {
-                schema: Publisher.SCHEMA.OBJ,
+                schema: PUBLISHER_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -281,10 +282,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.PUBLISHER.required(),
                 }),
-                payload: Publisher.SCHEMA.UPDATE,
+                payload: PUBLISHER_SCHEMA.UPDATE,
             },
             response: {
-                schema: Publisher.SCHEMA.OBJ,
+                schema: PUBLISHER_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

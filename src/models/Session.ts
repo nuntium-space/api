@@ -1,26 +1,11 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ISerializedSession, IDatabaseSession } from "../types/session";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
-import { ISerializedUser, User } from "./User";
-
-interface IDatabaseSession
-{
-    id: string,
-    user: string,
-    expires_at: Date,
-}
-
-export interface ISerializedSession
-{
-    id: string,
-    user: ISerializedUser,
-    expires_at: string,
-}
+import { User } from "./User";
 
 export class Session implements ISerializable<ISerializedSession>
 {
@@ -124,15 +109,4 @@ export class Session implements ISerializable<ISerializedSession>
             data.expires_at,
         );
     }
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.SESSION.required(),
-            user: User.SCHEMA.OBJ.required(),
-            expires_at: Schema.DATETIME.required(),
-        }),
-        CREATE: Joi.object({
-            email: Schema.EMAIL.required(),
-        }),
-    } as const;
 }
