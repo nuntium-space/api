@@ -21,8 +21,8 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
         private _content: any,
         public readonly author: Author | INotExpandedResource,
         private _reading_time: number,
-        public view_count: number,
-        public like_count: number,
+        public readonly view_count: number,
+        public readonly like_count: number,
         public readonly created_at: Date,
         private _updated_at: Date,
     )
