@@ -22,6 +22,16 @@ export class Author implements ISerializable<ISerializedAuthor>
     {
         const user = await User.retrieveWithEmail(data.email);
 
+        if (!user.full_name)
+        {
+            throw Boom.forbidden(undefined, [
+                {
+                    field: "author",
+                    error: "Cannot make a user an author if it does not have a full name set",
+                },
+            ]);
+        }
+
         const result = await Database.pool
             .query(
                 `
