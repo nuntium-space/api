@@ -144,10 +144,16 @@
         "trending": "Tendenze"
     },
     "feed": {
+        "bookmarks": {
+            "__title": "Segnalibri"
+        },
         "empty": {
             "title": "Cominciamo a riempire questo vuoto.",
-            "subtitle": "Cerca articoli, editori o autori specifici oppure esplora per scoprire tutto quello che puoi trovare su nuntium.",
-            "explore": "Esplora"
+            "subtitle": "Cerca articoli, editori o autori specifici oppure esplora per scoprire tutto quello che puoi trovare su nuntium."
+        },
+        "explore": "Esplora",
+        "likes": {
+            "__title": "Piaciuti"
         }
     },
     "generic": {

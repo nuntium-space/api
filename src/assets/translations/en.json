@@ -144,10 +144,16 @@
         "trending": "Trending"
     },
     "feed": {
+        "bookmarks": {
+            "__title": "Bookmarks"
+        },
         "empty": {
             "title": "Let's start filling this space.",
-            "subtitle": "Search for specific articles, publishers or authors or just explore to find out everything nuntium has to offer.",
-            "explore": "Explore"
+            "subtitle": "Search for specific articles, publishers or authors or just explore to find out everything nuntium has to offer."
+        },
+        "explore": "Explore",
+        "likes": {
+            "__title": "Liked"
         }
     },
     "generic": {
