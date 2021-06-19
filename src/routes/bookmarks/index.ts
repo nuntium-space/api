@@ -5,7 +5,6 @@ import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Bookmark } from "../../models/Bookmark";
 import { Session } from "../../models/Session";
-import { ARTICLE_SCHEMA } from "../../types/article";
 import { BOOKMARK_SCHEMA } from "../../types/bookmark";
 
 export default <ServerRoute[]>[
@@ -22,12 +21,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(
-                    Joi.object({
-                        article: ARTICLE_SCHEMA.OBJ.required(),
-                        timestamp: Schema.DATETIME.required(),
-                    }),
-                ),
+                schema: Schema.ARRAY(BOOKMARK_SCHEMA.OBJ),
             },
         },
         handler: async (request, h) =>
