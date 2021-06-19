@@ -4,6 +4,7 @@ services:
   localstack:
     container_name: localstack
     image: localstack/localstack
+    restart: always
     network_mode: bridge
     ports:
       - "4566:4566"
