@@ -21,6 +21,8 @@ create domain "email_address" as varchar(320);
 
 create domain "url" as varchar(500) check(value like 'https://%');
 
+create domain "current_timestamp_utc" as timestamp default (current_timestamp at time zone 'UTC') check (value = current_timestamp at time zone 'UTC');
+
 /*
 ------
 TABLES
@@ -128,8 +130,8 @@ create table "articles"
   "reading_time" int not null,
   "view_count" int not null default 0,
   "like_count" int not null default 0,
-  "created_at" timestamp not null default current_timestamp,
-  "updated_at" timestamp not null default current_timestamp,
+  "created_at" current_timestamp_utc not null,
+  "updated_at" current_timestamp_utc not null,
 
   primary key ("id"),
 
@@ -137,7 +139,6 @@ create table "articles"
 
   check ("id" like 'art_%'),
   check ("reading_time" >= 0),
-  check ("created_at" <= current_timestamp),
   check ("updated_at" >= "created_at")
 );
 
@@ -293,14 +294,12 @@ create table "user_history"
 (
   "user" id not null,
   "article" id not null,
-  "timestamp" timestamp not null default current_timestamp,
+  "timestamp" current_timestamp_utc not null,
 
   primary key ("article", "user", "timestamp"),
 
   foreign key ("user") references "users" on update cascade on delete cascade,
-  foreign key ("article") references "articles" on update cascade on delete cascade,
-
-  check ("timestamp" = current_timestamp)
+  foreign key ("article") references "articles" on update cascade on delete cascade
 );
 
 /*
@@ -319,14 +318,13 @@ create table "article_views"
   */
   "id" id not null,
   "article" id not null,
-  "timestamp" timestamp not null default current_timestamp,
+  "timestamp" current_timestamp_utc not null,
 
   primary key ("id"),
 
   foreign key ("article") references "articles" on update cascade on delete cascade,
 
-  check ("id" like 'avw_%'),
-  check ("timestamp" = current_timestamp)
+  check ("id" like 'avw_%')
 );
 
 create table "sources"
@@ -349,7 +347,7 @@ create table "likes"
   "user" id not null,
   "article" id not null,
 
-  primary key ("article", "user"),
+  primary key ("user", "article"),
 
   foreign key ("user") references "users" on update cascade on delete cascade,
   foreign key ("article") references "articles" on update cascade on delete cascade
@@ -359,14 +357,12 @@ create table "bookmarks"
 (
   "user" id not null,
   "article" id not null,
-  "timestamp" timestamp not null default current_timestamp,
+  "timestamp" current_timestamp_utc not null,
 
-  primary key ("article", "user"),
+  primary key ("user", "article"),
 
   foreign key ("user") references "users" on update cascade on delete cascade,
-  foreign key ("article") references "articles" on update cascade on delete cascade,
-
-  check ("timestamp" = current_timestamp)
+  foreign key ("article") references "articles" on update cascade on delete cascade
 );
 
 /*
@@ -394,10 +390,10 @@ begin
 end;
 $$ language plpgsql;
 
-create function trigger_update_updated_at()
+create function update_updated_at()
 returns trigger as $$
 begin
-  new."updated_at" = current_timestamp;
+  new."updated_at" = current_timestamp at time zone 'UTC';
   return new;
 end;
 $$ language plpgsql;
@@ -411,7 +407,7 @@ TRIGGERS
 create trigger "update_updated_at"
 before update on "articles"
 for each row
-execute procedure trigger_update_updated_at();
+execute procedure update_updated_at();
 
 create trigger "prevent_update"
 before update on "article_views"
