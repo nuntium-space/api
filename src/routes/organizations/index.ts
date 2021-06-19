@@ -5,6 +5,7 @@ import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Organization } from "../../models/Organization";
 import { Session } from "../../models/Session";
+import { ORGANIZATION_SCHEMA } from "../../types/organization";
 
 export default <ServerRoute[]>[
     {
@@ -17,7 +18,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Organization.SCHEMA.OBJ,
+                schema: ORGANIZATION_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -121,7 +122,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Organization.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(ORGANIZATION_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -143,10 +144,10 @@ export default <ServerRoute[]>[
         path: "/organizations",
         options: {
             validate: {
-                payload: Organization.SCHEMA.CREATE,
+                payload: ORGANIZATION_SCHEMA.CREATE,
             },
             response: {
-                schema: Organization.SCHEMA.OBJ,
+                schema: ORGANIZATION_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -166,10 +167,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.ORGANIZATION.required(),
                 }),
-                payload: Organization.SCHEMA.UPDATE,
+                payload: ORGANIZATION_SCHEMA.UPDATE,
             },
             response: {
-                schema: Organization.SCHEMA.OBJ,
+                schema: ORGANIZATION_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

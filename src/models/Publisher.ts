@@ -7,10 +7,11 @@ import { Config } from "../config/Config";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
-import { ISerializedOrganization, Organization } from "./Organization";
+import { Organization } from "./Organization";
 import { User } from "./User";
 import Joi from "joi";
 import { Schema } from "../config/Schema";
+import { ISerializedOrganization, ORGANIZATION_SCHEMA } from "../types/organization";
 
 interface IDatabasePublisher
 {
@@ -355,7 +356,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             id: Schema.ID.PUBLISHER.required(),
             name: Schema.STRING.max(50).required(),
             url: Schema.URL.required(),
-            organization: Organization.SCHEMA.OBJ.required(),
+            organization: ORGANIZATION_SCHEMA.OBJ.required(),
             verified: Schema.BOOLEAN.required(),
             imageUrl: Schema.NULLABLE(Schema.STRING).required(),
             __metadata: Joi.object({

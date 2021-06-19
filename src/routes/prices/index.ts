@@ -6,6 +6,7 @@ import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
 import { Session } from "../../models/Session";
+import { PRICE_SCHEMA } from "../../types/price";
 
 export default <ServerRoute[]>[
     {
@@ -21,7 +22,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Price.SCHEMA.OBJ,
+                schema: PRICE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -47,7 +48,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Price.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(PRICE_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -75,10 +76,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Price.SCHEMA.CREATE,
+                payload: PRICE_SCHEMA.CREATE,
             },
             response: {
-                schema: Price.SCHEMA.OBJ,
+                schema: PRICE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -114,10 +115,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.PRICE.required(),
                 }),
-                payload: Price.SCHEMA.UPDATE,
+                payload: PRICE_SCHEMA.UPDATE,
             },
             response: {
-                schema: Price.SCHEMA.OBJ,
+                schema: PRICE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

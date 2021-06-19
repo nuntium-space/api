@@ -1,42 +1,13 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ISerializedBundle, ICreateBundle, IUpdateBundle, IDatabaseBundle } from "../types/bundle";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
-import { ISerializedOrganization, Organization } from "./Organization";
+import { Organization } from "./Organization";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
-
-interface IDatabaseBundle
-{
-    id: string,
-    name: string,
-    organization: string,
-    active: boolean,
-    stripe_product_id: string | null,
-}
-
-interface ICreateBundle
-{
-    name: string,
-}
-
-interface IUpdateBundle
-{
-    name?: string,
-    active?: boolean,
-}
-
-export interface ISerializedBundle
-{
-    id: string,
-    name: string,
-    organization: ISerializedOrganization | INotExpandedResource,
-    active: boolean,
-}
 
 export class Bundle implements ISerializable<ISerializedBundle>
 {
@@ -304,26 +275,4 @@ export class Bundle implements ISerializable<ISerializedBundle>
             data.stripe_product_id,
         );
     }
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.BUNDLE.required(),
-            name: Schema.STRING.max(50).required(),
-            organization: Joi
-                .alternatives()
-                .try(
-                    Organization.SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
-                )
-                .required(),
-            active: Schema.BOOLEAN.required(),
-        }),
-        CREATE: Joi.object({
-            name: Schema.STRING.max(50).required(),
-        }),
-        UPDATE: Joi.object({
-            name: Schema.STRING.max(50),
-            active: Schema.BOOLEAN.optional(),
-        }),
-    } as const;
 }

@@ -6,6 +6,7 @@ import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
+import { BUNDLE_SCHEMA } from "../../types/bundle";
 
 export default <ServerRoute[]>[
     {
@@ -21,7 +22,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Bundle.SCHEMA.OBJ,
+                schema: BUNDLE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -46,7 +47,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Bundle.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(BUNDLE_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -78,7 +79,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Bundle.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(BUNDLE_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -103,10 +104,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Bundle.SCHEMA.CREATE,
+                payload: BUNDLE_SCHEMA.CREATE,
             },
             response: {
-                schema: Bundle.SCHEMA.OBJ,
+                schema: BUNDLE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -137,10 +138,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.BUNDLE.required(),
                 }),
-                payload: Bundle.SCHEMA.UPDATE,
+                payload: BUNDLE_SCHEMA.UPDATE,
             },
             response: {
-                schema: Bundle.SCHEMA.OBJ,
+                schema: BUNDLE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

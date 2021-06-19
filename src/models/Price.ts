@@ -1,43 +1,12 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ISerializedPrice, ICreatePrice, IUpdatePrice, IDatabasePrice } from "../types/price";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
-import { Bundle, ISerializedBundle } from "./Bundle";
+import { Bundle } from "./Bundle";
 import { User } from "./User";
-
-interface IDatabasePrice
-{
-    id: string,
-    amount: number,
-    currency: string,
-    bundle: string,
-    active: boolean,
-    stripe_price_id: string | null,
-}
-
-interface ICreatePrice
-{
-    amount: number,
-    currency: string,
-}
-
-interface IUpdatePrice
-{
-    active?: boolean,
-}
-
-export interface ISerializedPrice
-{
-    id: string,
-    amount: number,
-    currency: string,
-    bundle: ISerializedBundle | INotExpandedResource,
-    active: boolean,
-}
 
 export class Price implements ISerializable<ISerializedPrice>
 {
@@ -245,27 +214,4 @@ export class Price implements ISerializable<ISerializedPrice>
             data.stripe_price_id,
         );
     }
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.PRICE.required(),
-            amount: Schema.MONEY.required(),
-            currency: Schema.CURRENCY.required(),
-            bundle: Joi
-                .alternatives()
-                .try(
-                    Bundle.SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.BUNDLE),
-                )
-                .required(),
-            active: Schema.BOOLEAN.required(),
-        }),
-        CREATE: Joi.object({
-            amount: Schema.MONEY.required(),
-            currency: Schema.CURRENCY.required(),
-        }),
-        UPDATE: Joi.object({
-            active: Schema.BOOLEAN.optional(),
-        }),
-    } as const;
 }

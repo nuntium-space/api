@@ -1,40 +1,11 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ISerializedOrganization, ICreateOrganization, IUpdateOrganization, IDatabaseOrganization } from "../types/organization";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
-import { ISerializedUser, User } from "./User";
-
-interface IDatabaseOrganization
-{
-    id: string,
-    name: string,
-    user: string,
-    stripe_account_id: string,
-    stripe_account_enabled: boolean,
-}
-
-interface ICreateOrganization
-{
-    name: string,
-}
-
-interface IUpdateOrganization
-{
-    name?: string,
-    stripe_account_enabled?: boolean,
-}
-
-export interface ISerializedOrganization
-{
-    id: string,
-    name: string,
-    owner: ISerializedUser,
-    stripe_account_enabled: boolean,
-}
+import { User } from "./User";
 
 export class Organization implements ISerializable<ISerializedOrganization>
 {
@@ -218,19 +189,4 @@ export class Organization implements ISerializable<ISerializedOrganization>
             data.stripe_account_enabled,
         );
     }
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.ORGANIZATION.required(),
-            name: Schema.STRING.max(50).required(),
-            owner: User.SCHEMA.OBJ.required(),
-            stripe_account_enabled: Schema.BOOLEAN.required(),
-        }),
-        CREATE: Joi.object({
-            name: Schema.STRING.max(50).required(),
-        }),
-        UPDATE: Joi.object({
-            name: Schema.STRING.max(50),
-        }),
-    } as const;
 }

@@ -5,6 +5,7 @@ import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { PaymentMethod } from "../../models/PaymentMethod";
 import { Session } from "../../models/Session";
+import { PAYMENT_METHOD_SCHEMA } from "../../types/payment-method";
 
 export default <ServerRoute[]>[
     {
@@ -17,7 +18,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(PaymentMethod.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(PAYMENT_METHOD_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
