@@ -3,8 +3,8 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
+import { Bookmark } from "../../models/Bookmark";
 import { Session } from "../../models/Session";
-import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
     {
@@ -37,29 +37,9 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const result = await Database.pool
-                .query(
-                    `
-                    select "article", "timestamp"
-                    from "bookmarks"
-                    where "user" = $1
-                    `,
-                    [
-                        authenticatedUser.id,
-                    ],
-                )
-                .catch(() =>
-                {
-                    throw Boom.badImplementation();
-                });
+            const bookmarks = await Bookmark.forUser(authenticatedUser);
 
-            return Promise.all(result.rows.map(async _ =>
-            {
-                return {
-                    article: (await Article.retrieve(_.article)).serialize(),
-                    timestamp: _.timestamp,
-                };
-            }));
+            return bookmarks.map(_ => _.serialize());
         },
     },
     {
@@ -73,9 +53,7 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Joi.object({
-                    article: Schema.ID.ARTICLE.required(),
-                }),
+                payload: Bookmark.SCHEMA.CREATE,
             },
         },
         handler: async (request, h) =>
@@ -89,23 +67,7 @@ export default <ServerRoute[]>[
 
             const article = await Article.retrieve((request.payload as any).article);
 
-            await Database.pool
-                .query(
-                    `
-                    insert into "bookmarks"
-                        ("user", "article")
-                    values
-                        ($1, $2)
-                    `,
-                    [
-                        authenticatedUser.id,
-                        article.id,
-                    ],
-                )
-                .catch(() =>
-                {
-                    throw Boom.badImplementation();
-                });
+            await Bookmark.create(authenticatedUser, article);
 
             return h.response().code(201); // Created
         },
@@ -132,29 +94,9 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const result = await Database.pool
-                .query(
-                    `
-                    delete from "bookmarks"
-                    where
-                        "user" = $1
-                        and
-                        "article" = $2
-                    `,
-                    [
-                        authenticatedUser.id,
-                        request.query.article,
-                    ],
-                )
-                .catch(() =>
-                {
-                    throw Boom.badImplementation();
-                });
+            const bookmark = await Bookmark.retrieveWithUserAndArticle(authenticatedUser, (request.payload as any).article);
 
-            if (result.rowCount === 0)
-            {
-                throw Boom.notFound();
-            }
+            await bookmark.delete();
 
             return h.response();
         },
