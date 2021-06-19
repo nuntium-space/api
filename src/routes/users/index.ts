@@ -6,6 +6,7 @@ import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Session } from "../../models/Session";
 import { User } from "../../models/User";
+import { ARTICLE_SCHEMA } from "../../types/article";
 import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
@@ -46,7 +47,7 @@ export default <ServerRoute[]>[
             response: {
                 schema: Schema.ARRAY(
                     Joi.object({
-                        article: Article.SCHEMA.OBJ.required(),
+                        article: ARTICLE_SCHEMA.OBJ.required(),
                         timestamp: Schema.DATETIME.required(),
                     }),
                 ),

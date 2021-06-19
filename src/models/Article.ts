@@ -1,55 +1,17 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ISerializedArticle, ICreateArticle, IUpdateArticle, IDatabaseArticle } from "../types/article";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
-import { Author, ISerializedAuthor } from "./Author";
+import { Author } from "./Author";
+import { Bookmark } from "./Bookmark";
 import { Publisher } from "./Publisher";
-import { ICreateSource, Source } from "./Source";
+import { Source } from "./Source";
 import { User } from "./User";
 
-interface IDatabaseArticle
-{
-    id: string,
-    title: string,
-    content: any,
-    author: string,
-    reading_time: number,
-    view_count: number,
-    like_count: number,
-    created_at: Date,
-    updated_at: Date,
-}
-
-interface ICreateArticle
-{
-    title: string,
-    content: any,
-    sources: ICreateSource[],
-}
-
-interface IUpdateArticle
-{
-    title?: string,
-    content?: any,
-    sources?: ICreateSource[],
-}
-
-export interface ISerializedArticle
-{
-    id: string,
-    title: string,
-    content: any,
-    author: ISerializedAuthor | INotExpandedResource,
-    reading_time: number,
-    created_at: string,
-    updated_at: string,
-}
-
-export class Article implements ISerializable<ISerializedArticle>
+export class Article implements ISerializable<Promise<ISerializedArticle>>
 {
     private constructor
     (
@@ -389,18 +351,28 @@ export class Article implements ISerializable<ISerializedArticle>
     // SERIALIZATION //
     ///////////////////
 
-    public serialize(options?: {
+    public async serialize(options?: {
         for?: User | INotExpandedResource,
         /**
          * @default false
          */
         includeContent?: boolean,
-    }): ISerializedArticle
+        /**
+         * @default false
+         */
+        includeMetadata?: boolean,
+    }): Promise<ISerializedArticle>
     {
         options ??= {};
         options.includeContent ??= false;
+        options.includeMetadata ??= false;
 
-        return {
+        if (options.includeMetadata && !options.for)
+        {
+            throw Boom.badImplementation();
+        }
+
+        const obj: ISerializedArticle = {
             id: this.id,
             title: this.title,
             content: options.includeContent
@@ -413,6 +385,20 @@ export class Article implements ISerializable<ISerializedArticle>
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
         };
+
+        if (options.includeMetadata)
+        {
+            obj.__metadata = {
+                is_bookmarked: await Bookmark.existsWithUserAndArticle(
+                    options.for instanceof User
+                        ? options.for
+                        : options.for!.id,
+                    this,
+                ),
+            };
+        }
+
+        return obj;
     }
 
     private static async deserialize(data: IDatabaseArticle, expand?: string[]): Promise<Article>
@@ -438,35 +424,4 @@ export class Article implements ISerializable<ISerializedArticle>
             data.updated_at,
         );
     }
-
-    /////////////
-    // SCHEMAS //
-    /////////////
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.ARTICLE.required(),
-            title: Schema.STRING.max(50).required(),
-            content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
-            reading_time: Joi.number().integer().min(0).required(),
-            author: Joi
-                .alternatives()
-                .try(
-                    Author.SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR),
-                )
-                .required(),
-            created_at: Schema.DATETIME.required(),
-            updated_at: Schema.DATETIME.required(),
-        }),
-        CREATE: Joi.object({
-            title: Schema.STRING.max(50).required(),
-            content: Schema.ARTICLE_CONTENT.required(),
-            sources: Schema.ARRAY(Source.SCHEMA.CREATE).required(),
-        }),
-        UPDATE: Joi.object({
-            title: Schema.STRING.max(50),
-            content: Schema.ARTICLE_CONTENT,
-        }),
-    } as const;
 }

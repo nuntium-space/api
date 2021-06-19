@@ -3,8 +3,9 @@ import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Schema } from "../config/Schema";
+import { ARTICLE_SCHEMA, ISerializedArticle } from "../types/article";
 import Database from "../utilities/Database";
-import { Article, ISerializedArticle } from "./Article";
+import { Article } from "./Article";
 import { User } from "./User";
 
 interface IDatabaseBookmark
@@ -20,7 +21,7 @@ export interface ISerializedBookmark
     created_at: string,
 }
 
-export class Bookmark implements ISerializable<ISerializedBookmark>
+export class Bookmark implements ISerializable<Promise<ISerializedBookmark>>
 {
     private constructor
     (
@@ -113,6 +114,31 @@ export class Bookmark implements ISerializable<ISerializedBookmark>
     // UTILITIES //
     ///////////////
 
+    public static async existsWithUserAndArticle(user: User | string, article: Article | string): Promise<boolean>
+    {
+        const result = await Database.pool.query(
+            `
+            select 1
+            from "bookmarks"
+            where
+                "user" = $1
+                and
+                "article" = $2
+            limit 1
+            `,
+            [
+                user instanceof User
+                    ? user.id
+                    : user,
+                article instanceof Article
+                    ? article.id
+                    : article,
+            ],
+        );
+
+        return result.rows.length > 0;
+    }
+
     public static async forUser(user: User | string, expand?: string[]): Promise<Bookmark[]>
     {
         const result = await Database.pool.query(
@@ -135,11 +161,11 @@ export class Bookmark implements ISerializable<ISerializedBookmark>
     // SERIALIZATION //
     ///////////////////
 
-    public serialize(): ISerializedBookmark
+    public async serialize(): Promise<ISerializedBookmark>
     {
         return {
             article: this.article instanceof Article
-                ? this.article.serialize()
+                ? await this.article.serialize()
                 : this.article,
             created_at: this.created_at.toISOString(),
         };
@@ -176,7 +202,7 @@ export class Bookmark implements ISerializable<ISerializedBookmark>
             article: Joi
                 .alternatives()
                 .try(
-                    Article.SCHEMA.OBJ,
+                    ARTICLE_SCHEMA.OBJ,
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
                 )
                 .required(),

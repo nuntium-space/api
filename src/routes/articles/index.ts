@@ -7,6 +7,7 @@ import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
+import { ARTICLE_SCHEMA } from "../../types/article";
 import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
@@ -20,7 +21,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Article.SCHEMA.OBJ).max(Config.TRENDING_ARTICLES_MAX_LENGTH),
+                schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).max(Config.TRENDING_ARTICLES_MAX_LENGTH),
             },
         },
         handler: async (request, h) =>
@@ -45,7 +46,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Article.SCHEMA.OBJ,
+                schema: ARTICLE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -88,6 +89,7 @@ export default <ServerRoute[]>[
             return article.serialize({
                 for: authenticatedUser,
                 includeContent: true,
+                includeMetadata: true,
             });
         },
     },
@@ -104,7 +106,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Article.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -136,7 +138,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Article.SCHEMA.OBJ).max(Config.RECENT_ARTICLES_MAX_LENGTH),
+                schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).max(Config.RECENT_ARTICLES_MAX_LENGTH),
             },
         },
         handler: async (request, h) =>
@@ -164,10 +166,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Article.SCHEMA.CREATE,
+                payload: ARTICLE_SCHEMA.CREATE,
             },
             response: {
-                schema: Article.SCHEMA.OBJ,
+                schema: ARTICLE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -216,10 +218,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Article.SCHEMA.UPDATE,
+                payload: ARTICLE_SCHEMA.UPDATE,
             },
             response: {
-                schema: Article.SCHEMA.OBJ,
+                schema: ARTICLE_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
