@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { Schema } from "../config/Schema";
-import { ISerializedUser, User } from "../models/User";
+import { ISerializedUser, USER_SCHEMA } from "./user";
 
 export interface IDatabaseSession
 {
@@ -19,7 +19,7 @@ export interface ISerializedSession
 export const SESSION_SCHEMA = {
     OBJ: Joi.object({
         id: Schema.ID.SESSION.required(),
-        user: User.SCHEMA.OBJ.required(),
+        user: USER_SCHEMA.OBJ.required(),
         expires_at: Schema.DATETIME.required(),
     }),
     CREATE: Joi.object({

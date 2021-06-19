@@ -1,8 +1,8 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Schema } from "../config/Schema";
-import { ISerializedPublisher, Publisher } from "../models/Publisher";
-import { ISerializedUser, User } from "../models/User";
+import { ISerializedPublisher, PUBLISHER_SCHEMA } from "./publisher";
+import { ISerializedUser, USER_SCHEMA } from "./user";
 
 export interface IDatabaseAuthor
 {
@@ -30,7 +30,7 @@ export const AUTHOR_SCHEMA = {
         user: Joi
             .alternatives()
             .try(
-                User.SCHEMA.OBJ,
+                USER_SCHEMA.OBJ,
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
             )
             .required(),

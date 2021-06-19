@@ -1,31 +1,12 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { PoolClient } from "pg";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ICreateSource, IDatabaseSource, ISerializedSource } from "../types/source";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
-
-interface IDatabaseSource
-{
-    id: string,
-    url: string,
-    article: string,
-}
-
-export interface ICreateSource
-{
-    url: string,
-}
-
-export interface ISerializedSource
-{
-    id: string,
-    url: string,
-}
 
 export class Source implements ISerializable<ISerializedSource>
 {
@@ -129,18 +110,4 @@ export class Source implements ISerializable<ISerializedSource>
             article,
         );
     }
-
-    /////////////
-    // SCHEMAS //
-    /////////////
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.SOURCE.required(),
-            url: Schema.URL.required(),
-        }),
-        CREATE: Joi.object({
-            url: Schema.URL.required(),
-        }),
-    } as const;
 }

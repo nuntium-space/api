@@ -8,6 +8,7 @@ import { Organization } from "../../models/Organization";
 import { Price } from "../../models/Price";
 import { Session } from "../../models/Session";
 import { Subscription } from "../../models/Subscription";
+import { SUBSCRIPTION_SCHEMA } from "../../types/subscription";
 
 export default <ServerRoute[]>[
     {
@@ -23,7 +24,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Subscription.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(SUBSCRIPTION_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -51,7 +52,7 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Subscription.SCHEMA.CREATE,
+                payload: SUBSCRIPTION_SCHEMA.CREATE,
             },
         },
         handler: async (request, h) =>

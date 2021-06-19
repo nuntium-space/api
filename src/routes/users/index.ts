@@ -5,8 +5,8 @@ import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Session } from "../../models/Session";
-import { User } from "../../models/User";
 import { ARTICLE_SCHEMA } from "../../types/article";
+import { USER_SCHEMA } from "../../types/user";
 import Database from "../../utilities/Database";
 
 export default <ServerRoute[]>[
@@ -20,7 +20,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: User.SCHEMA.OBJ,
+                schema: USER_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -162,10 +162,10 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.USER.required(),
                 }),
-                payload: User.SCHEMA.UPDATE,
+                payload: USER_SCHEMA.UPDATE,
             },
             response: {
-                schema: User.SCHEMA.OBJ,
+                schema: USER_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

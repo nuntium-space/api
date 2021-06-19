@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Schema } from "../config/Schema";
-import { ISerializedUser, User } from "../models/User";
+import { ISerializedUser, USER_SCHEMA } from "./user";
 
 export interface IDatabasePaymentMethod
 {
@@ -28,7 +28,7 @@ export const PAYMENT_METHOD_SCHEMA = {
         user: Joi
             .alternatives()
             .try(
-                User.SCHEMA.OBJ,
+                USER_SCHEMA.OBJ,
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
             )
             .required(),

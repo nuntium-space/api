@@ -1,50 +1,12 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { Schema } from "../config/Schema";
+import { ISerializedUser, ICreateUser, IUpdateUser, IUserSettings, IUpdateUserSettings, IDatabaseUser } from "../types/user";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
-
-interface IDatabaseUser
-{
-    id: string,
-    full_name: string | null,
-    email: string,
-    stripe_customer_id: string | null,
-}
-
-interface ICreateUser
-{
-    full_name?: string,
-    email: string,
-}
-
-interface IUpdateUser
-{
-    full_name?: string,
-    email?: string,
-}
-
-interface IUserSettings
-{
-    language: string | null,
-}
-
-interface IUpdateUserSettings
-{
-    language?: string,
-}
-
-export interface ISerializedUser
-{
-    id: string,
-    full_name: string | null,
-    email: string,
-}
 
 export class User implements ISerializable<ISerializedUser>
 {
@@ -549,16 +511,4 @@ export class User implements ISerializable<ISerializedUser>
             data.stripe_customer_id,
         );
     }
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.USER.required(),
-            full_name: Schema.NULLABLE(Schema.STRING).optional(),
-            email: Schema.EMAIL.optional(),
-        }),
-        UPDATE: Joi.object({
-            full_name: Schema.STRING,
-            email: Schema.EMAIL,
-        }),
-    } as const;
 }

@@ -1,41 +1,10 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
-import { Schema } from "../config/Schema";
-import { ISerializedPrice, PRICE_SCHEMA } from "../types/price";
+import { ISerializedSubscription, IUpdateSubscription, IDatabaseSubscription } from "../types/subscription";
 import Database from "../utilities/Database";
 import { Price } from "./Price";
-import { ISerializedUser, User } from "./User";
-
-interface IDatabaseSubscription
-{
-    id: string,
-    status: string,
-    user: string,
-    price: string,
-    current_period_end: Date,
-    cancel_at_period_end: boolean,
-    deleted: boolean,
-    stripe_subscription_id: string,
-}
-
-interface IUpdateSubscription
-{
-    current_period_end?: number,
-    cancel_at_period_end?: boolean,
-}
-
-interface ISerializedSubscription
-{
-    id: string,
-    status: string,
-    user: ISerializedUser | INotExpandedResource,
-    price: ISerializedPrice | INotExpandedResource,
-    current_period_end: string,
-    cancel_at_period_end: boolean,
-    deleted: boolean,
-}
+import { User } from "./User";
 
 export class Subscription implements ISerializable<ISerializedSubscription>
 {
@@ -156,31 +125,4 @@ export class Subscription implements ISerializable<ISerializedSubscription>
             data.stripe_subscription_id,
         );
     }
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            id: Schema.ID.SUBSCRIPTION.required(),
-            status: Schema.STRING.required(),
-            user: Joi
-                .alternatives()
-                .try(
-                    User.SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
-                )
-                .required(),
-            price: Joi
-                .alternatives()
-                .try(
-                    PRICE_SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PRICE),
-                )
-                .required(),
-            current_period_end: Schema.DATETIME.required(),
-            cancel_at_period_end: Schema.BOOLEAN.required(),
-            deleted: Schema.BOOLEAN.required(),
-        }),
-        CREATE: Joi.object({
-            price: Schema.ID.PRICE.required(),
-        }),
-    } as const;
 }

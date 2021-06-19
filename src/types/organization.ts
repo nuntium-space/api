@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { Schema } from "../config/Schema";
-import { ISerializedUser, User } from "../models/User";
+import { ISerializedUser, USER_SCHEMA } from "./user";
 
 export interface IDatabaseOrganization
 {
@@ -34,7 +34,7 @@ export const ORGANIZATION_SCHEMA = {
     OBJ: Joi.object({
         id: Schema.ID.ORGANIZATION.required(),
         name: Schema.STRING.max(50).required(),
-        owner: User.SCHEMA.OBJ.required(),
+        owner: USER_SCHEMA.OBJ.required(),
         stripe_account_enabled: Schema.BOOLEAN.required(),
     }),
     CREATE: Joi.object({
