@@ -12,26 +12,11 @@ export class Author implements ISerializable<ISerializedAuthor>
 {
     private constructor
     (
-        private readonly _id: string,
-        private _user: User | INotExpandedResource,
-        private  _publisher: Publisher | INotExpandedResource,
+        public readonly id: string,
+        public readonly user: User | INotExpandedResource,
+        public readonly publisher: Publisher | INotExpandedResource,
     )
     {}
-
-    public get id(): string
-    {
-        return this._id;
-    }
-
-    public get user(): User | INotExpandedResource
-    {
-        return this._user;
-    }
-
-    public get publisher(): Publisher | INotExpandedResource
-    {
-        return this._publisher;
-    }
 
     public static async create(data: ICreateAuthor, expand?: string[]): Promise<Author>
     {

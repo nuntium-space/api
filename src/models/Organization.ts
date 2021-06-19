@@ -11,32 +11,17 @@ export class Organization implements ISerializable<ISerializedOrganization>
 {
     private constructor
     (
-        private readonly _id: string,
+        public readonly id: string,
         private _name: string,
-        private  _owner: User,
-        private readonly _stripe_account_id: string,
+        public readonly owner: User,
+        public readonly stripe_account_id: string,
         private _stripe_account_enabled: boolean,
     )
     {}
 
-    public get id(): string
-    {
-        return this._id;
-    }
-
     public get name(): string
     {
         return this._name;
-    }
-
-    public get owner(): User
-    {
-        return this._owner;
-    }
-
-    public get stripe_account_id(): string
-    {
-        return this._stripe_account_id;
     }
 
     public get stripe_account_enabled(): boolean

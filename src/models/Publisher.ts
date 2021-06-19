@@ -15,10 +15,10 @@ export class Publisher implements ISerializable<ISerializedPublisher>
 {
     private constructor
     (
-        private readonly _id: string,
+        public readonly _id: string,
         private _name: string,
         private _url: string,
-        private  _organization: Organization,
+        public readonly organization: Organization,
         public readonly verified: boolean,
         public readonly has_image: boolean,
         public readonly dns_txt_value: string,
@@ -38,11 +38,6 @@ export class Publisher implements ISerializable<ISerializedPublisher>
     public get url(): string
     {
         return this._url;
-    }
-
-    public get organization(): Organization
-    {
-        return this._organization;
     }
 
     public static async create(data: ICreatePublisher, organization: Organization): Promise<Publisher>

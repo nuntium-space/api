@@ -9,38 +9,13 @@ export class PaymentMethod implements ISerializable<ISerializedPaymentMethod>
 {
     private constructor
     (
-        private readonly _id: string,
-        private readonly _type: string,
-        private readonly _data: any,
-        private readonly _user: User | INotExpandedResource,
-        private readonly _stripe_id: string,
+        public readonly id: string,
+        public readonly type: string,
+        public readonly data: any,
+        public readonly user: User | INotExpandedResource,
+        public readonly stripe_id: string,
     )
     {}
-
-    public get id(): string
-    {
-        return this._id;
-    }
-
-    public get type(): string
-    {
-        return this._type;
-    }
-
-    public get data(): any
-    {
-        return this._data;
-    }
-
-    public get user(): User | INotExpandedResource
-    {
-        return this._user;
-    }
-
-    public get stripe_id(): string
-    {
-        return this._stripe_id;
-    }
 
     public static async retrieve(id: string): Promise<PaymentMethod>
     {

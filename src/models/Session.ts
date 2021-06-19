@@ -11,26 +11,11 @@ export class Session implements ISerializable<ISerializedSession>
 {
     private constructor
     (
-        private readonly _id: string,
-        private readonly _user: User,
-        private readonly _expires_at: Date,
+        public readonly id: string,
+        public readonly user: User,
+        public readonly expires_at: Date,
     )
     {}
-
-    public get id(): string
-    {
-        return this._id;
-    }
-
-    public get user(): User
-    {
-        return this._user;
-    }
-
-    public get expires_at(): Date
-    {
-        return this._expires_at;
-    }
 
     public static async create(user: User): Promise<Session>
     {
