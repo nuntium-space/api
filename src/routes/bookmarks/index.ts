@@ -69,7 +69,7 @@ export default <ServerRoute[]>[
 
             await Bookmark.create(authenticatedUser, article);
 
-            return h.response().code(201); // Created
+            return h.response();
         },
     },
     {
