@@ -3,6 +3,7 @@ import auth from "./auth";
 import authors from "./authors";
 import bookmarks from "./bookmarks";
 import bundles from "./bundles";
+import likes from "./likes";
 import organizations from "./organizations";
 import paymentMethods from "./payment-methods";
 import prices from "./prices";
@@ -19,6 +20,7 @@ export = [
     authors,
     bookmarks,
     bundles,
+    likes,
     organizations,
     paymentMethods,
     prices,
