@@ -82,7 +82,7 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.USER.required(),
                 }),
-                query: Joi.object({
+                payload: Joi.object({
                     article: Schema.ID.ARTICLE.required(),
                 }),
             },
