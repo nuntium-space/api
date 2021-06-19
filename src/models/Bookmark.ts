@@ -39,7 +39,7 @@ export class Bookmark implements ISerializable<ISerializedBookmark>
         const result = await Database.pool
             .query(
                 `
-                insert into "articles"
+                insert into "bookmarks"
                     ("user", "article")
                 values
                     ($1, $2)
