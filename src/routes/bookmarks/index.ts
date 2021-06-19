@@ -6,6 +6,7 @@ import { Article } from "../../models/Article";
 import { Bookmark } from "../../models/Bookmark";
 import { Session } from "../../models/Session";
 import { ARTICLE_SCHEMA } from "../../types/article";
+import { BOOKMARK_SCHEMA } from "../../types/bookmark";
 
 export default <ServerRoute[]>[
     {
@@ -54,7 +55,7 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Bookmark.SCHEMA.CREATE,
+                payload: BOOKMARK_SCHEMA.CREATE,
             },
         },
         handler: async (request, h) =>

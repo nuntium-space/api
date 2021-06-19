@@ -5,6 +5,7 @@ import { Schema } from "../../config/Schema";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
+import { AUTHOR_SCHEMA } from "../../types/author";
 
 export default <ServerRoute[]>[
     {
@@ -20,7 +21,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Author.SCHEMA.OBJ,
+                schema: AUTHOR_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -45,7 +46,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Author.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(AUTHOR_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -79,7 +80,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Author.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(AUTHOR_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>
@@ -109,10 +110,10 @@ export default <ServerRoute[]>[
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
                 }),
-                payload: Author.SCHEMA.CREATE,
+                payload: AUTHOR_SCHEMA.CREATE,
             },
             response: {
-                schema: Author.SCHEMA.OBJ,
+                schema: AUTHOR_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>

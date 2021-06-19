@@ -1,25 +1,10 @@
 import Boom from "@hapi/boom";
-import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
-import { Schema } from "../config/Schema";
-import { ARTICLE_SCHEMA, ISerializedArticle } from "../types/article";
+import { ISerializedBookmark, IDatabaseBookmark } from "../types/bookmark";
 import Database from "../utilities/Database";
 import { Article } from "./Article";
 import { User } from "./User";
-
-interface IDatabaseBookmark
-{
-    user: string,
-    article: string,
-    created_at: Date,
-}
-
-export interface ISerializedBookmark
-{
-    article: ISerializedArticle | INotExpandedResource,
-    created_at: string,
-}
 
 export class Bookmark implements ISerializable<Promise<ISerializedBookmark>>
 {
@@ -192,24 +177,4 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>>
             data.created_at,
         );
     }
-
-    /////////////
-    // SCHEMAS //
-    /////////////
-
-    public static readonly SCHEMA = {
-        OBJ: Joi.object({
-            article: Joi
-                .alternatives()
-                .try(
-                    ARTICLE_SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
-                )
-                .required(),
-            created_at: Schema.DATETIME.required(),
-        }),
-        CREATE: Joi.object({
-            article: Schema.ID.ARTICLE.required(),
-        }),
-    } as const;
 }

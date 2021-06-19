@@ -2,31 +2,10 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { ISerializedAccount, ICreateAccount, IDatabaseAccount } from "../types/account";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
-import { ISerializedUser, User } from "./User";
-
-interface IDatabaseAccount
-{
-    id: string,
-    user: string,
-    type: string,
-    external_id: string,
-}
-
-interface ICreateAccount
-{
-    user: User,
-    type: string,
-    external_id: string,
-}
-
-export interface ISerializedAccount
-{
-    id: string,
-    user: ISerializedUser | INotExpandedResource,
-    type: string,
-}
+import { User } from "./User";
 
 export class Account implements ISerializable<ISerializedAccount>
 {
@@ -134,10 +113,4 @@ export class Account implements ISerializable<ISerializedAccount>
             data.external_id,
         );
     }
-
-    /////////////
-    // SCHEMAS //
-    /////////////
-
-    // TODO
 }
