@@ -7,6 +7,7 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
 import { Bookmark } from "./Bookmark";
+import { Like } from "./Like";
 import { Publisher } from "./Publisher";
 import { Source } from "./Source";
 import { User } from "./User";
@@ -389,6 +390,12 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
         if (options.includeMetadata)
         {
             obj.__metadata = {
+                is_liked: await Like.existsWithUserAndArticle(
+                    options.for instanceof User
+                        ? options.for
+                        : options.for!.id,
+                    this,
+                ),
                 is_bookmarked: await Bookmark.existsWithUserAndArticle(
                     options.for instanceof User
                         ? options.for

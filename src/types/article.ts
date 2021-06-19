@@ -41,6 +41,7 @@ export interface ISerializedArticle
     created_at: string,
     updated_at: string,
     __metadata?: {
+        is_liked: boolean,
         is_bookmarked: boolean,
     },
 }
@@ -61,6 +62,7 @@ export const ARTICLE_SCHEMA = {
         created_at: Schema.DATETIME.required(),
         updated_at: Schema.DATETIME.required(),
         __metadata: Joi.object({
+            is_liked: Schema.BOOLEAN.required(),
             is_bookmarked: Schema.BOOLEAN.required(),
         }).optional(),
     }),
