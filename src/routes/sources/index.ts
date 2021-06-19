@@ -2,6 +2,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Source } from "../../models/Source";
+import { SOURCE_SCHEMA } from "../../types/source";
 
 export default <ServerRoute[]>[
     {
@@ -14,7 +15,7 @@ export default <ServerRoute[]>[
                 }),
             },
             response: {
-                schema: Schema.ARRAY(Source.SCHEMA.OBJ).required(),
+                schema: Schema.ARRAY(SOURCE_SCHEMA.OBJ).required(),
             },
         },
         handler: async (request, h) =>

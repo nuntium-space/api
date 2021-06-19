@@ -1,8 +1,8 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Schema } from "../config/Schema";
-import { ICreateSource, Source } from "../models/Source";
 import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
+import { ICreateSource, SOURCE_SCHEMA } from "./source";
 
 export interface IDatabaseArticle
 {
@@ -67,7 +67,7 @@ export const ARTICLE_SCHEMA = {
     CREATE: Joi.object({
         title: Schema.STRING.max(50).required(),
         content: Schema.ARTICLE_CONTENT.required(),
-        sources: Schema.ARRAY(Source.SCHEMA.CREATE).required(),
+        sources: Schema.ARRAY(SOURCE_SCHEMA.CREATE).required(),
     }),
     UPDATE: Joi.object({
         title: Schema.STRING.max(50),
