@@ -357,7 +357,7 @@ create table "bookmarks"
 (
   "user" id not null,
   "article" id not null,
-  "timestamp" current_timestamp_utc not null,
+  "created_at" current_timestamp_utc not null,
 
   primary key ("user", "article"),
 
