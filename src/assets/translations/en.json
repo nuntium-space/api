@@ -145,7 +145,8 @@
     },
     "feed": {
         "bookmarks": {
-            "__title": "Bookmarks"
+            "__title": "Bookmarks",
+            "empty": "You haven't added anything to your bookmarks"
         },
         "empty": {
             "title": "Let's start filling this space.",
@@ -153,7 +154,8 @@
         },
         "explore": "Explore",
         "likes": {
-            "__title": "Liked"
+            "__title": "Liked",
+            "empty": "You haven't added anything to your liked articles"
         }
     },
     "generic": {

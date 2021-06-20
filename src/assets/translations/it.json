@@ -145,7 +145,8 @@
     },
     "feed": {
         "bookmarks": {
-            "__title": "Segnalibri"
+            "__title": "Segnalibri",
+            "empty": "Non hai ancora aggiunto niente ai segnalibri"
         },
         "empty": {
             "title": "Cominciamo a riempire questo vuoto.",
@@ -153,7 +154,8 @@
         },
         "explore": "Esplora",
         "likes": {
-            "__title": "Piaciuti"
+            "__title": "Piaciuti",
+            "empty": "Non hai ancora aggiunto niente agli articoli piaciuti"
         }
     },
     "generic": {
