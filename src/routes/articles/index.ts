@@ -101,10 +101,7 @@ export default <ServerRoute[]>[
                         article.id,
                         new Date().toISOString(),
                     ],
-                ).catch(e =>
-                {
-                    console.log(e)
-                });
+                );
 
             return article.serialize({
                 for: authenticatedUser,
