@@ -35,7 +35,7 @@ export default <ServerRoute[]>[
 
             const likes = await Like.forUser(authenticatedUser);
 
-            return likes.map(_ => _.serialize());
+            return Promise.all(likes.map(_ => _.serialize()));
         },
     },
     {

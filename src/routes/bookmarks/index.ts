@@ -35,7 +35,7 @@ export default <ServerRoute[]>[
 
             const bookmarks = await Bookmark.forUser(authenticatedUser);
 
-            return bookmarks.map(_ => _.serialize());
+            return Promise.all(bookmarks.map(_ => _.serialize()));
         },
     },
     {
