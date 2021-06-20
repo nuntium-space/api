@@ -148,11 +148,18 @@
             "__title": "Segnalibri",
             "empty": "Non hai ancora aggiunto niente ai segnalibri"
         },
-        "empty": {
-            "title": "Cominciamo a riempire questo vuoto.",
-            "subtitle": "Cerca articoli, editori o autori specifici oppure esplora per scoprire tutto quello che puoi trovare su nuntium."
-        },
         "explore": "Esplora",
+        "history": {
+            "__title": "Cronologia",
+            "empty": "La tua cronologia è vuota"
+        },
+        "home": {
+            "__title": "Home",
+            "empty": {
+                "title": "Cominciamo a riempire questo vuoto.",
+                "subtitle": "Cerca articoli, editori o autori specifici oppure esplora per scoprire tutto quello che puoi trovare su nuntium."
+            }
+        },
         "likes": {
             "__title": "Piaciuti",
             "empty": "Non hai ancora aggiunto niente agli articoli piaciuti"

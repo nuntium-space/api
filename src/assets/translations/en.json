@@ -148,11 +148,18 @@
             "__title": "Bookmarks",
             "empty": "You haven't added anything to your bookmarks"
         },
-        "empty": {
-            "title": "Let's start filling this space.",
-            "subtitle": "Search for specific articles, publishers or authors or just explore to find out everything nuntium has to offer."
-        },
         "explore": "Explore",
+        "history": {
+            "__title": "History",
+            "empty": "Your history is empty"
+        },
+        "home": {
+            "__title": "Home",
+            "empty": {
+                "title": "Let's start filling this space.",
+                "subtitle": "Search for specific articles, publishers or authors or just explore to find out everything nuntium has to offer."
+            }
+        },
         "likes": {
             "__title": "Liked",
             "empty": "You haven't added anything to your liked articles"
