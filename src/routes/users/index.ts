@@ -43,6 +43,9 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.USER.required(),
                 }),
+                query: Joi.object({
+                    expand: Schema.EXPAND_QUERY,
+                }),
             },
             response: {
                 schema: Schema.ARRAY(
@@ -75,10 +78,10 @@ export default <ServerRoute[]>[
             return Promise.all(
                 result.rows.map(async _ =>
                 {
-                    const article = await Article.retrieve(_.article);
+                    const article = await Article.retrieve(_.article, request.query.expand);
         
                     return {
-                        article: article.serialize(),
+                        article: await article.serialize(),
                         timestamp: _.timestamp,
                     };
                 }),
