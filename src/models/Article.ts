@@ -134,29 +134,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
         return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
     }
 
-    public static async retrieveRecent(user: User, expand?: string[]): Promise<Article[]>
-    {
-        const result = await Database.pool.query(
-            `
-            select "a".*
-            from
-                "user_history" as "h"
-                inner join
-                "articles" as "a"
-                on "h"."article" = "a"."id"
-            where "user" = $1
-            order by "last_viewed_at" desc
-            limit $2
-            `,
-            [
-                user.id,
-                Config.RECENT_ARTICLES_MAX_LENGTH,
-            ],
-        );
-
-        return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
-    }
-
     public static async trending(expand?: string[]): Promise<Article[]>
     {
         const result = await Database.pool.query(

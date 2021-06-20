@@ -79,8 +79,7 @@ export class Config
 
     public static readonly PUBLISHER_DNS_TXT_VALUE_BYTES = 30;
 
-    public static readonly RECENT_ARTICLES_MAX_LENGTH = 3;
-    public static readonly TRENDING_ARTICLES_MAX_LENGTH = 3;
+    public static readonly TRENDING_ARTICLES_MAX_LENGTH = 10;
 
     public static readonly STRIPE = new Stripe(process.env.STRIPE_SECRET_API_KEY ?? "", { apiVersion: "2020-08-27" });
 

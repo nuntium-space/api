@@ -143,36 +143,6 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "GET",
-        path: "/users/{id}/articles/recent",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.USER.required(),
-                }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).max(Config.RECENT_ARTICLES_MAX_LENGTH),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
-
-            if (authenticatedUser.id !== request.params.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            const articles = await Article.retrieveRecent(authenticatedUser, request.query.expand);
-
-            return Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser })));
-        },
-    },
-    {
         method: "POST",
         path: "/authors/{id}/articles",
         options: {
