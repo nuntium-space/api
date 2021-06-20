@@ -33,7 +33,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const likes = await Like.forUser(authenticatedUser);
+            const likes = await Like.forUser(authenticatedUser, request.query.expand);
 
             return Promise.all(likes.map(_ => _.serialize()));
         },

@@ -33,7 +33,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const bookmarks = await Bookmark.forUser(authenticatedUser);
+            const bookmarks = await Bookmark.forUser(authenticatedUser, request.query.expand);
 
             return Promise.all(bookmarks.map(_ => _.serialize()));
         },
