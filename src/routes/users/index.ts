@@ -50,7 +50,10 @@ export default <ServerRoute[]>[
             response: {
                 schema: Schema.ARRAY(
                     Joi.object({
-                        article: ARTICLE_SCHEMA.OBJ.required(),
+                        article: Joi.alternatives(
+                            ARTICLE_SCHEMA.OBJ,
+                            Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
+                        ).required(),
                         timestamp: Schema.DATETIME.required(),
                     }),
                 ),
@@ -78,10 +81,19 @@ export default <ServerRoute[]>[
             return Promise.all(
                 result.rows.map(async _ =>
                 {
-                    const article = await Article.retrieve(_.article, request.query.expand);
+                    const article = request.query.expand?.includes("article")
+                        ? await Article.retrieve(
+                            _.article,
+                            (request.query.expand as string[])
+                                .filter(e => e.startsWith("article."))
+                                .map(e => e.replace("article.", ""))
+                        )
+                        : { id: _.article };
         
                     return {
-                        article: await article.serialize(),
+                        article: article instanceof Article
+                            ? await article.serialize()
+                            : article,
                         timestamp: _.timestamp,
                     };
                 }),
