@@ -21,7 +21,6 @@ create domain "email_address" as varchar(320);
 
 create domain "url" as varchar(500) check(value like 'https://%');
 
-create domain "timestamp_utc" as timestamp default (current_timestamp at time zone 'UTC') check (value = value at time zone 'UTC');
 create domain "current_timestamp_utc" as timestamp default (current_timestamp at time zone 'UTC') check (value = current_timestamp at time zone 'UTC');
 
 /*
@@ -295,7 +294,7 @@ create table "user_history"
 (
   "user" id not null,
   "article" id not null,
-  "last_viewed_at" timestamp_utc not null,
+  "last_viewed_at" timestamp not null,
 
   primary key ("user", "article"),
 

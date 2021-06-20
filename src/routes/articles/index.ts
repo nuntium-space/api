@@ -90,14 +90,18 @@ export default <ServerRoute[]>[
                 );
 
             const query = rowCount === 0
-                ? `insert into "user_history" ("user", "article") values ($1, $2)`
-                : `update "user_history" set "last_viewed_at" = $1 where "user" = $2 and "article" = $3`
+                ? `insert into "user_history" ("user", "article", "last_viewed_at") values ($1, $2, $3)`
+                : `update "user_history" set "last_viewed_at" = $3 where "user" = $1 and "article" = $2`;
 
-            const params = rowCount === 0
-                ? [ authenticatedUser.id, article.id ]
-                : [ new Date().toISOString(), authenticatedUser.id, article.id ];
-
-            await Database.pool.query(query, params).catch(e =>
+            await Database.pool
+                .query(
+                    query,
+                    [
+                        authenticatedUser.id,
+                        article.id,
+                        new Date().toISOString(),
+                    ],
+                ).catch(e =>
                 {
                     console.log(e)
                 });
