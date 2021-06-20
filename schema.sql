@@ -294,9 +294,9 @@ create table "user_history"
 (
   "user" id not null,
   "article" id not null,
-  "timestamp" current_timestamp_utc not null,
+  "last_visited_at" current_timestamp_utc not null,
 
-  primary key ("article", "user", "timestamp"),
+  primary key ("article", "user"),
 
   foreign key ("user") references "users" on update cascade on delete cascade,
   foreign key ("article") references "articles" on update cascade on delete cascade
@@ -421,11 +421,6 @@ execute procedure prevent_update();
 
 create trigger "prevent_update"
 before update on "likes"
-for each row
-execute procedure prevent_update();
-
-create trigger "prevent_update"
-before update on "user_history"
 for each row
 execute procedure prevent_update();
 
