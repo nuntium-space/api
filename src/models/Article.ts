@@ -138,20 +138,14 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
     {
         const result = await Database.pool.query(
             `
-            with "recent_articles" as
-            (
-                select "a".*, max("av"."timestamp") as "last_viewed"
-                from
-                    "user_history" as "av"
-                    inner join
-                    "articles" as "a"
-                    on "av"."article" = "a"."id"
-                where "av"."user" = $1
-                group by "a"."id"
-            )
-            select *
-            from "recent_articles"
-            order by "last_viewed" desc
+            select "a".*
+            from
+                "user_history" as "h"
+                inner join
+                "articles" as "a"
+                on "h"."article" = "a"."id"
+            where "user" = $1
+            order by "last_viewed_at" desc
             limit $2
             `,
             [

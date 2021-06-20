@@ -54,7 +54,7 @@ export default <ServerRoute[]>[
                             ARTICLE_SCHEMA.OBJ,
                             Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
                         ).required(),
-                        timestamp: Schema.DATETIME.required(),
+                        last_viewed_at: Schema.DATETIME.required(),
                     }),
                 ),
             },
@@ -71,9 +71,10 @@ export default <ServerRoute[]>[
             const result = await Database.pool
                 .query(
                     `
-                    select "article", "timestamp"
+                    select "article", "last_viewed_at"
                     from "user_history"
                     where "user" = $1
+                    order by "last_viewed_at" desc
                     `,
                     [ authenticatedUser.id ],
                 );
@@ -94,7 +95,7 @@ export default <ServerRoute[]>[
                         article: article instanceof Article
                             ? await article.serialize()
                             : article,
-                        timestamp: _.timestamp,
+                        last_viewed_at: _.last_viewed_at,
                     };
                 }),
             );

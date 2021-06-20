@@ -294,7 +294,7 @@ create table "user_history"
 (
   "user" id not null,
   "article" id not null,
-  "last_visited_at" current_timestamp_utc not null,
+  "last_viewed_at" current_timestamp_utc not null,
 
   primary key ("article", "user"),
 
