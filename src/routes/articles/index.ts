@@ -72,19 +72,35 @@ export default <ServerRoute[]>[
             // TODO:
             // Increment article view_count
 
-            await Database.pool
+            const { rowCount } = await Database.pool
                 .query(
                     `
-                    insert into "user_history"
-                        ("article", "user")
-                    values
-                        ($1, $2)
+                    select 1
+                    from "user_history"
+                    where
+                        "user" = $1
+                        and
+                        "article" = $2
+                    limit 1
                     `,
                     [
-                        article.id,
                         authenticatedUser.id,
+                        article.id,
                     ],
                 );
+
+            const query = rowCount === 0
+                ? `insert into "user_history" ("user", "article") values ($1, $2)`
+                : `update "user_history" set "last_viewed_at" = $1 where "user" = $2 and "article" = $3`
+
+            const params = rowCount === 0
+                ? [ authenticatedUser.id, article.id ]
+                : [ new Date().toISOString(), authenticatedUser.id, article.id ];
+
+            await Database.pool.query(query, params).catch(e =>
+                {
+                    console.log(e)
+                });
 
             return article.serialize({
                 for: authenticatedUser,
