@@ -13,7 +13,7 @@
         "subject": "Sei stato invitato ad essere autore per {{ PUBLISHER_NAME }}",
         "lines": [
             "Ciao,",
-            "Sei stato invitato ad essere autor per l'editore {{ PUBLISHER_NAME }}",
+            "Sei stato invitato ad essere autore per l'editore {{ PUBLISHER_NAME }}",
             "Per accettare l'invito clicca il seguente link e successivamente sul pulsante 'Accetta'",
             "{{ CLIENT_URL }}/settings/invites"
         ]
