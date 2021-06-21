@@ -181,7 +181,7 @@ export default <ServerRoute[]>[
             await sendgrid
                 .send({
                     to: user.email,
-                    from: "nuntium.tokens@alexsandri.com",
+                    from: "signin@nuntium.space",
                     subject: `[nuntium] ${translations.auth.email.subject}`,
                     text: (translations.auth.email.lines as string[])
                         .join("\n")
