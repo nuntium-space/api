@@ -365,7 +365,7 @@ create table "bookmarks"
   foreign key ("article") references "articles" on update cascade on delete cascade
 );
 
-create table "author-invites"
+create table "author_invites"
 (
   "id" id not null,
   "user" id not null,
