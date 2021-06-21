@@ -226,11 +226,15 @@
     "publisher": {
         "authors": {
             "__title": "Authors",
-            "empty": "You haven't invited any author",
+            "empty": "There are no authors",
             "invite": "Invite",
             "invite_author": {
                 "__title": "Invite author"
             }
+        },
+        "invites": {
+            "__title": "Invites",
+            "empty": "There are no active invites"
         },
         "details": {
             "__title": "Details",
