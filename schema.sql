@@ -365,6 +365,25 @@ create table "bookmarks"
   foreign key ("article") references "articles" on update cascade on delete cascade
 );
 
+create table "author-invites"
+(
+  "id" id not null,
+  "user" id not null,
+  "publisher" id not null,
+  "created_at" current_timestamp_utc not null,
+  "expires_at" timestamp not null,
+
+  primary key ("id"),
+
+  unique ("user", "publisher"),
+
+  foreign key ("user") references "users" on update cascade on delete cascade,
+  foreign key ("publisher") references "publishers" on update cascade on delete cascade,
+
+  check ("id" like 'inv_%'),
+  check ("expires_at" >= "created_at")
+);
+
 /*
 -----
 VIEWS
