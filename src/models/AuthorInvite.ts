@@ -38,6 +38,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
                     ("id", "user", "publisher", "expires_at")
                 values
                     ($1, $2, $3, $4)
+                returning *
                 `,
                 [
                     Utilities.id(Config.ID_PREFIXES.AUTHOR_INVITE),
