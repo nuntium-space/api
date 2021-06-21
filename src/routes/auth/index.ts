@@ -143,8 +143,8 @@ export default <ServerRoute[]>[
 
             const token = crypto.randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
 
-            const expires = new Date();
-            expires.setSeconds(new Date().getSeconds() + Config.SIGN_IN_REQUEST_DURATION);
+            const expiresAt = new Date();
+            expiresAt.setSeconds(expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS);
 
             const client = await Database.pool.connect();
 
@@ -162,7 +162,7 @@ export default <ServerRoute[]>[
                         id,
                         token,
                         user.id,
-                        expires.toISOString(),
+                        expiresAt.toISOString(),
                     ],
                 )
                 .catch(async () =>
@@ -176,7 +176,7 @@ export default <ServerRoute[]>[
 
             const lang = userSettings.language ?? "en";
 
-            const translations = require(`../../assets/translations/${lang}.json`);
+            const translations = require(`../../assets/translations/email/${lang}.json`);
 
             await sendgrid
                 .send({
@@ -185,11 +185,16 @@ export default <ServerRoute[]>[
                         name: "nuntium",
                         email: "signin@nuntium.space",
                     },
-                    subject: translations.auth.email.subject,
-                    text: (translations.auth.email.lines as string[])
+                    subject: translations.auth.subject,
+                    text: (translations.auth.lines as string[])
                         .join("\n")
                         .replace("{{ API_URL }}", Config.API_URL)
-                        .replace("{{ TOKEN }}", token),
+                        .replace("{{ TOKEN }}", token)
+                        +
+                        "\n\n"
+                        +
+                        (translations.__end.lines as string[])
+                            .join("\n"),
                     trackingSettings: {
                         clickTracking: {
                             enable: false,

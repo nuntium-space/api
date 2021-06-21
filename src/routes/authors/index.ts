@@ -100,45 +100,6 @@ export default <ServerRoute[]>[
         },
     },
     {
-        method: "POST",
-        path: "/publishers/{id}/authors",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.PUBLISHER.required(),
-                }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-                payload: AUTHOR_SCHEMA.CREATE,
-            },
-            response: {
-                schema: AUTHOR_SCHEMA.OBJ,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const publisher = await Publisher.retrieve(request.params.id);
-
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
-
-            if (!publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
-
-            const author = await Author.create(
-                {
-                    email: (request.payload as any).email,
-                    publisher: publisher.id,
-                },
-                request.query.expand,
-            );
-
-            return author.serialize({ for: authenticatedUser });
-        },
-    },
-    {
         method: "DELETE",
         path: "/authors/{id}",
         options: {

@@ -22,18 +22,6 @@
         },
         "title": "Title"
     },
-    "auth": {
-        "email": {
-            "subject": "Accept Sign In Request",
-            "lines": [
-                "Hi,",
-                "We received a request to sign into your account",
-                "If this is you click the link below to accept the sign in",
-                "If you are not sure and decide not to click it no one will gain access to your account\n",
-                "{{ API_URL }}/auth/email/{{ TOKEN }}"
-            ]
-        }
-    },
     "bundle": {
         "details": {
             "__title": "Details",
@@ -226,11 +214,15 @@
     "publisher": {
         "authors": {
             "__title": "Authors",
-            "empty": "You haven't invited any author",
+            "empty": "There are no authors",
             "invite": "Invite",
             "invite_author": {
                 "__title": "Invite author"
             }
+        },
+        "invites": {
+            "__title": "Invites",
+            "empty": "There are no active invites"
         },
         "details": {
             "__title": "Details",
