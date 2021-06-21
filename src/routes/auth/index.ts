@@ -143,8 +143,8 @@ export default <ServerRoute[]>[
 
             const token = crypto.randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
 
-            const expires = new Date();
-            expires.setSeconds(new Date().getSeconds() + Config.SIGN_IN_REQUEST_DURATION);
+            const expiresAt = new Date();
+            expiresAt.setSeconds(expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS);
 
             const client = await Database.pool.connect();
 
@@ -162,7 +162,7 @@ export default <ServerRoute[]>[
                         id,
                         token,
                         user.id,
-                        expires.toISOString(),
+                        expiresAt.toISOString(),
                     ],
                 )
                 .catch(async () =>

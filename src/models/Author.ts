@@ -18,6 +18,10 @@ export class Author implements ISerializable<ISerializedAuthor>
     )
     {}
 
+    //////////
+    // CRUD //
+    //////////
+
     public static async create(data: ICreateAuthor, expand?: string[]): Promise<Author>
     {
         const user = await User.retrieveWithEmail(data.email);
@@ -70,6 +74,46 @@ export class Author implements ISerializable<ISerializedAuthor>
         return Author.deserialize(result.rows[0], expand);
     }
 
+    public async delete(): Promise<void>
+    {
+        await Database.pool.query(
+            `delete from "authors" where "id" = $1`,
+            [ this.id ],
+        );
+    }
+
+    ///////////////
+    // UTILITIES //
+    ///////////////
+
+    public static async invite(data: ICreateAuthor): Promise<void>
+    {
+        const user = await User.retrieveWithEmail(data.email);
+
+        const expiresAt = new Date();
+        expiresAt.setSeconds(expiresAt.getSeconds() + Config.AUTHOR_INVITE_DURATION_IN_SECONDS);
+
+        await Database.pool
+            .query(
+                `
+                insert into "author_invites"
+                    ("id", "user", "publisher", "expires_at")
+                values
+                    ($1, $2, $3, $4)
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.AUTHOR_INVITE),
+                    user.id,
+                    data.publisher,
+                    expiresAt.toISOString(),
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
+    }
+
     public static async retrieveWithUserAndPublisher(user: User | string, publisher: Publisher | string, expand?: string[]): Promise<Author>
     {
         const result = await Database.pool.query(
@@ -100,14 +144,6 @@ export class Author implements ISerializable<ISerializedAuthor>
         return Author.deserialize(result.rows[0], expand);
     }
 
-    public async delete(): Promise<void>
-    {
-        await Database.pool.query(
-            `delete from "authors" where "id" = $1`,
-            [ this.id ],
-        );
-    }
-
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Author[]>
     {
         const result = await Database.pool.query(
@@ -127,6 +163,10 @@ export class Author implements ISerializable<ISerializedAuthor>
 
         return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
     }
+
+    ///////////////////
+    // SERIALIZATION //
+    ///////////////////
 
     public serialize(options?: {
         for?: User | INotExpandedResource,

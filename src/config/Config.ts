@@ -21,7 +21,14 @@ export class Config
      * 
      * 5 minutes
      */
-    public static readonly SIGN_IN_REQUEST_DURATION = 60 * 5;
+    public static readonly SIGN_IN_REQUEST_DURATION_IN_SECONDS = 60 * 5;
+
+    /**
+     * @default
+     * 
+     * 7 days
+     */
+     public static readonly AUTHOR_INVITE_DURATION_IN_SECONDS = 60 * 60 * 24 * 7;
 
     public static readonly SIGN_IN_REQUEST_TOKEN_BYTES = 60;
 
