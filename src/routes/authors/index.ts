@@ -101,19 +101,13 @@ export default <ServerRoute[]>[
     },
     {
         method: "POST",
-        path: "/publishers/{id}/authors",
+        path: "/publishers/{id}/authors/invites",
         options: {
             validate: {
                 params: Joi.object({
                     id: Schema.ID.PUBLISHER.required(),
                 }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
                 payload: AUTHOR_SCHEMA.CREATE,
-            },
-            response: {
-                schema: AUTHOR_SCHEMA.OBJ,
             },
         },
         handler: async (request, h) =>
@@ -127,15 +121,12 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const author = await Author.create(
-                {
-                    email: (request.payload as any).email,
-                    publisher: publisher.id,
-                },
-                request.query.expand,
-            );
+            await Author.invite({
+                email: (request.payload as any).email,
+                publisher: publisher.id,
+            });
 
-            return author.serialize({ for: authenticatedUser });
+            return h.response();
         },
     },
     {
