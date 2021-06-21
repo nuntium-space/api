@@ -7,6 +7,7 @@ import { AuthorInvite } from "../../models/AuthorInvite";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
 import { AUTHOR_SCHEMA } from "../../types/author";
+import { AUTHOR_INVITE_SCHEMA } from "../../types/author-invite";
 
 export default <ServerRoute[]>[
     {
@@ -108,7 +109,6 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.AUTHOR_INVITE.required(),
                 }),
-                payload: AUTHOR_SCHEMA.CREATE,
             },
         },
         handler: async (request, h) =>
@@ -135,7 +135,7 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.PUBLISHER.required(),
                 }),
-                payload: AUTHOR_SCHEMA.CREATE,
+                payload: AUTHOR_INVITE_SCHEMA.CREATE,
             },
         },
         handler: async (request, h) =>

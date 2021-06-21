@@ -11,12 +11,6 @@ export interface IDatabaseAuthor
     publisher: string,
 }
 
-export interface ICreateAuthor
-{
-    email: string,
-    publisher: string,
-}
-
 export interface ISerializedAuthor
 {
     id: string,
@@ -41,8 +35,5 @@ export const AUTHOR_SCHEMA = {
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
             )
             .required(),
-    }),
-    CREATE: Joi.object({
-        email: Schema.EMAIL.required(),
     }),
 } as const;

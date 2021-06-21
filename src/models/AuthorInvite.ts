@@ -97,7 +97,37 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
             ]);
         }
 
-        // TODO:
+        const client = await Database.pool.connect();
+
+        await client.query("begin");
+
+        await client.query(
+            `
+            insert into "authors"
+                ("id", "user", "publisher")
+            values
+                ($1, $2, $3)
+            `,
+            [
+                Utilities.id(Config.ID_PREFIXES.AUTHOR),
+                this.user.id,
+                this.publisher.id,
+            ],
+        );
+
+        await client.query(
+            `
+            delete from "author_invites"
+            where "id" = $1
+            `,
+            [
+                this.id,
+            ],
+        );
+
+        await client.query("commit");
+
+        client.release();
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<AuthorInvite[]>

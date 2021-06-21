@@ -1,10 +1,8 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
-import { Config } from "../config/Config";
-import { ISerializedAuthor, ICreateAuthor, IDatabaseAuthor } from "../types/author";
+import { ISerializedAuthor, IDatabaseAuthor } from "../types/author";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
@@ -21,43 +19,6 @@ export class Author implements ISerializable<ISerializedAuthor>
     //////////
     // CRUD //
     //////////
-
-    public static async create(data: ICreateAuthor, expand?: string[]): Promise<Author>
-    {
-        const user = await User.retrieveWithEmail(data.email);
-
-        if (!user.full_name)
-        {
-            throw Boom.forbidden(undefined, [
-                {
-                    field: "author",
-                    error: "Cannot make a user an author if it does not have a full name set",
-                },
-            ]);
-        }
-
-        const result = await Database.pool
-            .query(
-                `
-                insert into "authors"
-                    ("id", "user", "publisher")
-                values
-                    ($1, $2, $3)
-                returning *
-                `,
-                [
-                    Utilities.id(Config.ID_PREFIXES.AUTHOR),
-                    user.id,
-                    data.publisher,
-                ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badRequest();
-            });
-
-        return Author.deserialize(result.rows[0], expand);
-    }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Author>
     {
