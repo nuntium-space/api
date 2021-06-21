@@ -3,6 +3,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Author } from "../../models/Author";
+import { AuthorInvite } from "../../models/AuthorInvite";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
 import { AUTHOR_SCHEMA } from "../../types/author";
@@ -101,6 +102,33 @@ export default <ServerRoute[]>[
     },
     {
         method: "POST",
+        path: "/authors/invites/{id}/accept",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.AUTHOR_INVITE.required(),
+                }),
+                payload: AUTHOR_SCHEMA.CREATE,
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            const invite = await AuthorInvite.retrieve(request.params.id);
+
+            if (authenticatedUser.id !== invite.user.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await invite.accept();
+
+            return h.response();
+        },
+    },
+    {
+        method: "POST",
         path: "/publishers/{id}/authors/invites",
         options: {
             validate: {
@@ -121,7 +149,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            await Author.invite({
+            await AuthorInvite.create({
                 email: (request.payload as any).email,
                 publisher: publisher.id,
             });
