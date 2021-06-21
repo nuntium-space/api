@@ -181,8 +181,11 @@ export default <ServerRoute[]>[
             await sendgrid
                 .send({
                     to: user.email,
-                    from: "signin@nuntium.space",
-                    subject: `[nuntium] ${translations.auth.email.subject}`,
+                    from: {
+                        name: "nuntium",
+                        email: "signin@nuntium.space",
+                    },
+                    subject: translations.auth.email.subject,
                     text: (translations.auth.email.lines as string[])
                         .join("\n")
                         .replace("{{ API_URL }}", Config.API_URL)
