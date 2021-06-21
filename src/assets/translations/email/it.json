@@ -1,0 +1,27 @@
+{
+    "auth": {
+        "subject": "Accetta richiesta di accesso",
+        "lines": [
+            "Ciao,",
+            "Abbiamo ricevuto una richiesta di accesso al tuo account",
+            "Se sei stato tu clicca il link qui sotto per accettare l'accesso",
+            "Se non sei sicuro e decidi di non cliccarlo nessuno otterrà l'accesso al tuo account\n",
+            "{{ API_URL }}/auth/email/{{ TOKEN }}"
+        ]
+    },
+    "author_invite": {
+        "subject": "Sei stato invitato ad essere autore per {{ PUBLISHER_NAME }}",
+        "lines": [
+            "Ciao,",
+            "Sei stato invitato ad essere autor per l'editore {{ PUBLISHER_NAME }}",
+            "Per accettare l'invito clicca il seguente link e successivamente sul pulsante 'Accetta'",
+            "{{ CLIENT_URL }}/settings/invites"
+        ]
+    },
+    "__end": {
+        "lines": [
+            "Grazie,",
+            "Il team nuntium"
+        ]
+    }
+}

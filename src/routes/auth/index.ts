@@ -176,7 +176,7 @@ export default <ServerRoute[]>[
 
             const lang = userSettings.language ?? "en";
 
-            const translations = require(`../../assets/translations/${lang}.json`);
+            const translations = require(`../../assets/translations/email/${lang}.json`);
 
             await sendgrid
                 .send({
@@ -185,8 +185,8 @@ export default <ServerRoute[]>[
                         name: "nuntium",
                         email: "signin@nuntium.space",
                     },
-                    subject: translations.auth.email.subject,
-                    text: (translations.auth.email.lines as string[])
+                    subject: translations.auth.subject,
+                    text: (translations.auth.lines as string[])
                         .join("\n")
                         .replace("{{ API_URL }}", Config.API_URL)
                         .replace("{{ TOKEN }}", token),

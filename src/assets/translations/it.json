@@ -22,18 +22,6 @@
         },
         "title": "Titolo"
     },
-    "auth": {
-        "email": {
-            "subject": "Accetta richiesta di accesso",
-            "lines": [
-                "Ciao,",
-                "Abbiamo ricevuto una richiesta di accesso al tuo account",
-                "Se sei stato tu clicca il link qui sotto per accettare l'accesso",
-                "Se non sei sicuro e decidi di non cliccarlo nessuno otterrà l'accesso al tuo account\n",
-                "{{ API_URL }}/auth/email/{{ TOKEN }}"
-            ]
-        }
-    },
     "bundle": {
         "details": {
             "__title": "Dettagli",
