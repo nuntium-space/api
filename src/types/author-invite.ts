@@ -45,6 +45,8 @@ export const AUTHOR_INVITE_SCHEMA = {
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
             )
             .required(),
+        created_at: Schema.DATETIME.required(),
+        expires_at: Schema.DATETIME.required(),
     }),
     CREATE: Joi.object({
         email: Schema.EMAIL.required(),
