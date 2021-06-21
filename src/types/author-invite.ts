@@ -30,7 +30,7 @@ export interface ISerializedAuthorInvite
 
 export const AUTHOR_INVITE_SCHEMA = {
     OBJ: Joi.object({
-        id: Schema.ID.AUTHOR.required(),
+        id: Schema.ID.AUTHOR_INVITE.required(),
         user: Joi
             .alternatives()
             .try(
