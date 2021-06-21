@@ -189,7 +189,12 @@ export default <ServerRoute[]>[
                     text: (translations.auth.lines as string[])
                         .join("\n")
                         .replace("{{ API_URL }}", Config.API_URL)
-                        .replace("{{ TOKEN }}", token),
+                        .replace("{{ TOKEN }}", token)
+                        +
+                        "\n\n"
+                        +
+                        (translations.__end.lines as string[])
+                            .join("\n"),
                     trackingSettings: {
                         clickTracking: {
                             enable: false,
