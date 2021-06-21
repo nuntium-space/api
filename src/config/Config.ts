@@ -39,6 +39,7 @@ export class Config
         ACCOUNT: "acc",
         SIGN_IN_REQUEST: "sir",
         SOURCE: "src",
+        AUTHOR_INVITE: "inv",
     };
 
     public static readonly LANGUAGES = [
