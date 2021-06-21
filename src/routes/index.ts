@@ -1,5 +1,6 @@
 import articles from "./articles";
 import auth from "./auth";
+import authorInvites from "./author-invites";
 import authors from "./authors";
 import bookmarks from "./bookmarks";
 import bundles from "./bundles";
@@ -17,6 +18,7 @@ import webhooks from "./webhooks";
 export = [
     articles,
     auth,
+    authorInvites,
     authors,
     bookmarks,
     bundles,
