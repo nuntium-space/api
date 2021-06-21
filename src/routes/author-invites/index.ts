@@ -134,7 +134,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: Schema.ID.AUTHOR.required(),
+                    id: Schema.ID.AUTHOR_INVITE.required(),
                 }),
             },
         },
