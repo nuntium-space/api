@@ -2,7 +2,6 @@ import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Schema } from "../config/Schema";
 import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
-import { ICreateSource, SOURCE_SCHEMA } from "./source";
 
 export interface IDatabaseArticle
 {
@@ -16,20 +15,6 @@ export interface IDatabaseArticle
     is_published: boolean,
     created_at: Date,
     updated_at: Date,
-}
-
-export interface ICreateArticle
-{
-    title: string,
-    content: any,
-    sources: ICreateSource[],
-}
-
-export interface IUpdateArticle
-{
-    title?: string,
-    content?: any,
-    sources?: ICreateSource[],
 }
 
 export interface ISerializedArticle
@@ -68,14 +53,5 @@ export const ARTICLE_SCHEMA = {
             is_liked: Schema.BOOLEAN.required(),
             is_bookmarked: Schema.BOOLEAN.required(),
         }).optional(),
-    }),
-    CREATE: Joi.object({
-        title: Schema.STRING.max(50).required(),
-        content: Schema.ARTICLE_CONTENT.required(),
-        sources: Schema.ARRAY(SOURCE_SCHEMA.CREATE).required(),
-    }),
-    UPDATE: Joi.object({
-        title: Schema.STRING.max(50),
-        content: Schema.ARTICLE_CONTENT,
     }),
 } as const;

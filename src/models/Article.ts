@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedArticle, ICreateArticle, IUpdateArticle, IDatabaseArticle } from "../types/article";
+import { ISerializedArticle, IDatabaseArticle } from "../types/article";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
