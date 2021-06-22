@@ -340,6 +340,7 @@
             "invites": {
                 "__title": "Inviti",
                 "accept": "Accetta",
+                "empty": "Non hai inviti attivi",
                 "expires_at": "Scade il"
             },
             "publishers": {

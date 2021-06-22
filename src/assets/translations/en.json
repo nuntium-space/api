@@ -340,6 +340,7 @@
             "invites": {
                 "__title": "Invites",
                 "accept": "Accept",
+                "empty": "You have no active invites",
                 "expires_at": "Expires on"
             },
             "publishers": {
