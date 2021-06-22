@@ -130,6 +130,7 @@ create table "articles"
   "reading_time" int not null,
   "view_count" int not null default 0,
   "like_count" int not null default 0,
+  "is_published" boolean not null default false,
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,
 
@@ -396,13 +397,14 @@ create table "article_drafts"
   "id" id not null,
   "title" varchar(50) not null,
   "content" json not null,
-  "author" id not null,
+  "article" id not null,
   "status" text not null default 'draft',
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,
 
   primary key ("id"),
 
+  foreign key ("article") references "articles" on update cascade on delete cascade,
   foreign key ("status") references "article_draft_statuses" on update cascade on delete cascade,
 
   check ("id" like 'dft_%'),
@@ -414,6 +416,9 @@ create table "article_drafts"
 VIEWS
 -----
 */
+
+create view "v_published_articles"
+as select * from "articles" where "is_published" = true;
 
 create view "v_active_bundles"
 as select * from "bundles" where "active" = true;

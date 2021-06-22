@@ -7,8 +7,9 @@ nuntium's API
 ### Article created
 
 1. Draft is created
-2. Draft is modified
-3. Draft is submitted for verification
+2. Article is created (`is_published = false`)
+3. Draft is modified
+4. Draft is submitted for verification
     1. Draft is rejected (go to step 2.)
     2. Draft is accepted
         1. Article is published
