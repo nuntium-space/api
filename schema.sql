@@ -121,13 +121,6 @@ create table "authors"
   check ("id" like 'aut_%')
 );
 
-create table "article_statuses"
-(
-  "id" text not null,
-
-  primary key ("id")
-);
-
 create table "articles"
 (
   "id" id not null,
@@ -137,23 +130,15 @@ create table "articles"
   "reading_time" int not null,
   "view_count" int not null default 0,
   "like_count" int not null default 0,
-  "status" text not null default 'draft',
-  "is_verified" boolean not null default false,
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,
 
   primary key ("id"),
 
   foreign key ("author") references "authors" on update cascade on delete cascade,
-  foreign key ("status") references "article_statuses" on update cascade on delete cascade,
 
   check ("id" like 'art_%'),
   check ("reading_time" >= 0),
-  check (
-    ("status" = 'published' and "is_verified" = true)
-    or
-    ("status" <> 'published')
-  ),
   check ("updated_at" >= "created_at")
 );
 
@@ -399,14 +384,36 @@ create table "author_invites"
   check ("expires_at" >= "created_at")
 );
 
+create table "article_draft_statuses"
+(
+  "id" text not null,
+
+  primary key ("id")
+);
+
+create table "article_drafts"
+(
+  "id" id not null,
+  "title" varchar(50) not null,
+  "content" json not null,
+  "author" id not null,
+  "status" text not null default 'draft',
+  "created_at" current_timestamp_utc not null,
+  "updated_at" current_timestamp_utc not null,
+
+  primary key ("id"),
+
+  foreign key ("status") references "article_draft_statuses" on update cascade on delete cascade,
+
+  check ("id" like 'dft_%'),
+  check ("updated_at" >= "created_at")
+);
+
 /*
 -----
 VIEWS
 -----
 */
-
-create view "v_published_articles"
-as select * from "articles" where "status" = 'published';
 
 create view "v_active_bundles"
 as select * from "bundles" where "active" = true;
@@ -474,9 +481,8 @@ values
   ('google'),
   ('twitter');
 
-insert into "article_statuses"
+insert into "article_draft_statuses"
   ("id")
 values
-  ('draft'), -- Default value for new articles, the article can be modified
-  ('pending-verification'), -- Article submitted for verification, cannot be modified
-  ('published'); -- Article published and visible to all users, can be modified but a new draft must be created
+  ('draft'), -- Default value for new drafts, can be modified
+  ('pending-verification'); -- Draft submitted for verification, cannot be modified
