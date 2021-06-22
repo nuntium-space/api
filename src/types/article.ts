@@ -13,8 +13,6 @@ export interface IDatabaseArticle
     reading_time: number,
     view_count: number,
     like_count: number,
-    status: string,
-    is_verified: boolean,
     created_at: Date,
     updated_at: Date,
 }
@@ -42,8 +40,6 @@ export interface ISerializedArticle
     reading_time: number,
     created_at: string,
     updated_at: string,
-    status: string,
-    is_verified: boolean,
     __metadata?: {
         is_liked: boolean,
         is_bookmarked: boolean,
@@ -65,8 +61,6 @@ export const ARTICLE_SCHEMA = {
             .required(),
         created_at: Schema.DATETIME.required(),
         updated_at: Schema.DATETIME.required(),
-        status: Schema.STRING.required(),
-        is_verified: Schema.BOOLEAN.required(),
         __metadata: Joi.object({
             is_liked: Schema.BOOLEAN.required(),
             is_bookmarked: Schema.BOOLEAN.required(),
