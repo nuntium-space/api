@@ -22,7 +22,7 @@ export class Source implements ISerializable<ISerializedSource>
     // CRUD //
     //////////
 
-    public static async createMultiple(data: ICreateSource[], articleId: string, client: PoolClient): Promise<void>
+    public static async createMultiple(data: ICreateSource[], article: Article | INotExpandedResource | string, client: PoolClient): Promise<void>
     {
         await Promise
             .all(data.map(_ =>
@@ -39,7 +39,9 @@ export class Source implements ISerializable<ISerializedSource>
                         [
                             Utilities.id(Config.ID_PREFIXES.SOURCE),
                             _.url,
-                            articleId,
+                            typeof article === "string"
+                                ? article
+                                : article.id,
                         ],
                     );
             }))
