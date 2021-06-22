@@ -58,63 +58,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
     // CRUD //
     //////////
 
-    public static async create(data: ICreateArticle, author: Author, expand?: string[]): Promise<Article>
-    {
-        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE);
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        const result = await client
-            .query(
-                `
-                insert into "articles"
-                    ("id", "title", "content", "author", "reading_time")
-                values
-                    ($1, $2, $3, $4, $5)
-                returning *
-                `,
-                [
-                    id,
-                    data.title,
-                    data.content,
-                    author.id,
-                    Utilities.getArticleReadingTimeInMinutes(data.content),
-                ],
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badRequest();
-            });
-
-        await Config.ELASTICSEARCH
-            .index({
-                index: "articles",
-                id,
-                body: {
-                    title: data.title,
-                    content: Utilities.extractTextFromEditorJson(data.content),
-                },
-            })
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badImplementation();
-            });
-
-        await Source.createMultiple(data.sources, id, client);
-
-        await client.query("commit");
-
-        client.release();
-
-        return Article.deserialize(result.rows[0], expand);
-    }
-
     public static async retrieve(id: string, expand?: string[]): Promise<Article>
     {
         const result = await Database.pool.query(

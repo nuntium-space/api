@@ -49,25 +49,49 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
     // CRUD //
     //////////
 
-    public static async create(data: ICreateArticleDraft, author: Author, expand?: string[]): Promise<ArticleDraft>
+    public static async create(data: ICreateArticleDraft, author: Author, expand?: string[]): Promise<INotExpandedResource>
     {
-        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
+        const articleId = Utilities.id(Config.ID_PREFIXES.ARTICLE);
+        const articleDraftId = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
 
         const client = await Database.pool.connect();
 
         await client.query("begin");
 
-        const result = await client
+        await client
             .query(
                 `
-                insert into "article_drafts"
-                    ("id", "title", "content", "author")
+                insert into "articles"
+                    ("id", "title", "content", "author", "reading_time")
                 values
-                    ($1, $2, $3, $4)
+                    ($1, $2, $3, $4, $5)
                 returning *
                 `,
                 [
-                    id,
+                    articleId,
+                    data.title,
+                    data.content,
+                    author.id,
+                    Utilities.getArticleReadingTimeInMinutes(data.content),
+                ],
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        await client
+            .query(
+                `
+                insert into "article_drafts"
+                    ("id", "title", "content", "article")
+                values
+                    ($1, $2, $3, $4)
+                `,
+                [
+                    articleDraftId,
                     data.title,
                     data.content,
                     author.id,
@@ -80,13 +104,13 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                 throw Boom.badRequest();
             });
 
-        await Source.createMultiple(data.sources, id, client);
+        await Source.createMultiple(data.sources, articleId, client);
 
         await client.query("commit");
 
         client.release();
 
-        return ArticleDraft.deserialize(result.rows[0], expand);
+        return { id: articleDraftId };
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<ArticleDraft>
@@ -172,6 +196,33 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
     public async submitForVerification(): Promise<void>
     {
         // TODO
+    }
+
+    public async publish(): Promise<void>
+    {
+        // TODO: Update article row with new content and title and reading time
+
+        const client = await Database.pool.connect();
+        await client.query("begin");
+
+        await Config.ELASTICSEARCH
+            .index({
+                index: "articles",
+                id: this.article.id,
+                body: {
+                    title: this.title,
+                    content: Utilities.extractTextFromEditorJson(this.content),
+                },
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
+        client.release();
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<ArticleDraft[]>
