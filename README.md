@@ -4,7 +4,7 @@ nuntium's API
 
 ## Article lifecycle
 
-### Article created
+### Creation
 
 1. Draft is created
 2. Article is created (`is_published = false`)
@@ -15,7 +15,7 @@ nuntium's API
         1. Article is published
         2. Draft is deleted
 
-### Article updated
+### Update
 
 1. Draft is created
 2. Draft is modified
