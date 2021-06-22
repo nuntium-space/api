@@ -5,6 +5,7 @@ import { Config } from "../config/Config";
 import { ISerializedArticleDraft, ICreateArticleDraft, IUpdateArticleDraft, IDatabaseArticleDraft } from "../types/article-draft";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
+import { Article } from "./Article";
 import { Author } from "./Author";
 import { Publisher } from "./Publisher";
 import { Source } from "./Source";
@@ -17,7 +18,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         public readonly id: string,
         private _title: string,
         private _content: any,
-        public readonly author: Author | INotExpandedResource,
+        public readonly article: Article | INotExpandedResource,
         private _status: string,
         public readonly created_at: Date,
         private _updated_at: Date,
@@ -141,7 +142,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
         if (data.sources)
         {
-            await Source.deleteAll(this);
+            await Source.deleteAll(this.article);
             await Source.createMultiple(data.sources, this.id, client);
         }
 
@@ -215,9 +216,9 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
             content: options.includeContent
                 ? this.content
                 : null,
-            author: this.author instanceof Author
-                ? this.author.serialize({ for: options.for })
-                : this.author,
+            article: this.article instanceof Article
+                ? await this.article.serialize({ for: options.for })
+                : this.article,
             status: this.status,
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
@@ -226,20 +227,20 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     private static async deserialize(data: IDatabaseArticleDraft, expand?: string[]): Promise<ArticleDraft>
     {
-        const author = expand?.includes("author")
-            ? await Author.retrieve(
-                data.author,
+        const article = expand?.includes("article")
+            ? await Article.retrieve(
+                data.article,
                 expand
-                    .filter(e => e.startsWith("author."))
-                    .map(e => e.replace("author.", "")),
+                    .filter(e => e.startsWith("article."))
+                    .map(e => e.replace("article.", "")),
                 )
-            : { id: data.author };
+            : { id: data.article };
 
         return new ArticleDraft(
             data.id,
             data.title,
             data.content,
-            author,
+            article,
             data.status,
             data.created_at,
             data.updated_at,

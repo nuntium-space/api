@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Schema } from "../config/Schema";
-import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
+import { ARTICLE_SCHEMA, ISerializedArticle } from "./article";
 import { ICreateSource, SOURCE_SCHEMA } from "./source";
 
 export interface IDatabaseArticleDraft
@@ -9,7 +9,7 @@ export interface IDatabaseArticleDraft
     id: string,
     title: string,
     content: any,
-    author: string,
+    article: string,
     status: string,
     created_at: Date,
     updated_at: Date,
@@ -34,7 +34,7 @@ export interface ISerializedArticleDraft
     id: string,
     title: string,
     content: any,
-    author: ISerializedAuthor | INotExpandedResource,
+    article: ISerializedArticle | INotExpandedResource,
     status: string,
     created_at: string,
     updated_at: string,
@@ -45,11 +45,11 @@ export const ARTICLE_DRAFT_SCHEMA = {
         id: Schema.ID.ARTICLE.required(),
         title: Schema.STRING.max(50).required(),
         content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
-        author: Joi
+        article: Joi
             .alternatives()
             .try(
-                AUTHOR_SCHEMA.OBJ,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR),
+                ARTICLE_SCHEMA.OBJ,
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
             )
             .required(),
         status: Schema.STRING.required(),

@@ -51,7 +51,7 @@ export class Source implements ISerializable<ISerializedSource>
             });
     }
 
-    public static async deleteAll(article: Article): Promise<void>
+    public static async deleteAll(article: Article | INotExpandedResource | string): Promise<void>
     {
         await Database.pool
             .query(
@@ -59,7 +59,11 @@ export class Source implements ISerializable<ISerializedSource>
                 delete from "sources"
                 where "article" = $1
                 `,
-                [ article.id ],
+                [
+                    typeof article === "string"
+                        ? article
+                        : article.id,
+                ],
             );
     }
 
