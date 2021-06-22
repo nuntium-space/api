@@ -150,19 +150,22 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
 
         await client.query("begin");
 
-        await client.query(
-            `
-            insert into "authors"
-                ("id", "user", "publisher")
-            values
-                ($1, $2, $3)
-            `,
-            [
-                Utilities.id(Config.ID_PREFIXES.AUTHOR),
-                this.user.id,
-                this.publisher.id,
-            ],
-        );
+        if (!this.hasExpired())
+        {
+            await client.query(
+                `
+                insert into "authors"
+                    ("id", "user", "publisher")
+                values
+                    ($1, $2, $3)
+                `,
+                [
+                    Utilities.id(Config.ID_PREFIXES.AUTHOR),
+                    this.user.id,
+                    this.publisher.id,
+                ],
+            );
+        }
 
         await client.query(
             `
@@ -177,6 +180,11 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
         await client.query("commit");
 
         client.release();
+
+        if (this.hasExpired())
+        {
+            throw Boom.resourceGone();
+        }
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<AuthorInvite[]>
@@ -197,6 +205,11 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
         );
 
         return Promise.all(result.rows.map(row => AuthorInvite.deserialize(row, expand)));
+    }
+
+    public hasExpired(): boolean
+    {
+        return this.expires_at < new Date();
     }
 
     ///////////////////
