@@ -49,7 +49,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
     // CRUD //
     //////////
 
-    public static async create(data: ICreateArticleDraft, author: Author, expand?: string[]): Promise<INotExpandedResource>
+    public static async create(data: ICreateArticleDraft, author: Author): Promise<INotExpandedResource>
     {
         const articleId = Utilities.id(Config.ID_PREFIXES.ARTICLE);
         const articleDraftId = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
@@ -57,6 +57,8 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         const client = await Database.pool.connect();
 
         await client.query("begin");
+
+        // TODO: Create article only if it does not exist
 
         await client
             .query(
@@ -204,6 +206,8 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
         const client = await Database.pool.connect();
         await client.query("begin");
+
+        // TODO: Update index if already exists in index
 
         await Config.ELASTICSEARCH
             .index({
