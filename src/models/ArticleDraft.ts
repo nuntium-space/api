@@ -11,6 +11,8 @@ import { Publisher } from "./Publisher";
 import { Source } from "./Source";
 import { User } from "./User";
 
+// TODO: find a way to modify sources with new draftsm maybe new table?
+
 export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDraft>>
 {
     private constructor

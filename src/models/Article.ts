@@ -4,12 +4,10 @@ import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { ISerializedArticle, IDatabaseArticle } from "../types/article";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
 import { Bookmark } from "./Bookmark";
 import { Like } from "./Like";
 import { Publisher } from "./Publisher";
-import { Source } from "./Source";
 import { User } from "./User";
 
 export class Article implements ISerializable<Promise<ISerializedArticle>>
@@ -106,71 +104,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
         );
 
         return Promise.all(result.rows.map(row => Article.deserialize(row, expand)));
-    }
-
-    public async update(data: IUpdateArticle): Promise<void>
-    {
-        this._title = data.title ?? this.title;
-        this._content = data.content ?? this.content;
-        this._reading_time = Utilities.getArticleReadingTimeInMinutes(this.content);
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        const result = await client
-            .query(
-                `
-                update "articles"
-                set
-                    "title" = $1,
-                    "content" = $2,
-                    "reading_time" = $3
-                where
-                    "id" = $4
-                returning "updated_at"
-                `,
-                [
-                    this.title,
-                    this.content,
-                    this.reading_time,
-                    this.id,
-                ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badRequest();
-            });
-
-        await Config.ELASTICSEARCH
-            .update({
-                index: "articles",
-                id: this.id,
-                body: {
-                    doc: {
-                        title: this.title,
-                        content: Utilities.extractTextFromEditorJson(this.content),
-                    },
-                },
-            })
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badImplementation();
-            });
-
-        if (data.sources)
-        {
-            await Source.deleteAll(this);
-            await Source.createMultiple(data.sources, this.id, client);
-        }
-
-        await client.query("commit");
-
-        client.release();
-
-        this._updated_at = result.rows[0].updated_at;
     }
 
     public async delete(): Promise<void>
