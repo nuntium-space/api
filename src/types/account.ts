@@ -1,5 +1,6 @@
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializedUser, User } from "../models/User";
+import { User } from "../models/User";
+import { ISerializedUser } from "./user";
 
 export interface IDatabaseAccount
 {
