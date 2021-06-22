@@ -25,7 +25,18 @@ nuntium's API
         1. Update is published
         2. Draft is deleted
 
-## Errors
+## Response
+
+These should be the default response codes for successful requests.\
+Currently the API does not follow these rules but in the coming months a complete transition will happen.
+
+- `GET`: `200 OK` -> { *obj* }
+- `POST`: `201 Created` -> { id: *resource_id* }
+- `PATCH`: `200 OK` -> { *obj* }
+- `PUT`: `204 No Content` -> *void*
+- `DELETE`: `204 No Content` -> *void*
+
+### Errors
 
 How to throw an error:
 
