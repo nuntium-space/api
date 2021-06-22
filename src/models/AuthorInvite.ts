@@ -30,6 +30,11 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
         const user = await User.retrieveWithEmail(data.email);
         const publisher = await Publisher.retrieve(data.publisher);
 
+        if (user.isAuthorOfPublisher(publisher))
+        {
+            throw Boom.conflict();
+        }
+
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + Config.AUTHOR_INVITE_DURATION_IN_SECONDS);
 
