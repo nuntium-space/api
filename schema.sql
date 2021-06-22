@@ -453,6 +453,11 @@ before update on "articles"
 for each row
 execute procedure update_updated_at();
 
+create trigger "update_updated_at"
+before update on "article_drafts"
+for each row
+execute procedure update_updated_at();
+
 create trigger "prevent_update"
 before update on "article_views"
 for each row
