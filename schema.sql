@@ -137,7 +137,7 @@ create table "articles"
   "reading_time" int not null,
   "view_count" int not null default 0,
   "like_count" int not null default 0,
-  "status" text not null,
+  "status" text not null default 'draft',
   "is_verified" boolean not null default false,
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,
@@ -477,5 +477,6 @@ values
 insert into "article_statuses"
   ("id")
 values
-  ('draft'),
-  ('published');
+  ('draft'), -- Default value for new articles, the article can be modified
+  ('pending-verification'), -- Article submitted for verification, cannot be modified
+  ('published'); -- Article published and visible to all users, can be modified but a new draft must be created
