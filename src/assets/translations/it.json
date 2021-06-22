@@ -337,6 +337,11 @@
         },
         "author": {
             "__title": "Autore",
+            "invites": {
+                "__title": "Inviti",
+                "accept": "Accetta",
+                "expires_at": "Scade il"
+            },
             "publishers": {
                 "__title": "Editori",
                 "empty": "Non sei l'autore di nessun editore"
