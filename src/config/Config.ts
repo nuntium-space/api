@@ -33,20 +33,21 @@ export class Config
     public static readonly SIGN_IN_REQUEST_TOKEN_BYTES = 60;
 
     public static readonly ID_PREFIXES = {
-        USER: "usr",
-        ORGANIZATION: "org",
-        PUBLISHER: "pub",
-        AUTHOR: "aut",
+        ACCOUNT: "acc",
         ARTICLE: "art",
-        SESSION: "ses",
+        ARTICLE_DRAFT: "dft",
+        AUTHOR: "aut",
+        AUTHOR_INVITE: "inv",
         BUNDLE: "bdl",
-        SUBSCRIPTION: "sub",
+        ORGANIZATION: "org",
         PAYMENT_METHOD: "pmt",
         PRICE: "pri",
-        ACCOUNT: "acc",
+        PUBLISHER: "pub",
+        SESSION: "ses",
         SIGN_IN_REQUEST: "sir",
         SOURCE: "src",
-        AUTHOR_INVITE: "inv",
+        SUBSCRIPTION: "sub",
+        USER: "usr",
     };
 
     public static readonly LANGUAGES = [

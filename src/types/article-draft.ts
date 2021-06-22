@@ -42,14 +42,14 @@ export interface ISerializedArticleDraft
 
 export const ARTICLE_DRAFT_SCHEMA = {
     OBJ: Joi.object({
-        id: Schema.ID.ARTICLE.required(),
+        id: Schema.ID.ARTICLE_DRAFT.required(),
         title: Schema.STRING.max(50).required(),
         content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
         article: Joi
             .alternatives()
             .try(
                 ARTICLE_SCHEMA.OBJ,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE_DRAFT),
             )
             .required(),
         status: Schema.STRING.required(),

@@ -51,7 +51,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     public static async create(data: ICreateArticleDraft, author: Author, expand?: string[]): Promise<ArticleDraft>
     {
-        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE);
+        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
 
         const client = await Database.pool.connect();
 
