@@ -121,6 +121,13 @@ create table "authors"
   check ("id" like 'aut_%')
 );
 
+create table "article_statuses"
+(
+  "id" text not null,
+
+  primary key ("id")
+);
+
 create table "articles"
 (
   "id" id not null,
@@ -130,15 +137,23 @@ create table "articles"
   "reading_time" int not null,
   "view_count" int not null default 0,
   "like_count" int not null default 0,
+  "status" text not null,
+  "is_verified" boolean not null default false,
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,
 
   primary key ("id"),
 
   foreign key ("author") references "authors" on update cascade on delete cascade,
+  foreign key ("status") references "article_statuses" on update cascade on delete cascade,
 
   check ("id" like 'art_%'),
   check ("reading_time" >= 0),
+  check (
+    ("status" = 'published' and "is_verified" = true)
+    or
+    ("status" <> 'published')
+  ),
   check ("updated_at" >= "created_at")
 );
 
@@ -390,6 +405,9 @@ VIEWS
 -----
 */
 
+create view "v_published_articles"
+as select * from "articles" where "status" = 'published';
+
 create view "v_active_bundles"
 as select * from "bundles" where "active" = true;
 
@@ -449,8 +467,15 @@ INITIAL DATA
 ------------
 */
 
-insert into "account_types" ("id")
+insert into "account_types"
+  ("id")
 values
   ('facebook'),
   ('google'),
   ('twitter');
+
+insert into "article_statuses"
+  ("id")
+values
+  ('draft'),
+  ('published');
