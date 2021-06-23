@@ -7,6 +7,7 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
 import { Author } from "./Author";
+import { DraftSource } from "./DraftSource";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
@@ -138,8 +139,8 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
         if (data.sources)
         {
-            await DraftSource.deleteAll(this.article);
-            await DraftSource.createMultiple(data.sources, this.article, client);
+            await DraftSource.deleteAll(this);
+            await DraftSource.createMultiple(data.sources, this, client);
         }
 
         await client.query("commit");

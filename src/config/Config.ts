@@ -39,6 +39,7 @@ export class Config
         AUTHOR: "aut",
         AUTHOR_INVITE: "inv",
         BUNDLE: "bdl",
+        DRAFT_SOURCE: "dsr",
         ORGANIZATION: "org",
         PAYMENT_METHOD: "pmt",
         PRICE: "pri",
