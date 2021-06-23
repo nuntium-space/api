@@ -87,7 +87,7 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
                 )
                 / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
                     as "score"
-            from "v_published_article"
+            from "articles"
             group by "id"
             order by "score" desc
             limit $1
