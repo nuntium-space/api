@@ -37,4 +37,11 @@ export default class Utilities
 
         return json.content.map(Utilities.extractTextFromEditorJson).flat().join(" ");
     }
+
+    public static getNestedExpandQuery(query: string[], key: string): string[]
+    {
+        return query
+            .filter(_ => _.startsWith(`${key}.`))
+            .map(_ => _.replace(`${key}.`, ""));
+    }
 }

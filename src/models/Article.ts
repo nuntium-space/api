@@ -4,6 +4,7 @@ import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { ISerializedArticle, IDatabaseArticle } from "../types/article";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
 import { Bookmark } from "./Bookmark";
 import { Like } from "./Like";
@@ -258,12 +259,7 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
     private static async deserialize(data: IDatabaseArticle, expand?: string[]): Promise<Article>
     {
         const author = expand?.includes("author")
-            ? await Author.retrieve(
-                data.author,
-                expand
-                    .filter(e => e.startsWith("author."))
-                    .map(e => e.replace("author.", "")),
-                )
+            ? await Author.retrieve(data.author, Utilities.getNestedExpandQuery(expand, "author"))
             : { id: data.author };
 
         return new Article(

@@ -3,6 +3,7 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { ISerializedSubscription, IUpdateSubscription, IDatabaseSubscription } from "../types/subscription";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 import { Price } from "./Price";
 import { User } from "./User";
 
@@ -111,7 +112,7 @@ export class Subscription implements ISerializable<ISerializedSubscription>
             : { id: data.user };
 
         const price = expand?.includes("price")
-            ? await Price.retrieve(data.price, expand.filter(e => e.startsWith("price.")).map(e => e.replace("price.", "")))
+            ? await Price.retrieve(data.price, Utilities.getNestedExpandQuery(expand, "price"))
             : { id: data.price };
 
         return new Subscription(

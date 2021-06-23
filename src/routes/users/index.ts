@@ -8,6 +8,7 @@ import { Session } from "../../models/Session";
 import { ARTICLE_SCHEMA } from "../../types/article";
 import { USER_SCHEMA } from "../../types/user";
 import Database from "../../utilities/Database";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -83,12 +84,7 @@ export default <ServerRoute[]>[
                 result.rows.map(async _ =>
                 {
                     const article = request.query.expand?.includes("article")
-                        ? await Article.retrieve(
-                            _.article,
-                            (request.query.expand as string[])
-                                .filter(e => e.startsWith("article."))
-                                .map(e => e.replace("article.", ""))
-                        )
+                        ? await Article.retrieve(_.article, Utilities.getNestedExpandQuery(request.query.expand, "article"))
                         : { id: _.article };
         
                     return {

@@ -356,18 +356,13 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         let article: Article | INotExpandedResource | null = null;
 
         const author = expand?.includes("author")
-            ? await Author.retrieve(data.author)
+            ? await Author.retrieve(data.author, Utilities.getNestedExpandQuery(expand, "author"))
             : { id: data.author };
 
         if (data.article)
         {
             article = expand?.includes("article")
-                ? await Article.retrieve(
-                    data.article,
-                    expand
-                        .filter(e => e.startsWith("article."))
-                        .map(e => e.replace("article.", "")),
-                    )
+                ? await Article.retrieve(data.article, Utilities.getNestedExpandQuery(expand, "article"))
                 : { id: data.article };
         }
 

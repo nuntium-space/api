@@ -202,7 +202,7 @@ export class Price implements ISerializable<ISerializedPrice>
     private static async deserialize(data: IDatabasePrice, expand?: string[]): Promise<Price>
     {
         const bundle = expand?.includes("bundle")
-            ? await Bundle.retrieve(data.bundle, expand.filter(e => e.startsWith("bundle.")).map(e => e.replace("bundle.", "")))
+            ? await Bundle.retrieve(data.bundle, Utilities.getNestedExpandQuery(expand, "bundle"))
             : { id: data.bundle };
 
         return new Price(

@@ -3,6 +3,7 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { ISerializedBookmark, IDatabaseBookmark } from "../types/bookmark";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
 import { User } from "./User";
 
@@ -163,12 +164,7 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>>
             : { id: data.user };
 
         const article = expand?.includes("article")
-            ? await Article.retrieve(
-                data.article,
-                expand
-                    .filter(e => e.startsWith("article."))
-                    .map(e => e.replace("article.", "")),
-                )
+            ? await Article.retrieve(data.article, Utilities.getNestedExpandQuery(expand, "article"))
             : { id: data.article };
 
         return new Bookmark(
