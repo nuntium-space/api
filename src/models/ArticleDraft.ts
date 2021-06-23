@@ -57,7 +57,6 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         const articleDraftId = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
 
         const client = await Database.pool.connect();
-
         await client.query("begin");
 
         // TODO: Create article only if it does not exist
@@ -111,7 +110,6 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         await Source.createMultiple(data.sources, articleId, client);
 
         await client.query("commit");
-
         client.release();
 
         return { id: articleDraftId };
@@ -143,7 +141,6 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         this._content = data.content ?? this.content;
 
         const client = await Database.pool.connect();
-
         await client.query("begin");
 
         const result = await client
@@ -175,7 +172,6 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         }
 
         await client.query("commit");
-
         client.release();
 
         this._updated_at = result.rows[0].updated_at;
@@ -204,31 +200,81 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     public async publish(): Promise<void>
     {
-        // TODO: Update article row with new content and title and reading time
-
         const client = await Database.pool.connect();
         await client.query("begin");
 
-        // TODO: Update index if already exists in index
+        const article = this.article instanceof Article
+            ? this.article
+            : await Article.retrieve(this.article.id);
 
-        await Config.ELASTICSEARCH
-            .index({
-                index: "articles",
-                id: this.article.id,
-                body: {
-                    title: this.title,
-                    content: Utilities.extractTextFromEditorJson(this.content),
-                },
-            })
-            .catch(async () =>
+        const isFirstPublish = !article.is_published;
+
+        const result = await client
+            .query(
+                `
+                update "articles"
+                set
+                    "title" = $1,
+                    "content" = $2,
+                    "reading_time" = $3,
+                    "is_published" = true
+                where
+                    "id" = $4
+                returning "updated_at"
+                `,
+                [
+                    this.title,
+                    this.content,
+                    Utilities.getArticleReadingTimeInMinutes(this.content),
+                    this.id,
+                ],
+            )
+            .catch(() =>
             {
-                await client.query("rollback");
-
-                throw Boom.badImplementation();
+                throw Boom.badRequest();
             });
+
+        if (isFirstPublish)
+        {
+            await Config.ELASTICSEARCH
+                .index({
+                    index: "articles",
+                    id: this.article.id,
+                    body: {
+                        title: this.title,
+                        content: Utilities.extractTextFromEditorJson(this.content),
+                    },
+                })
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badImplementation();
+                });
+        }
+        else
+        {
+            await Config.ELASTICSEARCH
+                .update({
+                    index: "articles",
+                    id: this.article.id,
+                    body: {
+                        title: this.title,
+                        content: Utilities.extractTextFromEditorJson(this.content),
+                    },
+                })
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badImplementation();
+                });
+        }
 
         await client.query("commit");
         client.release();
+
+        this._updated_at = result.rows[0].updated_at;
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<ArticleDraft[]>
