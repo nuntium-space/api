@@ -1,6 +1,6 @@
 import BaseJoi from "joi";
 import JoiDate from "@joi/date";
-import { Config } from "./Config";
+import { Config, IdPrefixes } from "./Config";
 
 const Joi = BaseJoi.extend(JoiDate) as BaseJoi.Root;
 
@@ -8,7 +8,6 @@ export class Schema
 {
     public static readonly STRING = Joi.string().trim();
 
-    // TODO: Find a way to make this obj type safe
     public static readonly ID = Object
         .entries(Config.ID_PREFIXES)
         .map(([ key, value ]) =>
@@ -18,7 +17,7 @@ export class Schema
         .reduce((prev, curr) =>
         {
             return { ...prev, ...curr };
-        }, {});
+        }, {}) as unknown as IdPrefixes<BaseJoi.StringSchema>;
 
     public static readonly EMAIL = Schema.STRING.email();
 

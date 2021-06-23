@@ -3,7 +3,27 @@ import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
 import { CredentialsOptions } from "aws-sdk/lib/credentials";
 import Stripe from "stripe";
 
-const createAwsElasticsearchConnector = require('aws-elasticsearch-connector')
+const createAwsElasticsearchConnector = require('aws-elasticsearch-connector');
+
+export interface IdPrefixes<T>
+{
+    ACCOUNT: T,
+    ARTICLE: T,
+    ARTICLE_DRAFT: T,
+    AUTHOR: T,
+    AUTHOR_INVITE: T,
+    BUNDLE: T,
+    DRAFT_SOURCE: T,
+    ORGANIZATION: T,
+    PAYMENT_METHOD: T,
+    PRICE: T,
+    PUBLISHER: T,
+    SESSION: T,
+    SIGN_IN_REQUEST: T,
+    SOURCE: T,
+    SUBSCRIPTION: T,
+    USER: T,
+};
 
 export class Config
 {
@@ -32,7 +52,7 @@ export class Config
 
     public static readonly SIGN_IN_REQUEST_TOKEN_BYTES = 60;
 
-    public static readonly ID_PREFIXES = {
+    public static readonly ID_PREFIXES: IdPrefixes<string> = {
         ACCOUNT: "acc",
         ARTICLE: "art",
         ARTICLE_DRAFT: "dft",
