@@ -22,7 +22,7 @@ export class DraftSource implements ISerializable<ISerializedDraftSource>
     // CRUD //
     //////////
 
-    public static async createMultiple(data: ICreateDraftSource[], article: ArticleDraft | INotExpandedResource | string, client: PoolClient): Promise<void>
+    public static async createMultiple(data: ICreateDraftSource[], draft: ArticleDraft | INotExpandedResource | string, client: PoolClient): Promise<void>
     {
         await Promise
             .all(data.map(_ =>
@@ -30,8 +30,8 @@ export class DraftSource implements ISerializable<ISerializedDraftSource>
                 return client
                     .query(
                         `
-                        insert into "sources"
-                            ("id", "url", "article")
+                        insert into "draft_sources"
+                            ("id", "url", "draft")
                         values
                             ($1, $2, $3)
                         returning *
@@ -39,9 +39,9 @@ export class DraftSource implements ISerializable<ISerializedDraftSource>
                         [
                             Utilities.id(Config.ID_PREFIXES.SOURCE),
                             _.url,
-                            typeof article === "string"
-                                ? article
-                                : article.id,
+                            typeof draft === "string"
+                                ? draft
+                                : draft.id,
                         ],
                     );
             }))
@@ -53,18 +53,18 @@ export class DraftSource implements ISerializable<ISerializedDraftSource>
             });
     }
 
-    public static async deleteAll(article: ArticleDraft | INotExpandedResource | string): Promise<void>
+    public static async deleteAll(draft: ArticleDraft | INotExpandedResource | string): Promise<void>
     {
         await Database.pool
             .query(
                 `
-                delete from "sources"
-                where "article" = $1
+                delete from "draft_sources"
+                where "draft" = $1
                 `,
                 [
-                    typeof article === "string"
-                        ? article
-                        : article.id,
+                    typeof draft === "string"
+                        ? draft
+                        : draft.id,
                 ],
             );
     }
