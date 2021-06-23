@@ -37,7 +37,7 @@ export class DraftSource implements ISerializable<ISerializedDraftSource>
                         returning *
                         `,
                         [
-                            Utilities.id(Config.ID_PREFIXES.SOURCE),
+                            Utilities.id(Config.ID_PREFIXES.DRAFT_SOURCE),
                             _.url,
                             typeof draft === "string"
                                 ? draft
