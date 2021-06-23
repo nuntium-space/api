@@ -2,6 +2,7 @@ import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Schema } from "../config/Schema";
 import { ARTICLE_SCHEMA, ISerializedArticle } from "./article";
+import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
 import { ICreateSource, SOURCE_SCHEMA } from "./source";
 
 export interface IDatabaseArticleDraft
@@ -9,7 +10,8 @@ export interface IDatabaseArticleDraft
     id: string,
     title: string,
     content: any,
-    article: string,
+    author: string,
+    article: string | null,
     status: string,
     created_at: Date,
     updated_at: Date,
@@ -34,7 +36,8 @@ export interface ISerializedArticleDraft
     id: string,
     title: string,
     content: any,
-    article: ISerializedArticle | INotExpandedResource,
+    author: ISerializedAuthor | INotExpandedResource,
+    article: ISerializedArticle | INotExpandedResource | null,
     status: string,
     created_at: string,
     updated_at: string,
@@ -44,14 +47,22 @@ export const ARTICLE_DRAFT_SCHEMA = {
     OBJ: Joi.object({
         id: Schema.ID.ARTICLE_DRAFT.required(),
         title: Schema.STRING.max(50).required(),
-        content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
-        article: Joi
+        content: Schema.ARTICLE_CONTENT.required(),
+        author: Joi
             .alternatives()
             .try(
-                ARTICLE_SCHEMA.OBJ,
-                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE_DRAFT),
+                AUTHOR_SCHEMA.OBJ,
+                Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR),
             )
             .required(),
+        article: Schema.NULLABLE(
+            Joi
+                .alternatives()
+                .try(
+                    ARTICLE_SCHEMA.OBJ,
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE_DRAFT),
+                )
+        ).required(),
         status: Schema.STRING.required(),
         created_at: Schema.DATETIME.required(),
         updated_at: Schema.DATETIME.required(),

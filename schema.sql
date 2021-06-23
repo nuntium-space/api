@@ -397,7 +397,7 @@ create table "article_drafts"
   "id" id not null,
   "title" varchar(50) not null,
   "content" json not null,
-  "article" id not null,
+  "article" id, -- If it is null it means that this is the first draft of an article
   "status" text not null default 'draft',
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,

@@ -20,7 +20,8 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         public readonly id: string,
         private _title: string,
         private _content: any,
-        public readonly article: Article | INotExpandedResource,
+        public readonly author: Author | INotExpandedResource,
+        public readonly article: Article | INotExpandedResource | null,
         private _status: string,
         public readonly created_at: Date,
         private _updated_at: Date,
@@ -53,48 +54,21 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     public static async create(data: ICreateArticleDraft, author: Author): Promise<INotExpandedResource>
     {
-        const articleId = Utilities.id(Config.ID_PREFIXES.ARTICLE);
-        const articleDraftId = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
+        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
 
         const client = await Database.pool.connect();
         await client.query("begin");
-
-        // TODO: Create article only if it does not exist
-
-        await client
-            .query(
-                `
-                insert into "articles"
-                    ("id", "title", "content", "author", "reading_time")
-                values
-                    ($1, $2, $3, $4, $5)
-                returning *
-                `,
-                [
-                    articleId,
-                    data.title,
-                    data.content,
-                    author.id,
-                    Utilities.getArticleReadingTimeInMinutes(data.content),
-                ],
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
-
-                throw Boom.badRequest();
-            });
 
         await client
             .query(
                 `
                 insert into "article_drafts"
-                    ("id", "title", "content", "article")
+                    ("id", "title", "content", "author")
                 values
                     ($1, $2, $3, $4)
                 `,
                 [
-                    articleDraftId,
+                    id,
                     data.title,
                     data.content,
                     author.id,
@@ -107,12 +81,12 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                 throw Boom.badRequest();
             });
 
-        await Source.createMultiple(data.sources, articleId, client);
+        await DraftSource.createMultiple(data.sources, id, client);
 
         await client.query("commit");
         client.release();
 
-        return { id: articleDraftId };
+        return { id };
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<ArticleDraft>
@@ -203,43 +177,38 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         const client = await Database.pool.connect();
         await client.query("begin");
 
-        const article = this.article instanceof Article
-            ? this.article
-            : await Article.retrieve(this.article.id);
-
-        const isFirstPublish = !article.is_published;
-
-        const result = await client
-            .query(
-                `
-                update "articles"
-                set
-                    "title" = $1,
-                    "content" = $2,
-                    "reading_time" = $3,
-                    "is_published" = true
-                where
-                    "id" = $4
-                returning "updated_at"
-                `,
-                [
-                    this.title,
-                    this.content,
-                    Utilities.getArticleReadingTimeInMinutes(this.content),
-                    this.id,
-                ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badRequest();
-            });
-
-        if (isFirstPublish)
+        if (this.article === null)
         {
+            const id = Utilities.id(Config.ID_PREFIXES.ARTICLE);
+
+            await client
+                .query(
+                    `
+                    insert into "articles"
+                        ("id", "title", "content", "author", "reading_time")
+                    values
+                        ($1, $2, $3, $4, $5)
+                    returning *
+                    `,
+                    [
+                        id,
+                        this.title,
+                        this.content,
+                        this.author.id,
+                        Utilities.getArticleReadingTimeInMinutes(this.content),
+                    ],
+                )
+                .catch(async () =>
+                {
+                    await client.query("rollback");
+
+                    throw Boom.badRequest();
+                });
+
             await Config.ELASTICSEARCH
                 .index({
                     index: "articles",
-                    id: this.article.id,
+                    id,
                     body: {
                         title: this.title,
                         content: Utilities.extractTextFromEditorJson(this.content),
@@ -254,6 +223,31 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         }
         else
         {
+            await client
+                .query(
+                    `
+                    update "articles"
+                    set
+                        "title" = $1,
+                        "content" = $2,
+                        "reading_time" = $3,
+                        "is_published" = true
+                    where
+                        "id" = $4
+                    returning "updated_at"
+                    `,
+                    [
+                        this.title,
+                        this.content,
+                        Utilities.getArticleReadingTimeInMinutes(this.content),
+                        this.id,
+                    ],
+                )
+                .catch(() =>
+                {
+                    throw Boom.badRequest();
+                });
+
             await Config.ELASTICSEARCH
                 .update({
                     index: "articles",
@@ -271,10 +265,23 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                 });
         }
 
+        await client
+            .query(
+                `
+                delete from "article_drafts"
+                where "id" = $1
+                `,
+                [ this.id ],
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
         await client.query("commit");
         client.release();
-
-        this._updated_at = result.rows[0].updated_at;
     }
 
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<ArticleDraft[]>
@@ -319,6 +326,9 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
             content: options.includeContent
                 ? this.content
                 : null,
+            author: this.author instanceof Author
+                ? this.author.serialize({ for: options.for })
+                : this.author,
             article: this.article instanceof Article
                 ? await this.article.serialize({ for: options.for })
                 : this.article,
@@ -330,19 +340,29 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     private static async deserialize(data: IDatabaseArticleDraft, expand?: string[]): Promise<ArticleDraft>
     {
-        const article = expand?.includes("article")
-            ? await Article.retrieve(
-                data.article,
-                expand
-                    .filter(e => e.startsWith("article."))
-                    .map(e => e.replace("article.", "")),
-                )
-            : { id: data.article };
+        let article: Article | INotExpandedResource | null = null;
+
+        const author = expand?.includes("author")
+            ? await Author.retrieve(data.author)
+            : { id: data.author };
+
+        if (data.article)
+        {
+            article = expand?.includes("article")
+                ? await Article.retrieve(
+                    data.article,
+                    expand
+                        .filter(e => e.startsWith("article."))
+                        .map(e => e.replace("article.", "")),
+                    )
+                : { id: data.article };
+        }
 
         return new ArticleDraft(
             data.id,
             data.title,
             data.content,
+            author,
             article,
             data.status,
             data.created_at,
