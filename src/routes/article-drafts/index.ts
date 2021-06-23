@@ -160,6 +160,34 @@ export default <ServerRoute[]>[
         },
     },
     {
+        method: "POST",
+        path: "/articles/drafts/{id}/verify",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.ARTICLE_DRAFT.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
+
+            const author = await Author.retrieve(draft.author.id);
+
+            if (authenticatedUser.id !== author.user.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            await draft.submitForVerification();
+
+            return h.response();
+        },
+    },
+    {
         method: "PATCH",
         path: "/articles/drafts/{id}",
         options: {
