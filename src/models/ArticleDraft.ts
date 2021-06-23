@@ -9,6 +9,7 @@ import { Article } from "./Article";
 import { Author } from "./Author";
 import { DraftSource } from "./DraftSource";
 import { Publisher } from "./Publisher";
+import { Source } from "./Source";
 import { User } from "./User";
 
 export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDraft>>
@@ -80,6 +81,45 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
             });
 
         await DraftSource.createMultiple(data.sources, id, client);
+
+        await client.query("commit");
+        client.release();
+
+        return { id };
+    }
+
+    public static async createFromArticle(article: Article): Promise<INotExpandedResource>
+    {
+        const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
+
+        const client = await Database.pool.connect();
+        await client.query("begin");
+
+        await client
+            .query(
+                `
+                insert into "article_drafts"
+                    ("id", "title", "content", "author", "article")
+                values
+                    ($1, $2, $3, $4, $5)
+                `,
+                [
+                    id,
+                    article.title,
+                    article.content,
+                    article.author.id,
+                    article.id,
+                ],
+            )
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badRequest();
+            });
+
+        const sources = await Source.forArticle(article);
+        await DraftSource.createMultiple(sources, id, client);
 
         await client.query("commit");
         client.release();
