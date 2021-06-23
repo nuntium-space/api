@@ -15,7 +15,7 @@ export default <ServerRoute[]>[
         options: {
             validate: {
                 params: Joi.object({
-                    id: Schema.ID.ARTICLE.required(),
+                    id: Schema.ID.ARTICLE_DRAFT.required(),
                 }),
                 query: Joi.object({
                     expand: Schema.EXPAND_QUERY,
