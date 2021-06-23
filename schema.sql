@@ -130,7 +130,6 @@ create table "articles"
   "reading_time" int not null,
   "view_count" int not null default 0,
   "like_count" int not null default 0,
-  "is_published" boolean not null default false,
   "created_at" current_timestamp_utc not null,
   "updated_at" current_timestamp_utc not null,
 
@@ -418,9 +417,6 @@ create table "article_drafts"
 VIEWS
 -----
 */
-
-create view "v_published_articles"
-as select * from "articles" where "is_published" = true;
 
 create view "v_active_bundles"
 as select * from "bundles" where "active" = true;

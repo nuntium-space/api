@@ -21,7 +21,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
         private _reading_time: number,
         public readonly view_count: number,
         public readonly like_count: number,
-        private _is_published: boolean,
         public readonly created_at: Date,
         private _updated_at: Date,
     )
@@ -40,11 +39,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
     public get reading_time(): number
     {
         return this._reading_time;
-    }
-
-    public get is_published(): boolean
-    {
-        return this._is_published;
     }
 
     public get updated_at(): Date
@@ -236,7 +230,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
             author: this.author instanceof Author
                 ? this.author.serialize({ for: options.for })
                 : this.author,
-            is_published: this.is_published,
             created_at: this.created_at.toISOString(),
             updated_at: this.updated_at.toISOString(),
         };
@@ -281,7 +274,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>>
             parseInt(data.reading_time.toString()),
             parseInt(data.view_count.toString()),
             parseInt(data.like_count.toString()),
-            data.is_published,
             data.created_at,
             data.updated_at,
         );

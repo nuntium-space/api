@@ -8,7 +8,6 @@ import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
 import { Author } from "./Author";
 import { Publisher } from "./Publisher";
-import { Source } from "./Source";
 import { User } from "./User";
 
 // TODO: find a way to modify sources with new draftsm maybe new table?

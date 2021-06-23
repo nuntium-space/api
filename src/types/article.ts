@@ -12,7 +12,6 @@ export interface IDatabaseArticle
     reading_time: number,
     view_count: number,
     like_count: number,
-    is_published: boolean,
     created_at: Date,
     updated_at: Date,
 }
@@ -24,7 +23,6 @@ export interface ISerializedArticle
     content: any,
     author: ISerializedAuthor | INotExpandedResource,
     reading_time: number,
-    is_published: boolean,
     created_at: string,
     updated_at: string,
     __metadata?: {
@@ -46,7 +44,6 @@ export const ARTICLE_SCHEMA = {
                 Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR),
             )
             .required(),
-        is_published: Schema.BOOLEAN.required(),
         created_at: Schema.DATETIME.required(),
         updated_at: Schema.DATETIME.required(),
         __metadata: Joi.object({
