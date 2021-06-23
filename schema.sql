@@ -412,6 +412,21 @@ create table "article_drafts"
   check ("updated_at" >= "created_at")
 );
 
+create table "draft_sources"
+(
+  "id" id not null,
+  "url" url not null,
+  "draft" id not null,
+
+  primary key ("id"),
+
+  unique ("url", "draft"),
+
+  foreign key ("draft") references "article_drafts" on update cascade on delete cascade,
+
+  check ("id" like 'dsr_%')
+);
+
 /*
 -----
 VIEWS
