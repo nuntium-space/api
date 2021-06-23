@@ -141,8 +141,8 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
         if (data.sources)
         {
-            await Source.deleteAll(this.article);
-            await Source.createMultiple(data.sources, this.article, client);
+            await DraftSource.deleteAll(this.article);
+            await DraftSource.createMultiple(data.sources, this.article, client);
         }
 
         await client.query("commit");
