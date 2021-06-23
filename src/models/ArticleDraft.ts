@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedArticleDraft, ICreateArticleDraft, IUpdateArticleDraft, IDatabaseArticleDraft } from "../types/article-draft";
+import { ISerializedArticleDraft, ICreateArticleDraft, IUpdateArticleDraft, IDatabaseArticleDraft, ArticleDraftStatus } from "../types/article-draft";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
@@ -20,7 +20,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         private _content: any,
         public readonly author: Author | INotExpandedResource,
         public readonly article: Article | INotExpandedResource | null,
-        private _status: string,
+        private _status: ArticleDraftStatus,
         public readonly created_at: Date,
         private _updated_at: Date,
     )
@@ -36,7 +36,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         return this._content;
     }
 
-    public get status(): string
+    public get status(): ArticleDraftStatus
     {
         return this._status;
     }
@@ -109,6 +109,11 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     public async update(data: IUpdateArticleDraft): Promise<void>
     {
+        if (this.status === "pending-verification")
+        {
+            throw Boom.forbidden();
+        }
+
         this._title = data.title ?? this.title;
         this._content = data.content ?? this.content;
 
@@ -167,7 +172,28 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
     public async submitForVerification(): Promise<void>
     {
-        // TODO
+        const client = await Database.pool.connect();
+        await client.query("begin");
+
+        const result = await client
+            .query(
+                `
+                update "article_drafts"
+                set "status" = 'pending-verification'
+                where "id" = $1
+                returning "updated_at"
+                `,
+                [ this.id ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
+
+        await client.query("commit");
+        client.release();
+
+        this._updated_at = result.rows[0].updated_at;
     }
 
     public async publish(): Promise<void>

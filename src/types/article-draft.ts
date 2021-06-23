@@ -5,6 +5,8 @@ import { ARTICLE_SCHEMA, ISerializedArticle } from "./article";
 import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
 import { ICreateSource, SOURCE_SCHEMA } from "./source";
 
+export type ArticleDraftStatus = "draft" | "pending-verification";
+
 export interface IDatabaseArticleDraft
 {
     id: string,
@@ -12,7 +14,7 @@ export interface IDatabaseArticleDraft
     content: any,
     author: string,
     article: string | null,
-    status: string,
+    status: ArticleDraftStatus,
     created_at: Date,
     updated_at: Date,
 }
@@ -38,7 +40,7 @@ export interface ISerializedArticleDraft
     content: any,
     author: ISerializedAuthor | INotExpandedResource,
     article: ISerializedArticle | INotExpandedResource | null,
-    status: string,
+    status: ArticleDraftStatus,
     created_at: string,
     updated_at: string,
 }
@@ -63,7 +65,7 @@ export const ARTICLE_DRAFT_SCHEMA = {
                     Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE_DRAFT),
                 )
         ).required(),
-        status: Schema.STRING.required(),
+        status: Schema.STRING.allow("draft", "pending-verification").required(),
         created_at: Schema.DATETIME.required(),
         updated_at: Schema.DATETIME.required(),
     }),
