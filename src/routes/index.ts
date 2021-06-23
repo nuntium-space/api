@@ -1,3 +1,4 @@
+import articleDrafts from "./article-drafts";
 import articles from "./articles";
 import auth from "./auth";
 import authorInvites from "./author-invites";
@@ -16,6 +17,7 @@ import users from "./users";
 import webhooks from "./webhooks";
 
 export = [
+    articleDrafts,
     articles,
     auth,
     authorInvites,
