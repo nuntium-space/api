@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
+import { Article } from "../../models/Article";
 import { ArticleDraft } from "../../models/ArticleDraft";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
@@ -120,6 +121,7 @@ export default <ServerRoute[]>[
                     id: Schema.ID.AUTHOR.required(),
                 }),
                 query: Joi.object({
+                    from: Schema.ID.ARTICLE,
                     expand: Schema.EXPAND_QUERY,
                 }),
                 payload: ARTICLE_DRAFT_SCHEMA.CREATE,
@@ -154,6 +156,13 @@ export default <ServerRoute[]>[
                         error: `Cannot add articles to unverified publisher '${author.publisher.id}'`,
                     },
                 ]);
+            }
+
+            if (request.query.from)
+            {
+                const article = await Article.retrieve(request.query.from);
+
+                return ArticleDraft.createFromArticle(article);
             }
 
             return ArticleDraft.create(request.payload as any, author);
