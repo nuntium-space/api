@@ -282,19 +282,34 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         client.release();
     }
 
+    public static async forAuthor(author: Author, expand?: string[]): Promise<ArticleDraft[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select *
+            from "article_drafts"
+            where "author" = $1
+            order by "created_at" desc
+            `,
+            [ author.id ],
+        );
+
+        return Promise.all(result.rows.map(row => ArticleDraft.deserialize(row, expand)));
+    }
+
     public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<ArticleDraft[]>
     {
         const result = await Database.pool.query(
             `
-            select art.*
+            select "art".*
             from
-                articles as art
+                "article_drafts" as "art"
                 inner join
-                authors as aut
+                "authors" as "aut"
                 on
-                    art.author = aut.id
+                    "art"."author" = "aut"."id"
                     and
-                    aut.publisher = $1
+                    "aut"."publisher" = $1
             order by "created_at" desc
             `,
             [ publisher.id ],

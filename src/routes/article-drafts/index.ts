@@ -49,6 +49,38 @@ export default <ServerRoute[]>[
     },
     {
         method: "GET",
+        path: "/authors/{id}/articles/drafts",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.AUTHOR.required(),
+                }),
+                query: Joi.object({
+                    expand: Schema.EXPAND_QUERY,
+                }),
+            },
+            response: {
+                schema: Schema.ARRAY(ARTICLE_DRAFT_SCHEMA.OBJ).required(),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const authenticatedUser = (request.auth.credentials.session as Session).user;
+
+            const author = await Author.retrieve(request.params.id);
+
+            if (authenticatedUser.id !== author.user.id)
+            {
+                throw Boom.paymentRequired();
+            }
+
+            const drafts = await ArticleDraft.forAuthor(author, request.query.expand);
+
+            return Promise.all(drafts.map(_ => _.serialize({ for: authenticatedUser })));
+        },
+    },
+    {
+        method: "GET",
         path: "/publishers/{id}/articles/drafts",
         options: {
             validate: {
@@ -69,7 +101,7 @@ export default <ServerRoute[]>[
 
             const publisher = await Publisher.retrieve(request.params.id);
 
-            if (!await authenticatedUser.isSubscribedToPublisher(publisher))
+            if (!publisher.isOwnedByUser(authenticatedUser))
             {
                 throw Boom.paymentRequired();
             }

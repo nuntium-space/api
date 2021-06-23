@@ -47,7 +47,7 @@ export const ARTICLE_DRAFT_SCHEMA = {
     OBJ: Joi.object({
         id: Schema.ID.ARTICLE_DRAFT.required(),
         title: Schema.STRING.max(50).required(),
-        content: Schema.ARTICLE_CONTENT.required(),
+        content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
         author: Joi
             .alternatives()
             .try(
