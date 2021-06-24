@@ -14,6 +14,7 @@ import sessions from "./sessions";
 import subscriptions from "./subscriptions";
 import users from "./users";
 import webhooks from "./webhooks";
+import __internals from "./__internals";
 
 export = [
     articleDrafts,
@@ -32,4 +33,5 @@ export = [
     subscriptions,
     users,
     webhooks,
+    __internals,
 ].flat();
