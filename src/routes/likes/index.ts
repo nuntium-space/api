@@ -4,8 +4,8 @@ import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Like } from "../../models/Like";
-import { Session } from "../../models/Session";
 import { LIKE_SCHEMA } from "../../types/like";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -26,7 +26,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -54,7 +54,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -83,7 +83,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {

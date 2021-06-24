@@ -4,8 +4,8 @@ import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { AuthorInvite } from "../../models/AuthorInvite";
 import { Publisher } from "../../models/Publisher";
-import { Session } from "../../models/Session";
 import { AUTHOR_INVITE_SCHEMA } from "../../types/author-invite";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -28,7 +28,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -59,7 +59,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -84,7 +84,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const invite = await AuthorInvite.retrieve(request.params.id);
 
@@ -113,7 +113,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -147,7 +147,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!invite.publisher.isOwnedByUser(authenticatedUser))
             {

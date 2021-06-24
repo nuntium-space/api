@@ -4,8 +4,8 @@ import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Organization } from "../../models/Organization";
-import { Session } from "../../models/Session";
 import { ORGANIZATION_SCHEMA } from "../../types/organization";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -25,7 +25,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -54,7 +54,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -95,7 +95,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -127,7 +127,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -152,7 +152,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const organization = await Organization.create(request.payload as any, authenticatedUser);
 
@@ -177,7 +177,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -203,7 +203,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {

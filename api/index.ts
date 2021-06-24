@@ -19,6 +19,7 @@ import { Schema } from "../src/config/Schema";
 import { Publisher } from "../src/models/Publisher";
 import { ARTICLE_SCHEMA } from "../src/types/article";
 import { PUBLISHER_SCHEMA } from "../src/types/publisher";
+import Utilities from "../src/utilities/Utilities";
 
 const server = Hapi.server({
     port: process.env.PORT,
@@ -230,7 +231,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const articlesResult = await Config.ELASTICSEARCH
                 .search({
@@ -299,7 +300,7 @@ const init = async () =>
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {

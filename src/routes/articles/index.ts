@@ -6,9 +6,9 @@ import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
-import { Session } from "../../models/Session";
 import { ARTICLE_SCHEMA } from "../../types/article";
 import Database from "../../utilities/Database";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -26,7 +26,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const articles = await Article.trending(request.query.expand);
 
@@ -51,7 +51,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const article = await Article.retrieve(request.params.id, request.query.expand);
 
@@ -128,7 +128,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const publisher = await Publisher.retrieve(request.params.id);
 
@@ -161,7 +161,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (article.author.user.id !== authenticatedUser.id)
             {

@@ -10,9 +10,9 @@ import { Publisher } from "../../models/Publisher";
 import Database from "../../utilities/Database";
 import imageType from "image-type";
 import imageSize from "image-size";
-import { Session } from "../../models/Session";
 import { Schema } from "../../config/Schema";
 import { PUBLISHER_SCHEMA } from "../../types/publisher";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -30,7 +30,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const publisher = await Publisher.retrieve(request.params.id);
 
@@ -62,7 +62,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const publisher = await Publisher.retrieve(request.params.id);
 
@@ -93,7 +93,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const bundle = await Bundle.retrieve(request.params.id);
 
@@ -122,7 +122,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -156,7 +156,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (bundle.organization.owner.id !== authenticatedUser.id)
             {
@@ -204,7 +204,7 @@ export default <ServerRoute[]>[
         {
             const organization = await Organization.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (organization.owner.id !== authenticatedUser.id)
             {
@@ -221,7 +221,7 @@ export default <ServerRoute[]>[
         path: "/publishers/{id}/verify",
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const publisher = await Publisher.retrieve(request.params.id);
 
@@ -292,7 +292,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -331,7 +331,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -417,7 +417,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {

@@ -4,8 +4,8 @@ import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
-import { Session } from "../../models/Session";
 import { AUTHOR_SCHEMA } from "../../types/author";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -26,7 +26,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const author = await Author.retrieve(request.params.id, request.query.expand);
 
@@ -53,7 +53,7 @@ export default <ServerRoute[]>[
         {
             const publisher = await Publisher.retrieve(request.params.id);
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!publisher.isOwnedByUser(authenticatedUser))
             {
@@ -85,7 +85,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (request.params.id !== authenticatedUser.id)
             {
@@ -118,7 +118,7 @@ export default <ServerRoute[]>[
                 throw Boom.badImplementation();
             }
 
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             if (!author.publisher.isOwnedByUser(authenticatedUser))
             {

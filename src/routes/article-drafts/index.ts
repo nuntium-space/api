@@ -6,7 +6,6 @@ import { Article } from "../../models/Article";
 import { ArticleDraft } from "../../models/ArticleDraft";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
-import { Session } from "../../models/Session";
 import { ARTICLE_DRAFT_SCHEMA } from "../../types/article-draft";
 import Utilities from "../../utilities/Utilities";
 
@@ -66,7 +65,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const author = await Author.retrieve(request.params.id);
 
@@ -98,7 +97,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const publisher = await Publisher.retrieve(request.params.id);
 
@@ -133,7 +132,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const author = await Author.retrieve(request.params.id, [ "publisher" ]);
 
@@ -184,7 +183,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
 
@@ -219,7 +218,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
 
@@ -247,7 +246,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
             const draft = await ArticleDraft.retrieve(request.params.id, [ "author" ]);
 
