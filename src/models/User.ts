@@ -2,7 +2,7 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedUser, ICreateUser, IUpdateUser, IUserSettings, IUpdateUserSettings, IDatabaseUser } from "../types/user";
+import { ISerializedUser, ICreateUser, IUpdateUser, IUserSettings, IUpdateUserSettings, IDatabaseUser, UserType } from "../types/user";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
@@ -13,6 +13,7 @@ export class User implements ISerializable<ISerializedUser>
     private constructor
     (
         public readonly id: string,
+        public readonly type: UserType,
         private _full_name: string | null,
         private _email: string,
         public readonly stripe_customer_id: string | null,
@@ -506,6 +507,7 @@ export class User implements ISerializable<ISerializedUser>
     {
         return new User(
             data.id,
+            data.type,
             data.full_name,
             data.email,
             data.stripe_customer_id,

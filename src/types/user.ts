@@ -1,9 +1,12 @@
 import Joi from "joi";
 import { Schema } from "../config/Schema";
 
+export type UserType = "admin" | "user";
+
 export interface IDatabaseUser
 {
     id: string,
+    type: UserType,
     full_name: string | null,
     email: string,
     stripe_customer_id: string | null,
@@ -34,6 +37,7 @@ export interface IUpdateUserSettings
 export interface ISerializedUser
 {
     id: string,
+    type: UserType,
     full_name: string | null,
     email: string,
 }
@@ -41,6 +45,7 @@ export interface ISerializedUser
 export const USER_SCHEMA = {
     OBJ: Joi.object({
         id: Schema.ID.USER.required(),
+        type: Schema.STRING.allow("admin", "user").required(),
         full_name: Schema.NULLABLE(Schema.STRING).optional(),
         email: Schema.EMAIL.optional(),
     }),
