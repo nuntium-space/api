@@ -122,7 +122,6 @@ export default <ServerRoute[]>[
                 }),
                 query: Joi.object({
                     from: Schema.ID.ARTICLE,
-                    expand: Schema.EXPAND_QUERY,
                 }),
                 payload: ARTICLE_DRAFT_SCHEMA.CREATE,
             },
