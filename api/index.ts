@@ -130,7 +130,22 @@ const init = async () =>
                 throw Boom.unauthorized();
             }
 
-            return { valid: true, credentials: { session } };
+            const { user } = session;
+
+            const scope = [ user.type ];
+
+            if (user.type === "admin")
+            {
+                scope.push("user");
+            }
+
+            return {
+                valid: true,
+                credentials: {
+                    session,
+                    scope,
+                },
+            };
         },
     });
 
@@ -170,6 +185,7 @@ const init = async () =>
             "cookie",
             "token",
         ],
+        scope: "user",
     });
 
     server.ext("onPreResponse", (request, h) =>

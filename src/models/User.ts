@@ -496,6 +496,7 @@ export class User implements ISerializable<ISerializedUser>
         {
             response = {
                 ...response,
+                type: this.type,
                 email: this.email,
             };
         }
