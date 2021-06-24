@@ -28,11 +28,6 @@ export default <ServerRoute[]>[
     {
         method: "POST",
         path: "/articles/drafts/{id}/publish",
-        options: {
-            auth: {
-                scope: "admin",
-            },
-        },
         handler: async (request, h) =>
         {
             const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
