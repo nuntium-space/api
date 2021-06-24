@@ -32,12 +32,11 @@ export default <ServerRoute[]>[
 
             const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
 
-            if (!(draft.author instanceof Author))
-            {
-                throw Boom.badImplementation();
-            }
+            const author = draft.author instanceof Author
+                ? draft.author
+                : await Author.retrieve(draft.author.id);
 
-            if (authenticatedUser.id !== draft.author.user.id)
+            if (authenticatedUser.id !== author.user.id)
             {
                 throw Boom.forbidden();
             }
