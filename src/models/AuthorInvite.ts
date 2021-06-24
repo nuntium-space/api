@@ -146,7 +146,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
             throw Boom.forbidden(undefined, [
                 {
                     field: "author",
-                    error: "You must have a full name set in order to accept this invite",
+                    error: "errors.custom.author.invite.must_have_full_name",
                 },
             ]);
         }
