@@ -348,12 +348,13 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         client.release();
     }
 
-    public static async list(expand?: string[]): Promise<ArticleDraft[]>
+    public static async listSubmitted(expand?: string[]): Promise<ArticleDraft[]>
     {
         const result = await Database.pool.query(
             `
             select *
             from "article_drafts"
+            where "status" = 'pending-verification'
             order by "created_at" desc
             `,
         );

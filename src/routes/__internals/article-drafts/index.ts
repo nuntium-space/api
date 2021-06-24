@@ -7,7 +7,7 @@ import { ARTICLE_DRAFT_SCHEMA } from "../../../types/article-draft";
 export default <ServerRoute[]>[
     {
         method: "GET",
-        path: "/articles/drafts",
+        path: "/articles/drafts/submitted",
         options: {
             validate: {
                 query: Joi.object({
@@ -20,7 +20,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const drafts = await ArticleDraft.list(request.query.expand);
+            const drafts = await ArticleDraft.listSubmitted(request.query.expand);
 
             return Promise.all(drafts.map(_ => _.serialize()));
         },
