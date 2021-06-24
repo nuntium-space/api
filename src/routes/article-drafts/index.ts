@@ -8,6 +8,7 @@ import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import { Session } from "../../models/Session";
 import { ARTICLE_DRAFT_SCHEMA } from "../../types/article-draft";
+import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
     {
@@ -28,7 +29,7 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            const authenticatedUser = (request.auth.credentials.session as Session).user;
+            const [ authenticatedUser, isAdmin ] = Utilities.getAuthenticatedUser(request);
 
             const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
 
@@ -36,7 +37,7 @@ export default <ServerRoute[]>[
                 ? draft.author
                 : await Author.retrieve(draft.author.id);
 
-            if (authenticatedUser.id !== author.user.id)
+            if (!isAdmin && authenticatedUser.id !== author.user.id)
             {
                 throw Boom.forbidden();
             }
