@@ -348,6 +348,19 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         client.release();
     }
 
+    public static async list(expand?: string[]): Promise<ArticleDraft[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select *
+            from "article_drafts"
+            order by "created_at" desc
+            `,
+        );
+
+        return Promise.all(result.rows.map(row => ArticleDraft.deserialize(row, expand)));
+    }
+
     public static async forAuthor(author: Author, expand?: string[]): Promise<ArticleDraft[]>
     {
         const result = await Database.pool.query(
