@@ -161,6 +161,11 @@ export default <ServerRoute[]>[
             {
                 const article = await Article.retrieve(request.query.from);
 
+                if (article.author.id !== author.id)
+                {
+                    throw Boom.forbidden();
+                }
+
                 return ArticleDraft.createFromArticle(article);
             }
 
