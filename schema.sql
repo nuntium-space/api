@@ -29,9 +29,17 @@ TABLES
 ------
 */
 
+create table "user_types"
+(
+  "id" text not null,
+
+  primary key ("id")
+);
+
 create table "users"
 (
   "id" id not null,
+  "type" text not null default 'user',
   "full_name" text,
   "email" email_address not null,
   "stripe_customer_id" text,
@@ -39,6 +47,8 @@ create table "users"
   primary key ("id"),
 
   unique ("email"),
+
+  foreign key ("type") references "user_types" on update cascade on delete cascade,
 
   check ("id" like 'usr_%')
 );
@@ -509,3 +519,9 @@ insert into "article_draft_statuses"
 values
   ('draft'), -- Default value for new drafts, can be modified
   ('pending-verification'); -- Draft submitted for verification, cannot be modified
+
+insert into "user_types"
+  ("id")
+values
+  ('admin'),
+  ('user');

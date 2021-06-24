@@ -201,6 +201,28 @@ export default <ServerRoute[]>[
         },
     },
     {
+        method: "POST",
+        path: "/articles/drafts/{id}/publish",
+        options: {
+            auth: {
+                scope: "admin",
+            },
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.ARTICLE_DRAFT.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const draft = await ArticleDraft.retrieve(request.params.id, request.query.expand);
+
+            await draft.publish();
+
+            return h.response();
+        },
+    },
+    {
         method: "PATCH",
         path: "/articles/drafts/{id}",
         options: {

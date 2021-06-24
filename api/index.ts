@@ -82,7 +82,21 @@ const init = async () =>
                     throw Boom.unauthorized();
                 }
 
-                return h.authenticated({ credentials: { session } });
+                const { user } = session;
+
+                const scope = [ user.type ];
+
+                if (user.type === "admin")
+                {
+                    scope.push("user");
+                }
+
+                return h.authenticated({
+                    credentials: {
+                        session,
+                        scope,
+                    },
+                });
             },
         };
     });
