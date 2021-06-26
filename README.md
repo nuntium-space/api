@@ -1,6 +1,4 @@
-# nuntium API
-
-nuntium's API
+# nuntium-api
 
 ## Article lifecycle
 
@@ -43,7 +41,6 @@ How to throw an error:
 *Note: here we are using `badRequest` and `badImplementation` but this applies to all other methods*
 
 ```typescript
-
 /**
  * SPECIFIC ERROR
  * 
@@ -69,5 +66,85 @@ throw Boom.badRequest(undefined, [
  * GENERIC ERROR
  */
 throw Boom.badImplementation();
+```
+
+## Test
+
+### Set environment variables
 
 ```
+NODE_ENV=development
+PORT=4000
+
+
+API_URL=http://localhost:4000
+CLIENT_URL=http://localhost:4200
+ELASTICSEARCH_URL=http://localhost:4571
+
+
+DATABASE_URL=postgresql://{{ USER }}:{{ PASSWORD }}@{{ HOST }}:{{ PORT }}/{{ NAME }}?schema={{ SCHEMA }}
+
+
+AUTH_COOKIE_ENCRYPTION_PASSWORD=
+
+FACEBOOK_OAUTH_CLIENT_ID=
+FACEBOOK_OAUTH_CLIENT_SECRET=
+
+GOOGLE_OAUTH_CLIENT_ID=
+GOOGLE_OAUTH_CLIENT_SECRET=
+
+TWITTER_OAUTH_CLIENT_ID=
+TWITTER_OAUTH_CLIENT_SECRET=
+
+
+STRIPE_SECRET_API_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+
+AWS_ACCESS_KEY_ID=test
+AWS_SECRET_ACCESS_KEY=test
+
+AWS_PUBLISHER_ICONS_BUCKET_NAME=nuntium-publisher-icons
+
+
+SENDGRID_API_KEY=
+```
+
+### Install [`localstack`](https://github.com/localstack/localstack)
+
+#### Install `Docker`
+
+See [here](https://www.docker.com/products/docker-desktop).
+
+#### Start
+
+Run
+
+```
+docker-compose up --build
+```
+
+### Install `stripe` CLI
+
+See [here](https://stripe.com/docs/stripe-cli).
+
+### Create database
+
+#### Install PostgreSQL
+
+See [here](https://www.postgresql.org/download/).
+
+#### Create tables, views, etc.
+
+Run [`schema.sql`](schema.sql).
+
+### Serve locally
+
+This will start a local server on `http://localhost:4000`.
+
+```
+npm start
+```
+
+[nuntium]: https://github.com/nuntium-space/nuntium
+
