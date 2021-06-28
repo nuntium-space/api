@@ -1,7 +1,6 @@
 import Boom from "@hapi/boom";
 import crypto from "crypto";
 import { ServerRoute } from "@hapi/hapi";
-import sendgrid from "@sendgrid/mail";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Account } from "../../models/Account";
@@ -11,8 +10,7 @@ import Database from "../../utilities/Database";
 import Utilities from "../../utilities/Utilities";
 import { Schema } from "../../config/Schema";
 import { SESSION_SCHEMA } from "../../types/session";
-
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
+import { Email } from "../../utilities/Email";
 
 export default <ServerRoute[]>[
     {
@@ -172,41 +170,10 @@ export default <ServerRoute[]>[
                     throw Boom.badImplementation();
                 });
 
-            const userSettings = await user.retrieveSettings();
-
-            const lang = userSettings.language ?? "en";
-
-            const translations = require(`../../assets/translations/email/${lang}.json`);
-
-            await sendgrid
-                .send({
-                    to: user.email,
-                    from: {
-                        name: "nuntium",
-                        email: "signin@nuntium.space",
-                    },
-                    subject: translations.auth.subject,
-                    text: (translations.auth.lines as string[])
-                        .join("\n")
-                        .replace("{{ API_URL }}", Config.API_URL)
-                        .replace("{{ TOKEN }}", token)
-                        +
-                        "\n\n"
-                        +
-                        (translations.__end.lines as string[])
-                            .join("\n"),
-                    trackingSettings: {
-                        clickTracking: {
-                            enable: false,
-                        },
-                    },
-                })
-                .catch(async () =>
-                {
-                    await client.query("rollback");
-
-                    throw Boom.badImplementation();
-                });
+            await Email.send({
+                to: user,
+                type: Email.TYPE.AUTH,
+            });
 
             await client.query("commit");
 

@@ -1,9 +1,12 @@
 import "dotenv/config";
 
 import AWS from "aws-sdk";
+import sendgrid from "@sendgrid/mail";
 import { Config } from "../src/config/Config";
 
 AWS.config.update({ credentials: Config.AWS_CREDENTIALS });
+
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY ?? "");
 
 import Bell from "@hapi/bell";
 import Boom from "@hapi/boom";

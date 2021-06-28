@@ -1,10 +1,10 @@
 import Boom from "@hapi/boom";
-import sendgrid from "@sendgrid/mail";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { ISerializedAuthorInvite, ICreateAuthorInvite, IDatabaseAuthorInvite } from "../types/author-invite";
 import Database from "../utilities/Database";
+import { Email } from "../utilities/Email";
 import Utilities from "../utilities/Utilities";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
@@ -39,7 +39,6 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
         expiresAt.setSeconds(expiresAt.getSeconds() + Config.AUTHOR_INVITE_DURATION_IN_SECONDS);
 
         const client = await Database.pool.connect();
-
         await client.query("begin");
 
         const result = await Database.pool
@@ -58,51 +57,26 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
                     expiresAt.toISOString(),
                 ],
             )
-            .catch(() =>
+            .catch(async () =>
             {
+                await client.query("rollback");
+
                 throw Boom.badRequest();
             });
 
-        const userSettings = await user.retrieveSettings();
+        await Email
+            .send({
+                to: user,
+                type: Email.TYPE.AUTHOR_INVITE,
+            })
+            .catch(async () =>
+            {
+                await client.query("rollback");
 
-        const lang = userSettings.language ?? "en";
-
-        const translations = require(`../assets/translations/email/${lang}.json`);
-
-        await sendgrid
-                .send({
-                    to: user.email,
-                    from: {
-                        name: "nuntium",
-                        email: "invites@nuntium.space",
-                    },
-                    subject: (translations.author_invite.subject as string)
-                        .replace("{{ PUBLISHER_NAME }}", publisher.name),
-                    text:
-                        (translations.author_invite.lines as string[])
-                            .join("\n")
-                            .replace("{{ PUBLISHER_NAME }}", publisher.name)
-                            .replace("{{ CLIENT_URL }}", Config.CLIENT_URL)
-                        +
-                        "\n\n"
-                        +
-                        (translations.__end.lines as string[])
-                            .join("\n"),
-                    trackingSettings: {
-                        clickTracking: {
-                            enable: false,
-                        },
-                    },
-                })
-                .catch(async () =>
-                {
-                    await client.query("rollback");
-
-                    throw Boom.badImplementation();
-                });
+                throw Boom.badRequest();
+            });
 
         await client.query("commit");
-
         client.release();
 
         return AuthorInvite.deserialize(result.rows[0], expand);
