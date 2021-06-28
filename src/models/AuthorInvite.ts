@@ -68,6 +68,10 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
             .send({
                 to: user,
                 type: Email.TYPE.AUTHOR_INVITE,
+                replace: {
+                    PUBLISHER_NAME: publisher.name,
+                    CLIENT_URL: Config.CLIENT_URL,
+                },
             })
             .catch(async () =>
             {

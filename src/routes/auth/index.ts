@@ -173,6 +173,10 @@ export default <ServerRoute[]>[
             await Email.send({
                 to: user,
                 type: Email.TYPE.AUTH,
+                replace: {
+                    API_URL: Config.API_URL,
+                    TOKEN: token,
+                },
             });
 
             await client.query("commit");
