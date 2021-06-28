@@ -261,7 +261,12 @@ export default <ServerRoute[]>[
 
             request.cookieAuth.set({ id: session.id });
 
-            return h.redirect(Config.CLIENT_URL);
+            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
+
+            const redirectUrl = new URL(Config.CLIENT_URL);
+            redirectUrl.pathname = query?.redirectTo ?? "";
+
+            return h.redirect(redirectUrl.toString());
         },
     },
     {
@@ -310,7 +315,12 @@ export default <ServerRoute[]>[
 
             request.cookieAuth.set({ id: session.id });
 
-            return h.redirect(Config.CLIENT_URL);
+            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
+
+            const redirectUrl = new URL(Config.CLIENT_URL);
+            redirectUrl.pathname = query?.redirectTo ?? "";
+
+            return h.redirect(redirectUrl.toString());
         },
     },
     {
@@ -357,7 +367,12 @@ export default <ServerRoute[]>[
 
             request.cookieAuth.set({ id: session.id });
 
-            return h.redirect(Config.CLIENT_URL);
+            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
+
+            const redirectUrl = new URL(Config.CLIENT_URL);
+            redirectUrl.pathname = query?.redirectTo ?? "";
+
+            return h.redirect(redirectUrl.toString());
         },
     },
 ];
