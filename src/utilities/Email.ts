@@ -14,6 +14,7 @@ interface EmailData
         name: string,
         email: string,
     },
+    translation: string,
 }
 
 export class Email
@@ -24,54 +25,63 @@ export class Email
                 name: "nuntium",
                 email: "signin@nuntium.space",
             } as const,
+            translation: "auth",
         } as const,
         AUTHOR_INVITE: {
             from: {
                 name: "nuntium",
                 email: "invites@nuntium.space",
             } as const,
+            translation: "author_invite",
         } as const,
     } as const;
 
     public static async send(data: {
         to: User,
         type: EmailData,
+        replace: {
+            [ key: string ]: string,
+        },
     }): Promise<void>
     {
-        const userSettings = await user.retrieveSettings();
+        const userSettings = await data.to.retrieveSettings();
 
         const lang = userSettings.language ?? "en";
 
-        const translations = require(`../../assets/translations/email/${lang}.json`);
+        const translations = require(`../assets/translations/email/${lang}.json`);
 
         await sendgrid
             .send({
-                to: user.email,
-                from: {
-                    name: "nuntium",
-                    email: "signin@nuntium.space",
-                },
-                subject: translations.auth.subject,
-                text: (translations.auth.lines as string[])
-                    .join("\n")
-                    .replace("{{ API_URL }}", Config.API_URL)
-                    .replace("{{ TOKEN }}", token)
-                    +
-                    "\n\n"
-                    +
-                    (translations.__end.lines as string[])
-                        .join("\n"),
+                to: data.to.email,
+                from: data.type.from,
+                subject: translations[data.type.translation].subject,
+                text: Email.getText(data.type.translation, data.replace, lang),
                 trackingSettings: {
                     clickTracking: {
                         enable: false,
                     },
                 },
             })
-            .catch(async () =>
+            .catch(() =>
             {
-                await client.query("rollback");
-
                 throw Boom.badImplementation();
             });
+    }
+
+    private static getText(type: string, replace: { [ key: string ]: string }, lang: string): string
+    {
+        const translations = require(`../assets/translations/email/${lang}.json`);
+
+        let text = (translations[type].lines as string[]).join("\n");
+
+        for (const _ in replace)
+        {
+            text.replace(`{{ ${_} }}`, replace[_]);
+        }
+
+        text += "\n\n";
+        text += (translations.__end.lines as string[]).join("\n");
+
+        return text;
     }
 }
