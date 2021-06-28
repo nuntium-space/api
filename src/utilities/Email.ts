@@ -48,13 +48,11 @@ export class Email
 
         const lang = userSettings.language ?? "en";
 
-        const translations = require(`../assets/translations/email/${lang}.json`);
-
         await sendgrid
             .send({
                 to: data.to.email,
                 from: data.type.from,
-                subject: translations[data.type.translation].subject,
+                subject: Email.getSubject(data.type.translation, data.replace, lang),
                 text: Email.getText(data.type.translation, data.replace, lang),
                 trackingSettings: {
                     clickTracking: {
@@ -66,6 +64,20 @@ export class Email
             {
                 throw Boom.badImplementation();
             });
+    }
+
+    private static getSubject(type: string, replace: { [ key: string ]: string }, lang: string): string
+    {
+        const translations = require(`../assets/translations/email/${lang}.json`);
+
+        let subject = translations[type].subject as string;
+
+        for (const _ in replace)
+        {
+            subject = subject.replace(`{{ ${_} }}`, replace[_]);
+        }
+
+        return subject;
     }
 
     private static getText(type: string, replace: { [ key: string ]: string }, lang: string): string
