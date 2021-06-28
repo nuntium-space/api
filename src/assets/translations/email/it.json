@@ -9,12 +9,21 @@
             "{{ API_URL }}/auth/email/{{ TOKEN }}"
         ]
     },
-    "author_invite": {
-        "subject": "Sei stato invitato ad essere autore per {{ PUBLISHER_NAME }}",
+    "article_published": {
+        "subject": "Articolo pubblicato: \"{{ ARTICLE_TITLE }}\"",
         "lines": [
             "Ciao,",
-            "Sei stato invitato ad essere autore per l'editore {{ PUBLISHER_NAME }}",
-            "Per accettare l'invito clicca il seguente link e successivamente sul pulsante 'Accetta'",
+            "L'articolo \"{{ ARTICLE_TITLE }}\" scritto da \"{{ AUTHOR_NAME }}\" per \"{{ PUBLISHER_NAME }}\" è stato approvato ed è ora disponibile alla lettura.",
+            "Puoi vederlo al seguente indirizzo:",
+            "{{ CLIENT_URL }}/article/{{ ARTICLE_ID }}"
+        ]
+    },
+    "author_invite": {
+        "subject": "Sei stato invitato ad essere autore per \"{{ PUBLISHER_NAME }}\"",
+        "lines": [
+            "Ciao,",
+            "Sei stato invitato ad essere autore per l'editore \"{{ PUBLISHER_NAME }}\"",
+            "Per accettare l'invito clicca il seguente link e successivamente sul pulsante \"Accetta\"",
             "{{ CLIENT_URL }}/settings/invites"
         ]
     },

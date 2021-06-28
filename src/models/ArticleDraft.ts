@@ -236,15 +236,17 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         this._updated_at = result.rows[0].updated_at;
     }
 
-    public async publish(): Promise<void>
+    public async publish(): Promise<INotExpandedResource>
     {
         const client = await Database.pool.connect();
         await client.query("begin");
 
+        const id = this.article === null
+            ? Utilities.id(Config.ID_PREFIXES.ARTICLE)
+            : this.article.id;
+
         if (this.article === null)
         {
-            const id = Utilities.id(Config.ID_PREFIXES.ARTICLE);
-
             await client
                 .query(
                     `
@@ -304,7 +306,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                         this.title,
                         this.content,
                         Utilities.getArticleReadingTimeInMinutes(this.content),
-                        this.id,
+                        id,
                     ],
                 )
                 .catch(() =>
@@ -315,7 +317,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
             await Config.ELASTICSEARCH
                 .update({
                     index: "articles",
-                    id: this.article.id,
+                    id,
                     body: {
                         title: this.title,
                         content: Utilities.extractTextFromEditorJson(this.content),
@@ -346,6 +348,8 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
 
         await client.query("commit");
         client.release();
+
+        return { id };
     }
 
     public static async listSubmitted(expand?: string[]): Promise<ArticleDraft[]>
