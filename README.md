@@ -110,34 +110,6 @@ AWS_PUBLISHER_ICONS_BUCKET_NAME=publisher-icons
 SENDGRID_API_KEY=
 ```
 
-### Install [`localstack`](https://github.com/localstack/localstack)
-
-#### Install `Docker`
-
-See [here](https://www.docker.com/products/docker-desktop).
-
-#### Start
-
-Run
-
-```
-docker-compose up --build
-```
-
-### Install `stripe` CLI
-
-See [here](https://stripe.com/docs/stripe-cli).
-
-### Create database
-
-#### Install PostgreSQL
-
-See [here](https://www.postgresql.org/download/).
-
-#### Create tables, views, etc.
-
-Run [`schema.sql`](schema.sql).
-
 ### Serve locally
 
 This will start a local server on `http://localhost:4000`.
