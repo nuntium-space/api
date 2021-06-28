@@ -76,7 +76,7 @@ export class Email
 
         for (const _ in replace)
         {
-            text.replace(`{{ ${_} }}`, replace[_]);
+            text = text.replace(`{{ ${_} }}`, replace[_]);
         }
 
         text += "\n\n";
