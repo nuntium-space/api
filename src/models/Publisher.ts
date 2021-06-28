@@ -183,7 +183,6 @@ export class Publisher implements ISerializable<ISerializedPublisher>
     public async delete(): Promise<void>
     {
         const client = await Database.pool.connect();
-
         await client.query("begin");
 
         await client
@@ -210,8 +209,25 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                 throw Boom.badImplementation();
             });
 
-        await client.query("commit");
+        const s3Client = new AWS.S3({
+            endpoint: Config.AWS_ENDPOINT,
+            s3ForcePathStyle: true,
+        });
 
+        await s3Client
+            .deleteObject({
+                Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+                Key: this.id,
+            })
+            .promise()
+            .catch(async () =>
+            {
+                await client.query("rollback");
+
+                throw Boom.badImplementation();
+            });
+
+        await client.query("commit");
         client.release();
     }
 

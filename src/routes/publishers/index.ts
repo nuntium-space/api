@@ -385,18 +385,19 @@ export default <ServerRoute[]>[
                 s3ForcePathStyle: true,
             });
 
-            const upload = await s3Client.upload({
-                Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
-                Key: publisher.id,
-                Body: image,
-            })
-            .promise()
-            .catch(async () =>
-            {
-                await client.query("rollback");
+            const upload = await s3Client
+                .upload({
+                    Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+                    Key: publisher.id,
+                    Body: image,
+                })
+                .promise()
+                .catch(async () =>
+                {
+                    await client.query("rollback");
 
-                throw Boom.badImplementation();
-            });
+                    throw Boom.badImplementation();
+                });
 
             await client.query("commit");
 
