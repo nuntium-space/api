@@ -1,4 +1,4 @@
-import AWS from "aws-sdk";
+import S3 from "aws-sdk/clients/s3";
 import { promises as dns } from "dns";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
@@ -380,7 +380,7 @@ export default <ServerRoute[]>[
                     throw Boom.badImplementation();
                 });
 
-            const s3Client = new AWS.S3({
+            const s3Client = new S3({
                 endpoint: Config.AWS_ENDPOINT,
                 s3ForcePathStyle: true,
             });

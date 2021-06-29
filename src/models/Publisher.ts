@@ -1,4 +1,4 @@
-import AWS from "aws-sdk";
+import S3 from "aws-sdk/clients/s3";
 import Boom from "@hapi/boom";
 import crypto from "crypto";
 import { INotExpandedResource } from "../common/INotExpandedResource";
@@ -209,7 +209,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                 throw Boom.badImplementation();
             });
 
-        const s3Client = new AWS.S3({
+        const s3Client = new S3({
             endpoint: Config.AWS_ENDPOINT,
             s3ForcePathStyle: true,
         });
@@ -294,7 +294,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
 
         if (this.has_image)
         {
-            const s3Client = new AWS.S3({
+            const s3Client = new S3({
                 credentials: Config.AWS_CREDENTIALS,
                 endpoint: Config.AWS_ENDPOINT,
             });
