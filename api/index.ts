@@ -23,6 +23,7 @@ import { Publisher } from "../src/models/Publisher";
 import { ARTICLE_SCHEMA } from "../src/types/article";
 import { PUBLISHER_SCHEMA } from "../src/types/publisher";
 import Utilities from "../src/utilities/Utilities";
+import serverless from "serverless-http";
 
 const server = Hapi.server({
     port: process.env.PORT,
@@ -324,3 +325,22 @@ const init = async () =>
 }
 
 init();
+
+let cachedHandler: any;
+
+export async function handler(event: any, context: any)
+{
+    if (!cachedHandler)
+    {
+        cachedHandler = serverless(server as any, {
+            request: (request: any) =>
+            {
+                request.serverless = { event, context };
+            },
+        });
+    }
+
+    const res = await cachedHandler(event, context);
+
+    return res;
+};
