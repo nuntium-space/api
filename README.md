@@ -110,6 +110,8 @@ AWS_PUBLISHER_ICONS_BUCKET_NAME=publisher-icons
 SENDGRID_API_KEY=
 ```
 
+***Note:** `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network.*
+
 ### Serve locally
 
 This will start a local server on `http://localhost:4000`.
@@ -117,6 +119,16 @@ This will start a local server on `http://localhost:4000`.
 ```
 npm start
 ```
+
+### Deploy to localstack
+
+Run
+
+```
+sls deploy
+```
+
+***Note:** if the deployment fails try to delete the `.build` folder.*
 
 [nuntium]: https://github.com/nuntium-space/nuntium
 

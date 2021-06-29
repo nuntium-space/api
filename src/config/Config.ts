@@ -1,4 +1,4 @@
-import AWS from "aws-sdk";
+import { config } from "aws-sdk";
 import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
 import { CredentialsOptions } from "aws-sdk/lib/credentials";
 import Stripe from "stripe";
@@ -119,7 +119,7 @@ export class Config
     public static readonly CLIENT_URL = process.env.CLIENT_URL as string;
 
     public static readonly ELASTICSEARCH = new ElasticSearchClient({
-        ...createAwsElasticsearchConnector(AWS.config),
+        ...createAwsElasticsearchConnector(config),
         node: process.env.ELASTICSEARCH_URL,
     });
 

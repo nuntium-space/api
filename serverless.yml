@@ -1,0 +1,45 @@
+service: api
+
+useDotenv: true
+variablesResolutionMode: '20210326'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage, self:custom.defaultStage}
+  region: us-east-1
+  lambdaHashingVersion: '20201221'
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-localstack
+
+package:
+  include:
+    - src/assets/**
+
+custom:
+  defaultStage: local
+  localstack:
+    stages:
+      - local
+    host: http://localhost
+    edgePort: 4566
+    autostart: true
+    lambda:
+      mountCode: true
+    docker:
+      sudo: false
+
+functions:
+  api:
+    handler: api/index.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
