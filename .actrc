@@ -1,0 +1,5 @@
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+-s AWS_ACCESS_KEY_ID=test
+-s AWS_SECRET_ACCESS_KEY=test
+-s SERVERLESS_STAGE=local
