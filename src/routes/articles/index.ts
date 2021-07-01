@@ -6,7 +6,9 @@ import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
+import { Source } from "../../models/Source";
 import { ARTICLE_SCHEMA } from "../../types/article";
+import { SOURCE_SCHEMA } from "../../types/source";
 import Database from "../../utilities/Database";
 import Utilities from "../../utilities/Utilities";
 
@@ -108,6 +110,42 @@ export default <ServerRoute[]>[
                 includeContent: true,
                 includeMetadata: true,
             });
+        },
+    },
+    {
+        method: "GET",
+        path: "/articles/{id}/sources",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.ARTICLE.required(),
+                }),
+            },
+            response: {
+                schema: Schema.ARRAY(SOURCE_SCHEMA.OBJ),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+
+            const article = await Article.retrieve(request.params.id, request.query.expand);
+
+            const author = await Author.retrieve(article.author.id, [ "publisher" ]);
+
+            if (!(author.publisher instanceof Publisher))
+            {
+                throw Boom.badImplementation();
+            }
+
+            if (!await authenticatedUser.isSubscribedToPublisher(author.publisher))
+            {
+                throw Boom.paymentRequired();
+            }
+
+            const sources = await Source.forArticle(article);
+
+            return sources.map(_ => _.serialize());
         },
     },
     {
