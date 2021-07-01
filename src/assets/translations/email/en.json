@@ -9,13 +9,25 @@
             "{{ API_URL }}/auth/email/{{ TOKEN }}"
         ]
     },
-    "article_published": {
-        "subject": "Article published: \"{{ ARTICLE_TITLE }}\"",
+    "article_draft_published": {
+        "subject": "Article published: \"{{ ARTICLE_DRAFT_TITLE }}\"",
         "lines": [
             "Hi,",
-            "The article \"{{ ARTICLE_TITLE }}\" written by \"{{ AUTHOR_NAME }}\" for \"{{ PUBLISHER_NAME }}\" has been approved and it's now available to read.",
+            "The article \"{{ ARTICLE_DRAFT_TITLE }}\" written by \"{{ AUTHOR_NAME }}\" for \"{{ PUBLISHER_NAME }}\" has been approved and it's now available to read.",
             "You can see it at the following link:",
-            "{{ CLIENT_URL }}/article/{{ ARTICLE_ID }}"
+            "{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}"
+        ]
+    },
+    "article_draft_rejected": {
+        "subject": "Article draft rejected: \"{{ ARTICLE_DRAFT_TITLE }}\"",
+        "lines": [
+            "Hi,",
+            "We are sorry to say that the article draft \"{{ ARTICLE_DRAFT_TITLE }}\" written by \"{{ AUTHOR_NAME }}\" for \"{{ PUBLISHER_NAME }}\" has been rejected with the following reason:\n",
+            "----",
+            "{{ REASON }}",
+            "----\n",
+            "You can edit this draft at the following link and re-submit it when done:",
+            "{{ CLIENT_URL }}/draft/{{ ARTICLE_DRAFT_ID }}"
         ]
     },
     "author_invite": {

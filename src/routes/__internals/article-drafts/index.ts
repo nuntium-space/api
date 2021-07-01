@@ -53,13 +53,55 @@ export default <ServerRoute[]>[
 
             await Email.send({
                 to: draft.author.user,
-                type: Email.TYPE.ARTICLE_PUBLISHED,
+                type: Email.TYPE.ARTICLE_DRAFT_PUBLISHED,
                 replace: {
-                    ARTICLE_TITLE: draft.title,
+                    ARTICLE_DRAFT_TITLE: draft.title,
                     AUTHOR_NAME: draft.author.user.full_name,
                     PUBLISHER_NAME: draft.author.publisher.name,
                     CLIENT_URL: Config.CLIENT_URL,
-                    ARTICLE_ID: id,
+                    ARTICLE_DRAFT_ID: id,
+                },
+            });
+
+            return h.response();
+        },
+    },
+    {
+        method: "POST",
+        path: "/articles/drafts/{id}/reject",
+        options: {
+            validate: {
+                payload: Joi.object({
+                    reason: Schema.STRING.min(1).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const draft = await ArticleDraft.retrieve(request.params.id, [ "author", "author.user", "author.publisher" ]);
+
+            if
+            (
+                !(draft.author instanceof Author)
+                || !(draft.author.user instanceof User)
+                || !(draft.author.publisher instanceof Publisher)
+                || !draft.author.user.full_name
+            )
+            {
+                throw Boom.badImplementation();
+            }
+
+            await draft.reject((request.payload as any).reason);
+
+            await Email.send({
+                to: draft.author.user,
+                type: Email.TYPE.ARTICLE_DRAFT_REJECTED,
+                replace: {
+                    ARTICLE_DRAFT_TITLE: draft.title,
+                    AUTHOR_NAME: draft.author.user.full_name,
+                    PUBLISHER_NAME: draft.author.publisher.name,
+                    CLIENT_URL: Config.CLIENT_URL,
+                    ARTICLE_DRAFT_ID: draft.id,
                 },
             });
 

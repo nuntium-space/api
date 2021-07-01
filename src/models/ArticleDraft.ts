@@ -352,6 +352,30 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
         return { id };
     }
 
+    public async reject(reason: string): Promise<void>
+    {
+        await Database.pool
+            .query(
+                `
+                update "article_drafts"
+                set
+                    "status" = 'rejected'
+                    and
+                    "reason" = $1
+                where
+                    "id" = $2
+                `,
+                [
+                    this.id,
+                    reason,
+                ],
+            )
+            .catch(() =>
+            {
+                throw Boom.badRequest();
+            });
+    }
+
     public static async listSubmitted(expand?: string[]): Promise<ArticleDraft[]>
     {
         const result = await Database.pool.query(

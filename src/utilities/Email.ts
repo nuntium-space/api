@@ -5,7 +5,8 @@ import { User } from "../models/User";
 enum EmailType
 {
     AUTH = "AUTH",
-    ARTICLE_PUBLISHED = "ARTICLE_PUBLISHED",
+    ARTICLE_DRAFT_PUBLISHED = "ARTICLE_DRAFT_PUBLISHED",
+    ARTICLE_DRAFT_REJECTED = "ARTICLE_DRAFT_REJECTED",
     AUTHOR_INVITE = "AUTHOR_INVITE",
 }
 
@@ -28,12 +29,19 @@ export class Email
             } as const,
             translation: "auth",
         } as const,
-        ARTICLE_PUBLISHED: {
+        ARTICLE_DRAFT_PUBLISHED: {
             from: {
                 name: "nuntium",
                 email: "articles@nuntium.space",
             } as const,
-            translation: "article_published",
+            translation: "article_draft_published",
+        } as const,
+        ARTICLE_DRAFT_REJECTED: {
+            from: {
+                name: "nuntium",
+                email: "articles@nuntium.space",
+            } as const,
+            translation: "article_draft_rejected",
         } as const,
         AUTHOR_INVITE: {
             from: {
