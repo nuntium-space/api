@@ -5,8 +5,10 @@ import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
 import { ArticleDraft } from "../../models/ArticleDraft";
 import { Author } from "../../models/Author";
+import { DraftSource } from "../../models/DraftSource";
 import { Publisher } from "../../models/Publisher";
 import { ARTICLE_DRAFT_SCHEMA } from "../../types/article-draft";
+import { DRAFT_SOURCE_SCHEMA } from "../../types/draft-source";
 import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
@@ -45,6 +47,37 @@ export default <ServerRoute[]>[
                 for: authenticatedUser,
                 includeContent: true,
             });
+        },
+    },
+    {
+        method: "GET",
+        path: "/articles/drafts/{id}/sources",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.ARTICLE_DRAFT.required(),
+                }),
+            },
+            response: {
+                schema: Schema.ARRAY(DRAFT_SOURCE_SCHEMA.OBJ),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const [ authenticatedUser, isAdmin ] = Utilities.getAuthenticatedUser(request);
+
+            const draft = await ArticleDraft.retrieve(request.params.id);
+
+            const author = await Author.retrieve(draft.author.id);
+
+            if (!isAdmin && authenticatedUser.id !== author.user.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const sources = await DraftSource.forDraft(request.params.id);
+
+            return sources.map(_ => _.serialize());
         },
     },
     {
