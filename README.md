@@ -1,4 +1,4 @@
-# nuntium-api
+# api
 
 ## Article lifecycle
 
