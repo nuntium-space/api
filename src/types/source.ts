@@ -15,13 +15,11 @@ export interface ICreateSource
 
 export interface ISerializedSource
 {
-    id: string,
     url: string,
 }
 
 export const SOURCE_SCHEMA = {
     OBJ: Joi.object({
-        id: Schema.ID.SOURCE.required(),
         url: Schema.URL.required(),
     }),
     CREATE: Joi.object({

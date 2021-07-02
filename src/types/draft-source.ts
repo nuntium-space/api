@@ -15,13 +15,11 @@ export interface ICreateDraftSource
 
 export interface ISerializedDraftSource
 {
-    id: string,
     url: string,
 }
 
 export const DRAFT_SOURCE_SCHEMA = {
     OBJ: Joi.object({
-        id: Schema.ID.DRAFT_SOURCE.required(),
         url: Schema.URL.required(),
     }),
     CREATE: Joi.object({

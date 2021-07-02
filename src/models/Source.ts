@@ -99,7 +99,6 @@ export class Source implements ISerializable<ISerializedSource>
     public serialize(): ISerializedSource
     {
         return {
-            id: this.id,
             url: this.url,
         };
     }

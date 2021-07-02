@@ -99,7 +99,6 @@ export class DraftSource implements ISerializable<ISerializedDraftSource>
     public serialize(): ISerializedDraftSource
     {
         return {
-            id: this.id,
             url: this.url,
         };
     }
