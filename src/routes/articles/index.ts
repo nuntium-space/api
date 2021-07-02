@@ -67,7 +67,7 @@ export default <ServerRoute[]>[
             if (!await authenticatedUser.isSubscribedToPublisher(author.publisher))
             {
                 return h
-                    .response(article.serialize({ for: authenticatedUser })) // Only the metadata (content is excluded by default)
+                    .response(await article.serialize({ for: authenticatedUser })) // Only the metadata (content is excluded by default)
                     .code(402); // Payment Required
             }
 
