@@ -208,7 +208,7 @@ export default <ServerRoute[]>[
         {
             const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
-            const article = await Article.retrieve(request.query.from);
+            const article = await Article.retrieve(request.params.id);
 
             if (article.author.id !== authenticatedUser.id)
             {
