@@ -296,8 +296,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                     set
                         "title" = $1,
                         "content" = $2,
-                        "reading_time" = $3,
-                        "is_published" = true
+                        "reading_time" = $3
                     where
                         "id" = $4
                     returning "updated_at"
