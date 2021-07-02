@@ -208,9 +208,14 @@ export default <ServerRoute[]>[
         {
             const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
-            const article = await Article.retrieve(request.params.id);
+            const article = await Article.retrieve(request.params.id, [ "author" ]);
 
-            if (article.author.id !== authenticatedUser.id)
+            if (!(article.author instanceof Author))
+            {
+                throw Boom.badImplementation();
+            }
+
+            if (article.author.user.id !== authenticatedUser.id)
             {
                 throw Boom.forbidden();
             }
