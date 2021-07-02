@@ -152,9 +152,6 @@ export default <ServerRoute[]>[
                 params: Joi.object({
                     id: Schema.ID.AUTHOR.required(),
                 }),
-                query: Joi.object({
-                    from: Schema.ID.ARTICLE,
-                }),
                 payload: ARTICLE_DRAFT_SCHEMA.CREATE,
             },
             response: {
@@ -189,19 +186,36 @@ export default <ServerRoute[]>[
                 ]);
             }
 
-            if (request.query.from)
+            return ArticleDraft.create(request.payload as any, author);
+        },
+    },
+    {
+        method: "POST",
+        path: "/articles/{id}/drafts",
+        options: {
+            validate: {
+                params: Joi.object({
+                    id: Schema.ID.ARTICLE.required(),
+                }),
+            },
+            response: {
+                schema: Joi.object({
+                    id: Schema.ID.ARTICLE_DRAFT.required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+
+            const article = await Article.retrieve(request.query.from);
+
+            if (article.author.id !== authenticatedUser.id)
             {
-                const article = await Article.retrieve(request.query.from);
-
-                if (article.author.id !== author.id)
-                {
-                    throw Boom.forbidden();
-                }
-
-                return ArticleDraft.createFromArticle(article);
+                throw Boom.forbidden();
             }
 
-            return ArticleDraft.create(request.payload as any, author);
+            return ArticleDraft.createFromArticle(article);
         },
     },
     {
