@@ -331,6 +331,15 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                 });
         }
 
+        const sources = await DraftSource.forDraft(this);
+
+        if (this.article)
+        {
+            await Source.deleteAll(this.article);
+        }
+
+        await Source.createMultiple(sources, this, client);
+
         await client
             .query(
                 `
