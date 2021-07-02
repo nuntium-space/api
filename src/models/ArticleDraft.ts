@@ -268,7 +268,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                 {
                     await client.query("rollback");
 
-                    throw Boom.badRequest();
+                    throw Boom.badImplementation();
                 });
 
             await Config.ELASTICSEARCH
@@ -311,7 +311,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                 )
                 .catch(() =>
                 {
-                    throw Boom.badRequest();
+                    throw Boom.badImplementation();
                 });
 
             await Config.ELASTICSEARCH
@@ -338,7 +338,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
             await Source.deleteAll(this.article);
         }
 
-        await Source.createMultiple(sources, this, client);
+        await Source.createMultiple(sources, id, client);
 
         await client
             .query(
@@ -352,7 +352,7 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
             {
                 await client.query("rollback");
 
-                throw Boom.badRequest();
+                throw Boom.badImplementation();
             });
 
         await client.query("commit");
