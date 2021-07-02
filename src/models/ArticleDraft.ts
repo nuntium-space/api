@@ -318,12 +318,15 @@ export class ArticleDraft implements ISerializable<Promise<ISerializedArticleDra
                     index: "articles",
                     id,
                     body: {
-                        title: this.title,
-                        content: Utilities.extractTextFromEditorJson(this.content),
+                        doc: {
+                            title: this.title,
+                            content: Utilities.extractTextFromEditorJson(this.content),
+                        },
                     },
                 })
-                .catch(async () =>
+                .catch(async (e) =>
                 {
+                    console.log(e);
                     await client.query("rollback");
 
                     throw Boom.badImplementation();
