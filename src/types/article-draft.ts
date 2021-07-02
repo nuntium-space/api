@@ -77,5 +77,6 @@ export const ARTICLE_DRAFT_SCHEMA = {
     UPDATE: Joi.object({
         title: Schema.STRING.max(50),
         content: Schema.ARTICLE_CONTENT,
+        sources: Schema.ARRAY(SOURCE_SCHEMA.CREATE).optional(),
     }),
 } as const;
