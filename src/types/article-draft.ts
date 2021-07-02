@@ -62,7 +62,7 @@ export const ARTICLE_DRAFT_SCHEMA = {
                 .alternatives()
                 .try(
                     ARTICLE_SCHEMA.OBJ,
-                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE_DRAFT),
+                    Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE),
                 )
         ).required(),
         status: Schema.STRING.allow("draft", "pending-verification").required(),
