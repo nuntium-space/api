@@ -365,7 +365,6 @@ export default <ServerRoute[]>[
             }
 
             const client = await Database.pool.connect();
-
             await client.query("begin");
 
             await client
@@ -400,6 +399,7 @@ export default <ServerRoute[]>[
                 });
 
             await client.query("commit");
+            client.release();
 
             return { url: upload.Location };
         },
