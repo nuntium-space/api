@@ -107,7 +107,9 @@ export default <ServerRoute[]>[
                 payload: BUNDLE_SCHEMA.CREATE,
             },
             response: {
-                schema: BUNDLE_SCHEMA.OBJ,
+                schema: Joi.object({
+                    id: Schema.ID.BUNDLE.required(),
+                }),
             },
         },
         handler: async (request, h) =>
@@ -121,13 +123,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const bundle = await Bundle.create(
-                request.payload as any,
-                organization,
-                request.query.expand,
-            );
-
-            return bundle.serialize({ for: authenticatedUser });
+            return Bundle.create(request.payload as any, organization);
         },
     },
     {

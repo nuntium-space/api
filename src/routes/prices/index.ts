@@ -79,7 +79,9 @@ export default <ServerRoute[]>[
                 payload: PRICE_SCHEMA.CREATE,
             },
             response: {
-                schema: PRICE_SCHEMA.OBJ,
+                schema: Joi.object({
+                    id: Schema.ID.PRICE.required(),
+                }),
             },
         },
         handler: async (request, h) =>
@@ -98,13 +100,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const price = await Price.create(
-                request.payload as any,
-                bundle,
-                request.query.expand,
-            );
-
-            return price.serialize({ for: authenticatedUser });
+            return Price.create(request.payload as any, bundle);
         },
     },
     {

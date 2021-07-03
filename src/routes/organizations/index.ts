@@ -147,16 +147,16 @@ export default <ServerRoute[]>[
                 payload: ORGANIZATION_SCHEMA.CREATE,
             },
             response: {
-                schema: ORGANIZATION_SCHEMA.OBJ,
+                schema: Joi.object({
+                    id: Schema.ID.ORGANIZATION.required(),
+                }),
             },
         },
         handler: async (request, h) =>
         {
             const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
 
-            const organization = await Organization.create(request.payload as any, authenticatedUser);
-
-            return organization.serialize({ for: authenticatedUser });
+            return Organization.create(request.payload as any, authenticatedUser);
         },
     },
     {
