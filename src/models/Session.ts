@@ -17,7 +17,7 @@ export class Session implements ISerializable<ISerializedSession>
     )
     {}
 
-    public static async create(user: User | INotExpandedResource): Promise<INotExpandedResource>
+    public static async create(user: User | INotExpandedResource | string): Promise<INotExpandedResource>
     {
         const id = Utilities.id(Config.ID_PREFIXES.SESSION);
 
@@ -35,7 +35,9 @@ export class Session implements ISerializable<ISerializedSession>
                 `,
                 [
                     id,
-                    user.id,
+                    typeof user === "string"
+                        ? user
+                        : user.id,
                     expiresAt.toISOString(),
                 ],
             )

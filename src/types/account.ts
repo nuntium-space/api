@@ -12,7 +12,7 @@ export interface IDatabaseAccount
 
 export interface ICreateAccount
 {
-    user: User | INotExpandedResource,
+    user: User | INotExpandedResource | string,
     type: string,
     external_id: string,
 }
