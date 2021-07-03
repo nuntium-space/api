@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import crypto from "crypto";
+import { randomBytes } from "crypto";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
@@ -12,6 +12,81 @@ import { Schema } from "../../config/Schema";
 import { SESSION_SCHEMA } from "../../types/session";
 import { Email } from "../../utilities/Email";
 import { INotExpandedResource } from "../../common/INotExpandedResource";
+
+const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider =>
+{
+    return {
+        method: [ "GET", "POST" ],
+        path: `/auth/${provider.id}`,
+        options: {
+            auth: provider.id,
+        },
+        handler: async (request, h) =>
+        {
+            if (!request.auth.isAuthenticated)
+            {
+                throw Boom.unauthorized();
+            }
+
+            const profile = request.auth.credentials.profile;
+            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
+
+            let user: User | INotExpandedResource | string;
+            const providerUserId = provider.getId(profile);
+
+            if (query?.link)
+            {
+                const [ hmac, userId ] = query.link.split("--");
+
+                if (!Utilities.verifyHmac(hmac, userId))
+                {
+                    throw Boom.unauthorized();
+                }
+
+                user = userId;
+
+                if (await Account.exists(user, provider.id))
+                {
+                    throw Boom.conflict();
+                }
+
+                await Account.create({
+                    user,
+                    type: provider.id,
+                    external_id: providerUserId,
+                });
+            }
+            else if (await Account.existsWithExternalId(providerUserId))
+            {
+                const account = await Account.retrieveWithExternalId(providerUserId);
+
+                user = account.user;
+            }
+            else
+            {
+                user = await User.create({
+                    email: provider.getEmail(profile),
+                    full_name: provider.getFullName(profile),
+                });
+
+                await Account.create({
+                    user,
+                    type: provider.id,
+                    external_id: providerUserId,
+                });
+            }
+
+            const session = await Session.create(user);
+
+            request.cookieAuth.set({ id: session.id });
+
+            const redirectUrl = new URL(Config.CLIENT_URL);
+            redirectUrl.pathname = query?.redirectTo ?? "";
+
+            return h.redirect(redirectUrl.toString());
+        },
+    };
+});
 
 export default <ServerRoute[]>[
     {
@@ -140,7 +215,7 @@ export default <ServerRoute[]>[
 
             const id = Utilities.id(Config.ID_PREFIXES.SIGN_IN_REQUEST);
 
-            const token = crypto.randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
+            const token = randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
 
             const expiresAt = new Date();
             expiresAt.setSeconds(expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS);
@@ -185,164 +260,5 @@ export default <ServerRoute[]>[
             return { id };
         },
     },
-    {
-        method: [ "GET", "POST" ],
-        path: "/auth/facebook",
-        options: {
-            auth: "facebook",
-        },
-        handler: async (request, h) =>
-        {
-            if (!request.auth.isAuthenticated)
-            {
-                throw Boom.unauthorized();
-            }
-
-            const profile: {
-                id: string,
-                email: string,
-                displayName: string,
-            } = request.auth.credentials.profile as any;
-
-            let user: User | INotExpandedResource;
-
-            if (await User.exists(profile.email))
-            {
-                user = await User.retrieveWithEmail(profile.email);
-            }
-            else
-            {
-                user = await User.create({
-                    email: profile.email,
-                    full_name: profile.displayName,
-                });
-            }
-
-            if (!await Account.exists(user, "facebook"))
-            {
-                await Account.create({
-                    user,
-                    type: "facebook",
-                    external_id: profile.id,
-                });
-            }
-
-            const session = await Session.create(user);
-
-            request.cookieAuth.set({ id: session.id });
-
-            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
-
-            const redirectUrl = new URL(Config.CLIENT_URL);
-            redirectUrl.pathname = query?.redirectTo ?? "";
-
-            return h.redirect(redirectUrl.toString());
-        },
-    },
-    {
-        method: [ "GET", "POST" ],
-        path: "/auth/google",
-        options: {
-            auth: "google",
-        },
-        handler: async (request, h) =>
-        {
-            if (!request.auth.isAuthenticated)
-            {
-                throw Boom.unauthorized();
-            }
-
-            const profile: {
-                id: string,
-                email: string,
-                displayName: string,
-            } = request.auth.credentials.profile as any;
-
-            let user: User | INotExpandedResource;
-
-            if (await User.exists(profile.email))
-            {
-                user = await User.retrieveWithEmail(profile.email);
-            }
-            else
-            {
-                user = await User.create({
-                    email: profile.email,
-                    full_name: profile.displayName,
-                });
-            }
-
-            if (!await Account.exists(user, "google"))
-            {
-                await Account.create({
-                    user,
-                    type: "google",
-                    external_id: profile.id,
-                });
-            }
-
-            const session = await Session.create(user);
-
-            request.cookieAuth.set({ id: session.id });
-
-            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
-
-            const redirectUrl = new URL(Config.CLIENT_URL);
-            redirectUrl.pathname = query?.redirectTo ?? "";
-
-            return h.redirect(redirectUrl.toString());
-        },
-    },
-    {
-        method: [ "GET", "POST" ],
-        path: "/auth/twitter",
-        options: {
-            auth: "twitter",
-        },
-        handler: async (request, h) =>
-        {
-            if (!request.auth.isAuthenticated)
-            {
-                throw Boom.unauthorized();
-            }
-
-            const profile: {
-                id: string,
-                raw: {
-                    email: string,
-                },
-            } = request.auth.credentials.profile as any;
-
-            let user: User | INotExpandedResource;
-
-            if (await User.exists(profile.raw.email))
-            {
-                user = await User.retrieveWithEmail(profile.raw.email);
-            }
-            else
-            {
-                user = await User.create({ email: profile.raw.email });
-            }
-
-            if (!await Account.exists(user, "twitter"))
-            {
-                await Account.create({
-                    user,
-                    type: "twitter",
-                    external_id: profile.id,
-                });
-            }
-
-            const session = await Session.create(user);
-
-            request.cookieAuth.set({ id: session.id });
-
-            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
-
-            const redirectUrl = new URL(Config.CLIENT_URL);
-            redirectUrl.pathname = query?.redirectTo ?? "";
-
-            return h.redirect(redirectUrl.toString());
-        },
-    },
+    ...authProvidersEndpoints,
 ];

@@ -1,3 +1,4 @@
+import accounts from "./accounts";
 import articleDrafts from "./article-drafts";
 import articles from "./articles";
 import auth from "./auth";
@@ -17,6 +18,7 @@ import webhooks from "./webhooks";
 import __internals from "./__internals";
 
 export = [
+    accounts,
     articleDrafts,
     articles,
     auth,

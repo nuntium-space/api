@@ -37,7 +37,9 @@ export class Account implements ISerializable<ISerializedAccount>
                 `,
                 [
                     id,
-                    data.user.id,
+                    typeof data.user === "string"
+                        ? data.user
+                        : data.user.id,
                     data.type,
                     data.external_id,
                 ],
@@ -65,6 +67,21 @@ export class Account implements ISerializable<ISerializedAccount>
         return Account.deserialize(result.rows[0]);
     }
 
+    public static async retrieveWithExternalId(id: string): Promise<Account>
+    {
+        const result = await Database.pool.query(
+            `select * from "accounts" where "external_id" = $1`,
+            [ id ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            throw Boom.notFound();
+        }
+
+        return Account.deserialize(result.rows[0]);
+    }
+
     public async delete(): Promise<void>
     {
         await Database.pool.query(
@@ -77,14 +94,60 @@ export class Account implements ISerializable<ISerializedAccount>
     // UTILITIES //
     ///////////////
 
-    public static async exists(user: User | INotExpandedResource, type: string): Promise<boolean>
+    public static async exists(user: User | INotExpandedResource | string, type: string): Promise<boolean>
     {
         const result = await Database.pool.query(
-            `select count(*) as "count" from "accounts" where "user" = $1 and "type" = $2 limit 1`,
-            [ user.id, type ],
+            `
+            select 1
+            from "accounts"
+            where
+                "user" = $1
+                and
+                "type" = $2
+            limit 1
+            `,
+            [
+                typeof user === "string"
+                    ? user
+                    : user.id,
+                type,
+            ],
         );
 
-        return result.rows[0].count > 0;
+        return result.rows.length > 0;
+    }
+
+    public static async existsWithExternalId(id: string): Promise<boolean>
+    {
+        const result = await Database.pool.query(
+            `
+            select 1
+            from "accounts"
+            where "external_id" = $1
+            limit 1
+            `,
+            [ id ],
+        );
+
+        return result.rows.length > 0;
+    }
+
+    public static async forUser(user: User | INotExpandedResource | string, expand?: string[]): Promise<Account[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select *
+            from "accounts"
+            where "user" = $1
+            `,
+            [
+                typeof user === "string"
+                    ? user
+                    : user.id,
+            ],
+        );
+
+        return Promise.all(result.rows.map(_ => Account.deserialize(_, expand)));
     }
 
     ///////////////////

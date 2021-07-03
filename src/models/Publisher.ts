@@ -1,6 +1,6 @@
 import S3 from "aws-sdk/clients/s3";
 import Boom from "@hapi/boom";
-import crypto from "crypto";
+import { randomBytes } from "crypto";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -64,7 +64,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     data.url,
                     organization.id,
                     false,
-                    crypto.randomBytes(Config.PUBLISHER_DNS_TXT_VALUE_BYTES).toString("hex"),
+                    randomBytes(Config.PUBLISHER_DNS_TXT_VALUE_BYTES).toString("hex"),
                 ],
             )
             .catch(async () =>

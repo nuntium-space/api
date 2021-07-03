@@ -93,6 +93,27 @@ export class Config
         },
     ];
 
+    public static readonly AUTH_PROVIDERS = [
+        {
+            id: "facebook",
+            getId: (profile: any) => profile.id,
+            getEmail: (profile: any) => profile.email,
+            getFullName: (profile: any) => profile.displayName,
+        },
+        {
+            id: "google",
+            getId: (profile: any) => profile.id,
+            getEmail: (profile: any) => profile.email,
+            getFullName: (profile: any) => profile.displayName,
+        },
+        {
+            id: "twitter",
+            getId: (profile: any) => profile.id,
+            getEmail: (profile: any) => profile.raw.email,
+            getFullName: (profile: any) => undefined,
+        },
+    ];
+
     public static readonly DOMAIN_VERIFICATION_DNS_TXT_RECORD_PREFIX = "nuntium-domain-verification";
 
     /**
