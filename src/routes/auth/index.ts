@@ -45,14 +45,14 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider
 
                 user = userId;
 
-                if (await Account.exists(user, "google"))
+                if (await Account.exists(user, provider.id))
                 {
                     throw Boom.conflict();
                 }
 
                 await Account.create({
                     user,
-                    type: "google",
+                    type: provider.id,
                     external_id: providerUserId,
                 });
             }
@@ -71,7 +71,7 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider
 
                 await Account.create({
                     user,
-                    type: "google",
+                    type: provider.id,
                     external_id: providerUserId,
                 });
             }
