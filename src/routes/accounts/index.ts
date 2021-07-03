@@ -26,7 +26,12 @@ const accountLinkingRoutes: ServerRoute[] = [ "facebook", "google", "twitter" ].
                 throw Boom.forbidden();
             }
 
-            const hmac = createHmac("sha512", process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD ?? "");
+            if (!process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD)
+            {
+                throw Boom.badImplementation();
+            }
+
+            const hmac = createHmac("sha512", process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD);
             hmac.update(authenticatedUser.id);
 
             return h.redirect(`auth/${provider}?link=${hmac.digest("hex")}`);
