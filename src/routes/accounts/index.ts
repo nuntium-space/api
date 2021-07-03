@@ -3,6 +3,7 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
+import { Account } from "../../models/Account";
 import Utilities from "../../utilities/Utilities";
 
 const accountLinkingRoutes: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider =>
@@ -46,7 +47,16 @@ export default <ServerRoute[]>[
         },
         handler: async (request, h) =>
         {
-            throw Boom.notImplemented();
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+
+            if (authenticatedUser.id !== request.params.id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const accounts = await Account.forUser(authenticatedUser);
+
+            return accounts.map(_ => _.serialize());
         },
     },
     ...accountLinkingRoutes,

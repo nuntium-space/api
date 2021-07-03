@@ -132,6 +132,24 @@ export class Account implements ISerializable<ISerializedAccount>
         return result.rows.length > 0;
     }
 
+    public static async forUser(user: User | INotExpandedResource | string, expand?: string[]): Promise<Account[]>
+    {
+        const result = await Database.pool.query(
+            `
+            select *
+            from "accounts"
+            where "user" = $1
+            `,
+            [
+                typeof user === "string"
+                    ? user
+                    : user.id,
+            ],
+        );
+
+        return Promise.all(result.rows.map(_ => Account.deserialize(_, expand)));
+    }
+
     ///////////////////
     // SERIALIZATION //
     ///////////////////
