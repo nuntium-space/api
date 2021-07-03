@@ -77,7 +77,7 @@ export class Account implements ISerializable<ISerializedAccount>
     // UTILITIES //
     ///////////////
 
-    public static async exists(user: User, type: string): Promise<boolean>
+    public static async exists(user: User | INotExpandedResource, type: string): Promise<boolean>
     {
         const result = await Database.pool.query(
             `select count(*) as "count" from "accounts" where "user" = $1 and "type" = $2 limit 1`,

@@ -11,6 +11,7 @@ import Utilities from "../../utilities/Utilities";
 import { Schema } from "../../config/Schema";
 import { SESSION_SCHEMA } from "../../types/session";
 import { Email } from "../../utilities/Email";
+import { INotExpandedResource } from "../../common/INotExpandedResource";
 
 export default <ServerRoute[]>[
     {
@@ -126,7 +127,7 @@ export default <ServerRoute[]>[
         {
             const { email } = request.payload as any;
 
-            let user: User;
+            let user: User | INotExpandedResource;
 
             if (await User.exists(email))
             {
@@ -145,7 +146,6 @@ export default <ServerRoute[]>[
             expiresAt.setSeconds(expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS);
 
             const client = await Database.pool.connect();
-
             await client.query("begin");
 
             await client
@@ -180,7 +180,6 @@ export default <ServerRoute[]>[
             });
 
             await client.query("commit");
-
             client.release();
 
             return { id };
@@ -205,7 +204,7 @@ export default <ServerRoute[]>[
                 displayName: string,
             } = request.auth.credentials.profile as any;
 
-            let user: User;
+            let user: User | INotExpandedResource;
 
             if (await User.exists(profile.email))
             {
@@ -259,7 +258,7 @@ export default <ServerRoute[]>[
                 displayName: string,
             } = request.auth.credentials.profile as any;
 
-            let user: User;
+            let user: User | INotExpandedResource;
 
             if (await User.exists(profile.email))
             {
@@ -314,7 +313,7 @@ export default <ServerRoute[]>[
                 },
             } = request.auth.credentials.profile as any;
 
-            let user: User;
+            let user: User | INotExpandedResource;
 
             if (await User.exists(profile.raw.email))
             {

@@ -17,7 +17,7 @@ export class Session implements ISerializable<ISerializedSession>
     )
     {}
 
-    public static async create(user: User): Promise<INotExpandedResource>
+    public static async create(user: User | INotExpandedResource): Promise<INotExpandedResource>
     {
         const id = Utilities.id(Config.ID_PREFIXES.SESSION);
 
