@@ -26,7 +26,7 @@ export class Price implements ISerializable<ISerializedPrice>
         return this._active;
     }
 
-    public static async create(data: ICreatePrice, bundle: Bundle, expand?: string[]): Promise<Price>
+    public static async create(data: ICreatePrice, bundle: Bundle): Promise<INotExpandedResource>
     {
         if (!bundle.stripe_product_id)
         {
@@ -59,8 +59,9 @@ export class Price implements ISerializable<ISerializedPrice>
             ]);
         }
 
-        const client = await Database.pool.connect();
+        const id = Utilities.id(Config.ID_PREFIXES.PRICE);
 
+        const client = await Database.pool.connect();
         await client.query("begin");
 
         const result = await client
@@ -73,7 +74,7 @@ export class Price implements ISerializable<ISerializedPrice>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.PRICE),
+                    id,
                     data.amount,
                     data.currency,
                     bundle.id,
@@ -107,10 +108,9 @@ export class Price implements ISerializable<ISerializedPrice>
             });
 
         await client.query("commit");
-
         client.release();
 
-        return Price.deserialize(result.rows[0], expand);
+        return { id };
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Price>

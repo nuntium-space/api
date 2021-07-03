@@ -20,9 +20,9 @@ export class Like implements ISerializable<Promise<ISerializedLike>>
     // CRUD //
     //////////
 
-    public static async create(user: User | string, article: Article | string, expand?: string[]): Promise<Like>
+    public static async create(user: User | string, article: Article | string): Promise<void>
     {
-        const result = await Database.pool
+        await Database.pool
             .query(
                 `
                 insert into "likes"
@@ -44,8 +44,6 @@ export class Like implements ISerializable<Promise<ISerializedLike>>
             {
                 throw Boom.badImplementation();
             });
-
-        return Like.deserialize(result.rows[0], expand);
     }
 
     public static async retrieveWithUserAndArticle(user: User | string, article: Article | string, expand?: string[]): Promise<Like>

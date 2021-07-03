@@ -31,7 +31,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
         return this._active;
     }
 
-    public static async create(data: ICreateBundle, organization: Organization, expand?: string[]): Promise<Bundle>
+    public static async create(data: ICreateBundle, organization: Organization): Promise<INotExpandedResource>
     {
         if (await Bundle.existsWithNameAndOrganization(data.name, organization))
         {
@@ -43,8 +43,9 @@ export class Bundle implements ISerializable<ISerializedBundle>
             ]);
         }
 
-        const client = await Database.pool.connect();
+        const id = Utilities.id(Config.ID_PREFIXES.BUNDLE);
 
+        const client = await Database.pool.connect();
         await client.query("begin");
 
         const result = await client
@@ -57,7 +58,7 @@ export class Bundle implements ISerializable<ISerializedBundle>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.BUNDLE),
+                    id,
                     data.name,
                     organization.id,
                     true,
@@ -85,10 +86,9 @@ export class Bundle implements ISerializable<ISerializedBundle>
             });
 
         await client.query("commit");
-
         client.release();
 
-        return Bundle.deserialize(result.rows[0], expand);
+        return { id };
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<Bundle>

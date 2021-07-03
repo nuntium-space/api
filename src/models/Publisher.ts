@@ -42,7 +42,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         return this._url;
     }
 
-    public static async create(data: ICreatePublisher, organization: Organization): Promise<Publisher>
+    public static async create(data: ICreatePublisher, organization: Organization): Promise<INotExpandedResource>
     {
         const id = Utilities.id(Config.ID_PREFIXES.PUBLISHER);
 
@@ -97,7 +97,7 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         const png = jdenticon.toPng(publisher.id, 500, { backColor: "#ffffff" });
         publisher.setImage(png);
 
-        return publisher;
+        return { id };
     }
 
     public static async retrieve(id: string): Promise<Publisher>

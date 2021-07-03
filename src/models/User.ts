@@ -30,10 +30,11 @@ export class User implements ISerializable<ISerializedUser>
         return this._email;
     }
 
-    public static async create(data: ICreateUser): Promise<User>
+    public static async create(data: ICreateUser): Promise<INotExpandedResource>
     {
-        const client = await Database.pool.connect();
+        const id = Utilities.id(Config.ID_PREFIXES.USER);
 
+        const client = await Database.pool.connect();
         await client.query("begin");
 
         const result = await client
@@ -46,7 +47,7 @@ export class User implements ISerializable<ISerializedUser>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.USER),
+                    id,
                     data.full_name,
                     data.email,
                 ],
@@ -73,10 +74,9 @@ export class User implements ISerializable<ISerializedUser>
             });
 
         await client.query("commit");
-
         client.release();
 
-        return User.deserialize(result.rows[0]);
+        return { id };
     }
 
     public static async retrieve(id: string): Promise<User>

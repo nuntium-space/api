@@ -29,7 +29,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
         return this._stripe_account_enabled;
     }
 
-    public static async create(data: ICreateOrganization, user: User): Promise<Organization>
+    public static async create(data: ICreateOrganization, user: User): Promise<INotExpandedResource>
     {
         if (await Organization.existsWithName(data.name))
         {
@@ -56,7 +56,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
                 throw Boom.badImplementation();
             });
 
-        const result = await Database.pool
+        await Database.pool
             .query(
                 `
                 insert into "organizations"
@@ -77,7 +77,7 @@ export class Organization implements ISerializable<ISerializedOrganization>
                 throw Boom.badRequest();
             });
 
-        return Organization.deserialize(result.rows[0]);
+        return { id };
     }
 
     public static async retrieve(id: string): Promise<Organization>

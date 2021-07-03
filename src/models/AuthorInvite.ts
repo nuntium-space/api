@@ -25,7 +25,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
     // CRUD //
     //////////
 
-    public static async create(data: ICreateAuthorInvite, expand?: string[]): Promise<AuthorInvite>
+    public static async create(data: ICreateAuthorInvite): Promise<INotExpandedResource>
     {
         const user = await User.retrieveWithEmail(data.email);
         const publisher = await Publisher.retrieve(data.publisher);
@@ -35,13 +35,15 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
             throw Boom.conflict();
         }
 
+        const id = Utilities.id(Config.ID_PREFIXES.AUTHOR_INVITE);
+
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + Config.AUTHOR_INVITE_DURATION_IN_SECONDS);
 
         const client = await Database.pool.connect();
         await client.query("begin");
 
-        const result = await Database.pool
+        await Database.pool
             .query(
                 `
                 insert into "author_invites"
@@ -51,7 +53,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.AUTHOR_INVITE),
+                    id,
                     user.id,
                     publisher.id,
                     expiresAt.toISOString(),
@@ -83,7 +85,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite>
         await client.query("commit");
         client.release();
 
-        return AuthorInvite.deserialize(result.rows[0], expand);
+        return { id };
     }
 
     public static async retrieve(id: string, expand?: string[]): Promise<AuthorInvite>

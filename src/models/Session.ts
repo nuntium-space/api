@@ -17,12 +17,14 @@ export class Session implements ISerializable<ISerializedSession>
     )
     {}
 
-    public static async create(user: User): Promise<Session>
+    public static async create(user: User): Promise<INotExpandedResource>
     {
+        const id = Utilities.id(Config.ID_PREFIXES.SESSION);
+
         const expiresAt = new Date();
         expiresAt.setSeconds(expiresAt.getSeconds() + Config.SESSION_DURATION_IN_SECONDS);
 
-        const result = await Database.pool
+        await Database.pool
             .query(
                 `
                 insert into "sessions"
@@ -32,7 +34,7 @@ export class Session implements ISerializable<ISerializedSession>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.SESSION),
+                    id,
                     user.id,
                     expiresAt.toISOString(),
                 ],
@@ -42,7 +44,7 @@ export class Session implements ISerializable<ISerializedSession>
                 throw Boom.badRequest();
             });
 
-        return Session.deserialize(result.rows[0]);
+        return { id };
     }
 
     public static async retrieve(id: string): Promise<Session>

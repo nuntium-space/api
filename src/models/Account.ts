@@ -22,9 +22,11 @@ export class Account implements ISerializable<ISerializedAccount>
     // CRUD //
     //////////
 
-    public static async create(data: ICreateAccount): Promise<Account>
+    public static async create(data: ICreateAccount): Promise<INotExpandedResource>
     {
-        const result = await Database.pool
+        const id = Utilities.id(Config.ID_PREFIXES.ACCOUNT);
+
+        await Database.pool
             .query(
                 `
                 insert into "accounts"
@@ -34,7 +36,7 @@ export class Account implements ISerializable<ISerializedAccount>
                 returning *
                 `,
                 [
-                    Utilities.id(Config.ID_PREFIXES.ACCOUNT),
+                    id,
                     data.user.id,
                     data.type,
                     data.external_id,
@@ -45,7 +47,7 @@ export class Account implements ISerializable<ISerializedAccount>
                 throw Boom.badRequest();
             });
 
-        return Account.deserialize(result.rows[0]);
+        return { id };
     }
 
     public static async retrieve(id: string): Promise<Account>
