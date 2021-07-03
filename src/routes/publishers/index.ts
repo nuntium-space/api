@@ -1,4 +1,3 @@
-import S3 from "aws-sdk/clients/s3";
 import { promises as dns } from "dns";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
@@ -8,8 +7,6 @@ import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
 import { Publisher } from "../../models/Publisher";
 import Database from "../../utilities/Database";
-import imageType from "image-type";
-import imageSize from "image-size";
 import { Schema } from "../../config/Schema";
 import { PUBLISHER_SCHEMA } from "../../types/publisher";
 import Utilities from "../../utilities/Utilities";
@@ -340,68 +337,7 @@ export default <ServerRoute[]>[
 
             const { image } = request.payload as any;
 
-            const { mime } = imageType(image) ?? { mime: "" };
-
-            if (!Config.PUBLISHER_IMAGE_SUPPORTED_MIME_TYPES.includes(mime))
-            {
-                throw Boom.unsupportedMediaType(undefined, [
-                    {
-                        field: "image",
-                        error: "custom.publisher.image.not_supported",
-                    },
-                ]);
-            }
-
-            const { width, height } = imageSize(image);
-
-            if (width !== height)
-            {
-                throw Boom.badData(undefined, [
-                    {
-                        field: "image",
-                        error: "custom.publisher.image.must_be_square",
-                    },
-                ]);
-            }
-
-            const client = await Database.pool.connect();
-            await client.query("begin");
-
-            await client
-                .query(
-                    `update "publishers" set "has_image" = $1 where "id" = $2`,
-                    [ true, publisher.id ],
-                )
-                .catch(async () =>
-                {
-                    await client.query("rollback");
-
-                    throw Boom.badImplementation();
-                });
-
-            const s3Client = new S3({
-                endpoint: Config.AWS_ENDPOINT,
-                s3ForcePathStyle: true,
-            });
-
-            const upload = await s3Client
-                .upload({
-                    Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
-                    Key: publisher.id,
-                    Body: image,
-                })
-                .promise()
-                .catch(async () =>
-                {
-                    await client.query("rollback");
-
-                    throw Boom.badImplementation();
-                });
-
-            await client.query("commit");
-            client.release();
-
-            return { url: upload.Location };
+            return publisher.setImage(image);
         },
     },
     {

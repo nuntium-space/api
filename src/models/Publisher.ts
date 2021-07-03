@@ -10,6 +10,8 @@ import { Bundle } from "./Bundle";
 import { Organization } from "./Organization";
 import { User } from "./User";
 import { ISerializedPublisher, ICreatePublisher, IUpdatePublisher, IDatabasePublisher } from "../types/publisher";
+import imageType from "image-type";
+import imageSize from "image-size";
 
 export class Publisher implements ISerializable<ISerializedPublisher>
 {
@@ -284,6 +286,52 @@ export class Publisher implements ISerializable<ISerializedPublisher>
     public isOwnedByUser(user: User): boolean
     {
         return this.organization.owner.id === user.id;
+    }
+
+    public async setImage(image: any): Promise<{ url: string }>
+    {
+        const { mime } = imageType(image) ?? { mime: "" };
+
+        if (!Config.PUBLISHER_IMAGE_SUPPORTED_MIME_TYPES.includes(mime))
+        {
+            throw Boom.unsupportedMediaType(undefined, [
+                {
+                    field: "image",
+                    error: "custom.publisher.image.not_supported",
+                },
+            ]);
+        }
+
+        const { width, height } = imageSize(image);
+
+        if (width !== height)
+        {
+            throw Boom.badData(undefined, [
+                {
+                    field: "image",
+                    error: "custom.publisher.image.must_be_square",
+                },
+            ]);
+        }
+
+        const s3Client = new S3({
+            endpoint: Config.AWS_ENDPOINT,
+            s3ForcePathStyle: true,
+        });
+
+        const upload = await s3Client
+            .upload({
+                Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+                Key: this.id,
+                Body: image,
+            })
+            .promise()
+            .catch(() =>
+            {
+                throw Boom.badImplementation();
+            });
+
+        return { url: upload.Location };
     }
 
     public serialize(options?: {
