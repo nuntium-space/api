@@ -27,7 +27,7 @@ const accountLinkingRoutes: ServerRoute[] = [ "facebook", "google", "twitter" ].
 
             const hmac = Utilities.createHmac(authenticatedUser.id);
 
-            return h.redirect(`auth/${provider}?link=${hmac}`);
+            return h.redirect(`/auth/${provider}?link=${hmac}`);
         },
     };
 });
