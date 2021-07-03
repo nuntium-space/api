@@ -209,6 +209,11 @@ export default <ServerRoute[]>[
             if (await User.exists(profile.email))
             {
                 user = await User.retrieveWithEmail(profile.email);
+
+                if (!await Account.exists(user, "facebook"))
+                {
+                    throw Boom.forbidden(); // TODO: redirect to sign in page and show message to link account in settings
+                }
             }
             else
             {
@@ -216,10 +221,7 @@ export default <ServerRoute[]>[
                     email: profile.email,
                     full_name: profile.displayName,
                 });
-            }
 
-            if (!await Account.exists(user, "facebook"))
-            {
                 await Account.create({
                     user,
                     type: "facebook",
@@ -263,6 +265,11 @@ export default <ServerRoute[]>[
             if (await User.exists(profile.email))
             {
                 user = await User.retrieveWithEmail(profile.email);
+
+                if (!await Account.exists(user, "google"))
+                {
+                    throw Boom.forbidden(); // TODO: redirect to sign in page and show message to link account in settings
+                }
             }
             else
             {
@@ -270,10 +277,7 @@ export default <ServerRoute[]>[
                     email: profile.email,
                     full_name: profile.displayName,
                 });
-            }
 
-            if (!await Account.exists(user, "google"))
-            {
                 await Account.create({
                     user,
                     type: "google",
@@ -318,14 +322,16 @@ export default <ServerRoute[]>[
             if (await User.exists(profile.raw.email))
             {
                 user = await User.retrieveWithEmail(profile.raw.email);
+
+                if (!await Account.exists(user, "twitter"))
+                {
+                    throw Boom.forbidden(); // TODO: redirect to sign in page and show message to link account in settings
+                }
             }
             else
             {
                 user = await User.create({ email: profile.raw.email });
-            }
 
-            if (!await Account.exists(user, "twitter"))
-            {
                 await Account.create({
                     user,
                     type: "twitter",
