@@ -194,7 +194,9 @@ export default <ServerRoute[]>[
                 payload: PUBLISHER_SCHEMA.CREATE,
             },
             response: {
-                schema: PUBLISHER_SCHEMA.OBJ,
+                schema: Joi.object({
+                    id: Schema.ID.PUBLISHER.required(),
+                }),
             },
         },
         handler: async (request, h) =>
@@ -208,9 +210,7 @@ export default <ServerRoute[]>[
                 throw Boom.forbidden();
             }
 
-            const publisher = await Publisher.create(request.payload as any, organization);
-
-            return publisher.serialize({ for: authenticatedUser });
+            return Publisher.create(request.payload as any, organization);
         },
     },
     {
