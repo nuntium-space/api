@@ -1,3 +1,4 @@
+import { createHmac } from "crypto";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
@@ -8,7 +9,7 @@ const accountLinkingRoutes: ServerRoute[] = [ "facebook", "google", "twitter" ].
 {
     return {
         method: "GET",
-        path: "/users/{id}/accounts/link/facebook",
+        path: `/users/{id}/accounts/link/${provider}`,
         options: {
             validate: {
                 params: Joi.object({
@@ -25,12 +26,10 @@ const accountLinkingRoutes: ServerRoute[] = [ "facebook", "google", "twitter" ].
                 throw Boom.forbidden();
             }
 
-            // TODO:
-            // Generate HMAC to link user account (user id is not enough because it is not private)
+            const hmac = createHmac("sha512", process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD ?? "");
+            hmac.update(authenticatedUser.id);
 
-            const hmac = "TODO";
-
-            return h.redirect(`auth/${request.auth.strategy}?link=${hmac}`);
+            return h.redirect(`auth/${provider}?link=${hmac.digest("hex")}`);
         },
     };
 });

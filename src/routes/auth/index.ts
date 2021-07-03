@@ -1,5 +1,5 @@
 import Boom from "@hapi/boom";
-import crypto from "crypto";
+import { randomBytes } from "crypto";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Config } from "../../config/Config";
@@ -140,7 +140,7 @@ export default <ServerRoute[]>[
 
             const id = Utilities.id(Config.ID_PREFIXES.SIGN_IN_REQUEST);
 
-            const token = crypto.randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
+            const token = randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
 
             const expiresAt = new Date();
             expiresAt.setSeconds(expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS);
