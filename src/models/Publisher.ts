@@ -22,7 +22,6 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         private _url: string,
         public readonly organization: Organization,
         public readonly verified: boolean,
-        public readonly has_image: boolean,
         public readonly dns_txt_value: string,
     )
     {}
@@ -54,9 +53,9 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             .query(
                 `
                 insert into "publishers"
-                    ("id", "name", "url", "organization", "verified", "has_image", "dns_txt_value")
+                    ("id", "name", "url", "organization", "verified", "dns_txt_value")
                 values
-                    ($1, $2, $3, $4, $5, $6, $7)
+                    ($1, $2, $3, $4, $5, $6)
                 returning *
                 `,
                 [
@@ -64,7 +63,6 @@ export class Publisher implements ISerializable<ISerializedPublisher>
                     data.name,
                     data.url,
                     organization.id,
-                    false,
                     false,
                     crypto.randomBytes(Config.PUBLISHER_DNS_TXT_VALUE_BYTES).toString("hex"),
                 ],
@@ -338,17 +336,12 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         for?: User | INotExpandedResource,
     }): ISerializedPublisher
     {
-        let imageUrl: string | null = null;
+        const s3Client = new S3({
+            credentials: Config.AWS_CREDENTIALS,
+            endpoint: Config.AWS_ENDPOINT,
+        });
 
-        if (this.has_image)
-        {
-            const s3Client = new S3({
-                credentials: Config.AWS_CREDENTIALS,
-                endpoint: Config.AWS_ENDPOINT,
-            });
-
-            imageUrl = `${s3Client.endpoint.href}/${process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME}/${this.id}`;
-        }
+        const imageUrl = `${s3Client.endpoint.href}/${process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME}/${this.id}`;
 
         return {
             id: this.id,
@@ -370,7 +363,6 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             data.url,
             organization,
             data.verified,
-            data.has_image,
             data.dns_txt_value,
         );
     }

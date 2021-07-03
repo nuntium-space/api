@@ -9,7 +9,6 @@ export interface IDatabasePublisher
     url: string,
     organization: string,
     verified: boolean,
-    has_image: boolean,
     dns_txt_value: string,
 }
 
@@ -32,7 +31,7 @@ export interface ISerializedPublisher
     url: string,
     organization: ISerializedOrganization,
     verified: boolean,
-    imageUrl: string | null,
+    imageUrl: string,
 }
 
 export const PUBLISHER_SCHEMA = {
@@ -42,7 +41,7 @@ export const PUBLISHER_SCHEMA = {
         url: Schema.URL.required(),
         organization: ORGANIZATION_SCHEMA.OBJ.required(),
         verified: Schema.BOOLEAN.required(),
-        imageUrl: Schema.NULLABLE(Schema.STRING).required(),
+        imageUrl: Schema.STRING.required(),
         __metadata: Joi.object({
             is_author: Schema.BOOLEAN.required(),
             is_subscribed: Schema.BOOLEAN.required(),
