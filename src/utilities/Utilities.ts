@@ -1,4 +1,6 @@
+import Boom from "@hapi/boom";
 import { Request } from "@hapi/hapi";
+import { createHmac, timingSafeEqual } from "crypto";
 import cuid from "cuid";
 import readingTime from "reading-time";
 import { Session } from "../models/Session";
@@ -63,5 +65,23 @@ export default class Utilities
             session.user,
             session.user.type === "admin",
         ];
+    }
+
+    public static createHmac(value: string): string
+    {
+        if (!process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD)
+        {
+            throw Boom.badImplementation();
+        }
+
+        const hmac = createHmac("sha512", process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD);
+        hmac.update(value);
+
+        return hmac.digest("hex");
+    }
+
+    public static verifyHmac(hmac: string, value: string): boolean
+    {
+        return timingSafeEqual(Buffer.from(hmac), Buffer.from(Utilities.createHmac(value)));
     }
 }

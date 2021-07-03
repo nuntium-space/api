@@ -1,4 +1,3 @@
-import { createHmac } from "crypto";
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
@@ -26,15 +25,9 @@ const accountLinkingRoutes: ServerRoute[] = [ "facebook", "google", "twitter" ].
                 throw Boom.forbidden();
             }
 
-            if (!process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD)
-            {
-                throw Boom.badImplementation();
-            }
+            const hmac = Utilities.createHmac(authenticatedUser.id);
 
-            const hmac = createHmac("sha512", process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD);
-            hmac.update(authenticatedUser.id);
-
-            return h.redirect(`auth/${provider}?link=${hmac.digest("hex")}`);
+            return h.redirect(`auth/${provider}?link=${hmac}`);
         },
     };
 });
