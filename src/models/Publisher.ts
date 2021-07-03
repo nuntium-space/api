@@ -12,6 +12,7 @@ import { User } from "./User";
 import { ISerializedPublisher, ICreatePublisher, IUpdatePublisher, IDatabasePublisher } from "../types/publisher";
 import imageType from "image-type";
 import imageSize from "image-size";
+import jdenticon from "jdenticon";
 
 export class Publisher implements ISerializable<ISerializedPublisher>
 {
@@ -46,7 +47,6 @@ export class Publisher implements ISerializable<ISerializedPublisher>
         const id = Utilities.id(Config.ID_PREFIXES.PUBLISHER);
 
         const client = await Database.pool.connect();
-
         await client.query("begin");
 
         const result = await client
@@ -90,10 +90,14 @@ export class Publisher implements ISerializable<ISerializedPublisher>
             });
 
         await client.query("commit");
-
         client.release();
 
-        return Publisher.deserialize(result.rows[0]);
+        const publisher = await Publisher.deserialize(result.rows[0]);
+
+        const png = jdenticon.toPng(publisher.id, 500, { backColor: "#ffffff" });
+        publisher.setImage(png);
+
+        return publisher;
     }
 
     public static async retrieve(id: string): Promise<Publisher>
