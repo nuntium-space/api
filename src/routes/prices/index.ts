@@ -79,9 +79,7 @@ export default <ServerRoute[]>[
                 payload: PRICE_SCHEMA.CREATE,
             },
             response: {
-                schema: Joi.object({
-                    id: Schema.ID.PRICE.required(),
-                }),
+                schema: Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PRICE),
             },
         },
         handler: async (request, h) =>

@@ -107,9 +107,7 @@ export default <ServerRoute[]>[
                 payload: BUNDLE_SCHEMA.CREATE,
             },
             response: {
-                schema: Joi.object({
-                    id: Schema.ID.BUNDLE.required(),
-                }),
+                schema: Schema.NOT_EXPANDED_RESOURCE(Schema.ID.BUNDLE),
             },
         },
         handler: async (request, h) =>

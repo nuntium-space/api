@@ -194,9 +194,7 @@ export default <ServerRoute[]>[
                 payload: PUBLISHER_SCHEMA.CREATE,
             },
             response: {
-                schema: Joi.object({
-                    id: Schema.ID.PUBLISHER.required(),
-                }),
+                schema: Schema.NOT_EXPANDED_RESOURCE(Schema.ID.PUBLISHER),
             },
         },
         handler: async (request, h) =>

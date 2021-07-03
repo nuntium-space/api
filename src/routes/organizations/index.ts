@@ -147,9 +147,7 @@ export default <ServerRoute[]>[
                 payload: ORGANIZATION_SCHEMA.CREATE,
             },
             response: {
-                schema: Joi.object({
-                    id: Schema.ID.ORGANIZATION.required(),
-                }),
+                schema: Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
             },
         },
         handler: async (request, h) =>
