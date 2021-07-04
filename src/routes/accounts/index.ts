@@ -29,8 +29,9 @@ const accountLinkingRoutes: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider =
             }
 
             const hmac = Utilities.createHmac(authenticatedUser.id);
+            const redirectTo = `${Config.CLIENT_URL}/settings/security`;
 
-            return h.redirect(`/auth/${provider.id}?link=${hmac}--${authenticatedUser.id}`);
+            return h.redirect(`/auth/${provider.id}?link=${hmac}--${authenticatedUser.id}&redirectTo=${redirectTo}`);
         },
     };
 });
