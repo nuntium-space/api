@@ -1,5 +1,7 @@
 # api
 
+[![Deployment](https://github.com/nuntium-space/api/actions/workflows/cd.yml/badge.svg)](https://github.com/nuntium-space/api/actions/workflows/cd.yml)
+
 ## Article lifecycle
 
 ### Creation
