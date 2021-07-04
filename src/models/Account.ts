@@ -93,11 +93,17 @@ export class Account
         return Account.deserialize(result.rows[0]);
     }
 
-    public static async retrieveWithExternalId(id: string): Promise<Account>
+    public static async retrieveWithTypeAndExternalId(type: string, externalId: string): Promise<Account>
     {
         const result = await Database.pool.query(
-            `select * from "accounts" where "external_id" = $1`,
-            [ id ],
+            `
+            select *
+            from "accounts"
+            where
+                "type" = $1
+                and
+                "external_id" = $2`,
+            [ type, externalId ],
         );
 
         if (result.rowCount === 0)
@@ -143,16 +149,19 @@ export class Account
         return result.rows.length > 0;
     }
 
-    public static async existsWithExternalId(id: string): Promise<boolean>
+    public static async existsWithTypeAndExternalId(type: string, externalId: string): Promise<boolean>
     {
         const result = await Database.pool.query(
             `
             select 1
             from "accounts"
-            where "external_id" = $1
+            where
+                "type" = $1
+                and
+                "external_id" = $2
             limit 1
             `,
-            [ id ],
+            [ type, externalId ],
         );
 
         return result.rows.length > 0;

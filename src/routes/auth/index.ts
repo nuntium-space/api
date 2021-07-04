@@ -50,15 +50,21 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider
                     throw Boom.conflict();
                 }
 
+                // An account cannot be linked to multiple users
+                if (await Account.existsWithTypeAndExternalId(provider.id, providerUserId))
+                {
+                    throw Boom.conflict();
+                }
+
                 await Account.create({
                     user,
                     type: provider.id,
                     external_id: providerUserId,
                 });
             }
-            else if (await Account.existsWithExternalId(providerUserId))
+            else if (await Account.existsWithTypeAndExternalId(provider.id, providerUserId))
             {
-                const account = await Account.retrieveWithExternalId(providerUserId);
+                const account = await Account.retrieveWithTypeAndExternalId(provider.id, providerUserId);
 
                 user = account.user;
             }
