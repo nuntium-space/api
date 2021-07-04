@@ -13,262 +13,248 @@ import { SESSION_SCHEMA } from "../../types/session";
 import { Email } from "../../utilities/Email";
 import { INotExpandedResource } from "../../common/INotExpandedResource";
 
-const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider =>
-{
+const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(
+  (provider) => {
     return {
-        method: [ "GET", "POST" ],
-        path: `/auth/${provider.id}`,
-        options: {
-            auth: provider.id,
-        },
-        handler: async (request, h) =>
-        {
-            if (!request.auth.isAuthenticated)
-            {
-                throw Boom.unauthorized();
-            }
+      method: ["GET", "POST"],
+      path: `/auth/${provider.id}`,
+      options: {
+        auth: provider.id,
+      },
+      handler: async (request, h) => {
+        if (!request.auth.isAuthenticated) {
+          throw Boom.unauthorized();
+        }
 
-            const profile = request.auth.credentials.profile;
-            const query = request.auth.credentials.query as { [ key: string ]: string } | undefined;
+        const profile = request.auth.credentials.profile;
+        const query = request.auth.credentials.query as
+          | { [key: string]: string }
+          | undefined;
 
-            let user: User | INotExpandedResource | string;
-            const providerUserId = provider.getId(profile);
+        let user: User | INotExpandedResource | string;
+        const providerUserId = provider.getId(profile);
 
-            if (query?.link)
-            {
-                const [ hmac, userId ] = query.link.split("--");
+        if (query?.link) {
+          const [hmac, userId] = query.link.split("--");
 
-                if (!Utilities.verifyHmac(hmac, userId))
-                {
-                    throw Boom.unauthorized();
-                }
+          if (!Utilities.verifyHmac(hmac, userId)) {
+            throw Boom.unauthorized();
+          }
 
-                user = userId;
+          user = userId;
 
-                if (await Account.exists(user, provider.id))
-                {
-                    throw Boom.conflict();
-                }
+          if (await Account.exists(user, provider.id)) {
+            throw Boom.conflict();
+          }
 
-                // An account cannot be linked to multiple users
-                if (await Account.existsWithTypeAndExternalId(provider.id, providerUserId))
-                {
-                    throw Boom.conflict();
-                }
+          // An account cannot be linked to multiple users
+          if (
+            await Account.existsWithTypeAndExternalId(
+              provider.id,
+              providerUserId
+            )
+          ) {
+            throw Boom.conflict();
+          }
 
-                await Account.create({
-                    user,
-                    type: provider.id,
-                    external_id: providerUserId,
-                });
-            }
-            else if (await Account.existsWithTypeAndExternalId(provider.id, providerUserId))
-            {
-                const account = await Account.retrieveWithTypeAndExternalId(provider.id, providerUserId);
+          await Account.create({
+            user,
+            type: provider.id,
+            external_id: providerUserId,
+          });
+        } else if (
+          await Account.existsWithTypeAndExternalId(provider.id, providerUserId)
+        ) {
+          const account = await Account.retrieveWithTypeAndExternalId(
+            provider.id,
+            providerUserId
+          );
 
-                user = account.user;
-            }
-            else if (await User.existsWithEmail(provider.getEmail(profile)))
-            {
-                return h.redirect(`${Config.CLIENT_URL}/signin?error=account-not-linked`);
-            }
-            else
-            {
-                user = await User.create({
-                    email: provider.getEmail(profile),
-                    full_name: provider.getFullName(profile),
-                });
+          user = account.user;
+        } else if (await User.existsWithEmail(provider.getEmail(profile))) {
+          return h.redirect(
+            `${Config.CLIENT_URL}/signin?error=account-not-linked`
+          );
+        } else {
+          user = await User.create({
+            email: provider.getEmail(profile),
+            full_name: provider.getFullName(profile),
+          });
 
-                await Account.create({
-                    user,
-                    type: provider.id,
-                    external_id: providerUserId,
-                });
-            }
+          await Account.create({
+            user,
+            type: provider.id,
+            external_id: providerUserId,
+          });
+        }
 
-            const session = await Session.create(user);
+        const session = await Session.create(user);
 
-            request.cookieAuth.set({ id: session.id });
+        request.cookieAuth.set({ id: session.id });
 
-            const redirectUrl = new URL(Config.CLIENT_URL);
-            redirectUrl.pathname = query?.redirectTo ?? "";
+        const redirectUrl = new URL(Config.CLIENT_URL);
+        redirectUrl.pathname = query?.redirectTo ?? "";
 
-            return h.redirect(redirectUrl.toString());
-        },
+        return h.redirect(redirectUrl.toString());
+      },
     };
-});
+  }
+);
 
 export default <ServerRoute[]>[
-    {
-        method: "GET",
-        path: "/auth/email/{token}",
-        options: {
-            auth: false,
-            validate: {
-                params: Joi.object({
-                    token: Schema.STRING.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const result = await Database.pool
-                .query(
-                    `select * from "sign_in_requests" where "token" = $1`,
-                    [ request.params.token ],
-                );
-
-            if (result.rowCount === 0)
-            {
-                throw Boom.notFound();
-            }
-
-            if
-            (
-                result.rows[0].expires_at < new Date()
-                || result.rows[0].session !== null
-            )
-            {
-                throw Boom.forbidden();
-            }
-
-            const user = await User.retrieve(result.rows[0].user);
-
-            const session = await Session.create(user);
-
-            await Database.pool
-                .query(
-                    `update "sign_in_requests" set "session" = $1 where "id" = $2`,
-                    [ session.id, result.rows[0].id ],
-                );
-
-            return h.response();
-        },
+  {
+    method: "GET",
+    path: "/auth/email/{token}",
+    options: {
+      auth: false,
+      validate: {
+        params: Joi.object({
+          token: Schema.STRING.required(),
+        }),
+      },
     },
-    {
-        method: "GET",
-        path: "/auth/email/requests/{id}",
-        options: {
-            auth: false,
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.SIGN_IN_REQUEST.required(),
-                }),
-            },
-            response: {
-                schema: Joi.object({
-                    session: SESSION_SCHEMA.OBJ.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const result = await Database.pool
-                .query(
-                    `select * from "sign_in_requests" where "id" = $1`,
-                    [ request.params.id ],
-                );
+    handler: async (request, h) => {
+      const result = await Database.pool.query(
+        `select * from "sign_in_requests" where "token" = $1`,
+        [request.params.token]
+      );
 
-            if (result.rowCount === 0 || !result.rows[0].session)
-            {
-                throw Boom.notFound();
-            }
+      if (result.rowCount === 0) {
+        throw Boom.notFound();
+      }
 
-            if (result.rows[0].expires_at < new Date())
-            {
-                throw Boom.forbidden();
-            }
+      if (
+        result.rows[0].expires_at < new Date() ||
+        result.rows[0].session !== null
+      ) {
+        throw Boom.forbidden();
+      }
 
-            await Database.pool
-                .query(
-                    `delete from "sign_in_requests" where "id" = $1`,
-                    [ result.rows[0].id ],
-                );
+      const user = await User.retrieve(result.rows[0].user);
 
-            const user = await User.retrieve(result.rows[0].user);
+      const session = await Session.create(user);
 
-            const session = await Session.retrieve(result.rows[0].session);
+      await Database.pool.query(
+        `update "sign_in_requests" set "session" = $1 where "id" = $2`,
+        [session.id, result.rows[0].id]
+      );
 
-            request.cookieAuth.set({ id: session.id });
-
-            return { session: session.serialize({ for: user }) };
-        },
+      return h.response();
     },
-    {
-        method: "POST",
-        path: "/auth/email",
-        options: {
-            auth: false,
-            validate: {
-                payload: SESSION_SCHEMA.CREATE,
-            },
-            response: {
-                schema: Joi.object({
-                    id: Schema.ID.SIGN_IN_REQUEST.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const { email } = request.payload as any;
+  },
+  {
+    method: "GET",
+    path: "/auth/email/requests/{id}",
+    options: {
+      auth: false,
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.SIGN_IN_REQUEST.required(),
+        }),
+      },
+      response: {
+        schema: Joi.object({
+          session: SESSION_SCHEMA.OBJ.required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const result = await Database.pool.query(
+        `select * from "sign_in_requests" where "id" = $1`,
+        [request.params.id]
+      );
 
-            let user: User | INotExpandedResource;
+      if (result.rowCount === 0 || !result.rows[0].session) {
+        throw Boom.notFound();
+      }
 
-            if (await User.existsWithEmail(email))
-            {
-                user = await User.retrieveWithEmail(email);
-            }
-            else
-            {
-                user = await User.create({ email });
-            }
+      if (result.rows[0].expires_at < new Date()) {
+        throw Boom.forbidden();
+      }
 
-            const id = Utilities.id(Config.ID_PREFIXES.SIGN_IN_REQUEST);
+      await Database.pool.query(
+        `delete from "sign_in_requests" where "id" = $1`,
+        [result.rows[0].id]
+      );
 
-            const token = randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString("hex");
+      const user = await User.retrieve(result.rows[0].user);
 
-            const expiresAt = new Date();
-            expiresAt.setSeconds(expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS);
+      const session = await Session.retrieve(result.rows[0].session);
 
-            const client = await Database.pool.connect();
-            await client.query("begin");
+      request.cookieAuth.set({ id: session.id });
 
-            await client
-                .query(
-                    `
+      return { session: session.serialize({ for: user }) };
+    },
+  },
+  {
+    method: "POST",
+    path: "/auth/email",
+    options: {
+      auth: false,
+      validate: {
+        payload: SESSION_SCHEMA.CREATE,
+      },
+      response: {
+        schema: Joi.object({
+          id: Schema.ID.SIGN_IN_REQUEST.required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const { email } = request.payload as any;
+
+      let user: User | INotExpandedResource;
+
+      if (await User.existsWithEmail(email)) {
+        user = await User.retrieveWithEmail(email);
+      } else {
+        user = await User.create({ email });
+      }
+
+      const id = Utilities.id(Config.ID_PREFIXES.SIGN_IN_REQUEST);
+
+      const token = randomBytes(Config.SIGN_IN_REQUEST_TOKEN_BYTES).toString(
+        "hex"
+      );
+
+      const expiresAt = new Date();
+      expiresAt.setSeconds(
+        expiresAt.getSeconds() + Config.SIGN_IN_REQUEST_DURATION_IN_SECONDS
+      );
+
+      const client = await Database.pool.connect();
+      await client.query("begin");
+
+      await client
+        .query(
+          `
                     insert into "sign_in_requests"
                         ("id", "token", "user", "expires_at")
                     values
                         ($1, $2, $3, $4)
                     `,
-                    [
-                        id,
-                        token,
-                        user.id,
-                        expiresAt.toISOString(),
-                    ],
-                )
-                .catch(async () =>
-                {
-                    await client.query("rollback");
+          [id, token, user.id, expiresAt.toISOString()]
+        )
+        .catch(async () => {
+          await client.query("rollback");
 
-                    throw Boom.badImplementation();
-                });
+          throw Boom.badImplementation();
+        });
 
-            await Email.send({
-                to: user,
-                type: Email.TYPE.AUTH,
-                replace: {
-                    API_URL: Config.API_URL,
-                    TOKEN: token,
-                },
-            });
-
-            await client.query("commit");
-            client.release();
-
-            return { id };
+      await Email.send({
+        to: user,
+        type: Email.TYPE.AUTH,
+        replace: {
+          API_URL: Config.API_URL,
+          TOKEN: token,
         },
+      });
+
+      await client.query("commit");
+      client.release();
+
+      return { id };
     },
-    ...authProvidersEndpoints,
+  },
+  ...authProvidersEndpoints,
 ];

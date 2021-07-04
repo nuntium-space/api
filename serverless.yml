@@ -1,14 +1,14 @@
 service: api
 
 useDotenv: true
-variablesResolutionMode: '20210326'
+variablesResolutionMode: "20210326"
 
 provider:
   name: aws
   runtime: nodejs14.x
   stage: ${opt:stage, self:custom.defaultStage}
   region: us-east-1
-  lambdaHashingVersion: '20201221'
+  lambdaHashingVersion: "20201221"
 
 plugins:
   - serverless-plugin-typescript

@@ -12,11 +12,13 @@ jobs:
       - name: checkout
         uses: actions/checkout@master
 
-      - name: dependencies
+      - name: setup
         uses: actions/setup-node@master
         with:
           node-version: "14"
-      - run: npm ci
+
+      - name: dependencies
+        run: npm ci
 
       - name: deploy
         run: npx serverless deploy --stage ${{ secrets.SERVERLESS_STAGE }}

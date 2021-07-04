@@ -1,0 +1,26 @@
+name: Prettier
+
+on: push
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+
+      - name: setup
+        uses: actions/setup-node@master
+        with:
+          node-version: "14"
+
+      - name: dependencies
+        run: npm ci
+
+      - name: format
+        run: npx prettier --write .
+
+      - name: commit
+        uses: stefanzweifel/git-auto-commit-action@master
+        with:
+          commit_message: Apply formatting changes

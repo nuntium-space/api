@@ -2,216 +2,213 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedPrice, ICreatePrice, IUpdatePrice, IDatabasePrice } from "../types/price";
+import {
+  ISerializedPrice,
+  ICreatePrice,
+  IUpdatePrice,
+  IDatabasePrice,
+} from "../types/price";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { User } from "./User";
 
-export class Price implements ISerializable<ISerializedPrice>
-{
-    private constructor
-    (
-        public readonly id: string,
-        public readonly amount: number,
-        public readonly currency: string,
-        public readonly bundle: Bundle | INotExpandedResource,
-        private _active: boolean,
-        public readonly stripe_price_id: string | null,
-    )
-    {}
+export class Price implements ISerializable<ISerializedPrice> {
+  private constructor(
+    public readonly id: string,
+    public readonly amount: number,
+    public readonly currency: string,
+    public readonly bundle: Bundle | INotExpandedResource,
+    private _active: boolean,
+    public readonly stripe_price_id: string | null
+  ) {}
 
-    public get active(): boolean
-    {
-        return this._active;
+  public get active(): boolean {
+    return this._active;
+  }
+
+  public static async create(
+    data: ICreatePrice,
+    bundle: Bundle
+  ): Promise<INotExpandedResource> {
+    if (!bundle.stripe_product_id) {
+      throw Boom.badImplementation();
     }
 
-    public static async create(data: ICreatePrice, bundle: Bundle): Promise<INotExpandedResource>
-    {
-        if (!bundle.stripe_product_id)
+    const currencyConfig = Config.CURRENCIES.find(
+      (c) => c.name === data.currency
+    );
+
+    if (!currencyConfig) {
+      throw Boom.badData(undefined, [
         {
-            throw Boom.badImplementation();
-        }
+          field: "currency",
+          error: "custom.price.currency.not_supported",
+        },
+      ]);
+    }
 
-        const currencyConfig = Config.CURRENCIES.find(c => c.name === data.currency);
-
-        if (!currencyConfig)
+    if (data.amount < currencyConfig.min) {
+      throw Boom.badData(undefined, [
         {
-            throw Boom.badData(undefined, [
-                {
-                    field: "currency",
-                    error: "custom.price.currency.not_supported",
-                },
-            ]);
-        }
+          field: "amount",
+          error: "custom.price.amount.not_enough",
+          params: {
+            MIN_AMOUNT: Utilities.formatCurrencyAmount(
+              currencyConfig.min,
+              data.currency
+            ),
+            CURRENCY: data.currency,
+          },
+        },
+      ]);
+    }
 
-        if (data.amount < currencyConfig.min)
-        {
-            throw Boom.badData(undefined, [
-                {
-                    field: "amount",
-                    error: "custom.price.amount.not_enough",
-                    params: {
-                        MIN_AMOUNT: Utilities.formatCurrencyAmount(currencyConfig.min, data.currency),
-                        CURRENCY: data.currency,
-                    },
-                },
-            ]);
-        }
+    const id = Utilities.id(Config.ID_PREFIXES.PRICE);
 
-        const id = Utilities.id(Config.ID_PREFIXES.PRICE);
+    const client = await Database.pool.connect();
+    await client.query("begin");
 
-        const client = await Database.pool.connect();
-        await client.query("begin");
-
-        const result = await client
-            .query(
-                `
+    const result = await client
+      .query(
+        `
                 insert into "prices"
                     ("id", "amount", "currency", "bundle", "active")
                 values
                     ($1, $2, $3, $4, $5)
                 returning *
                 `,
-                [
-                    id,
-                    data.amount,
-                    data.currency,
-                    bundle.id,
-                    true,
-                ],
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
+        [id, data.amount, data.currency, bundle.id, true]
+      )
+      .catch(async () => {
+        await client.query("rollback");
 
-                throw Boom.badRequest();
-            });
+        throw Boom.badRequest();
+      });
 
-        await Config.STRIPE.prices
-            .create({
-                product: bundle.stripe_product_id,
-                unit_amount: data.amount,
-                currency: data.currency,
-                recurring: {
-                    interval: "month",
-                },
-                metadata: {
-                    price_id: result.rows[0].id,
-                },
-            })
-            .catch(async () =>
-            {
-                await client.query("rollback");
+    await Config.STRIPE.prices
+      .create({
+        product: bundle.stripe_product_id,
+        unit_amount: data.amount,
+        currency: data.currency,
+        recurring: {
+          interval: "month",
+        },
+        metadata: {
+          price_id: result.rows[0].id,
+        },
+      })
+      .catch(async () => {
+        await client.query("rollback");
 
-                throw Boom.badRequest();
-            });
+        throw Boom.badRequest();
+      });
 
-        await client.query("commit");
-        client.release();
+    await client.query("commit");
+    client.release();
 
-        return { id };
+    return { id };
+  }
+
+  public static async retrieve(id: string, expand?: string[]): Promise<Price> {
+    const result = await Database.pool.query(
+      `select * from "prices" where "id" = $1`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public static async retrieve(id: string, expand?: string[]): Promise<Price>
-    {
-        const result = await Database.pool.query(
-            `select * from "prices" where "id" = $1`,
-            [ id ],
-        );
+    return Price.deserialize(result.rows[0], expand);
+  }
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
-
-        return Price.deserialize(result.rows[0], expand);
+  public async update(data: IUpdatePrice): Promise<void> {
+    if (!this.stripe_price_id) {
+      throw Boom.badImplementation();
     }
 
-    public async update(data: IUpdatePrice): Promise<void>
-    {
-        if (!this.stripe_price_id)
-        {
-            throw Boom.badImplementation();
-        }
+    this._active = data.active ?? this.active;
 
-        this._active = data.active ?? this.active;
+    const client = await Database.pool.connect();
 
-        const client = await Database.pool.connect();
+    await client.query("begin");
 
-        await client.query("begin");
+    await client.query(`update "prices" set "active" = $1 where "id" = $2`, [
+      this.active,
+      this.id,
+    ]);
 
-        await client.query(
-            `update "prices" set "active" = $1 where "id" = $2`,
-            [ this.active, this.id ],
-        );
+    await Config.STRIPE.prices
+      .update(this.stripe_price_id, {
+        active: this.active,
+      })
+      .catch(async () => {
+        await client.query("rollback");
 
-        await Config.STRIPE.prices
-            .update(
-                this.stripe_price_id,
-                {
-                    active: this.active,
-                },
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
+        throw Boom.badRequest();
+      });
 
-                throw Boom.badRequest();
-            });
+    await client.query("commit");
 
-        await client.query("commit");
+    client.release();
+  }
 
-        client.release();
+  public static async forBundle(
+    bundle: Bundle,
+    options?: {
+      active?: boolean;
+      expand?: string[];
+    }
+  ): Promise<Price[]> {
+    let query = `select * from "prices" where "bundle" = $1`;
+    const params: any[] = [bundle.id];
+
+    if (options && typeof options.active === "boolean") {
+      query += `and "active" = $2`;
+      params.push(options.active);
     }
 
-    public static async forBundle(bundle: Bundle, options?: {
-        active?: boolean,
-        expand?: string[],
-    }): Promise<Price[]>
-    {
-        let query = `select * from "prices" where "bundle" = $1`;
-        const params: any[] = [ bundle.id ];
+    const result = await Database.pool.query(query, params);
 
-        if (options && typeof options.active === "boolean")
-        {
-            query += `and "active" = $2`;
-            params.push(options.active);
-        }
+    return Promise.all(
+      result.rows.map((row) => Price.deserialize(row, options?.expand))
+    );
+  }
 
-        const result = await Database.pool.query(query, params);
+  public serialize(options?: {
+    for?: User | INotExpandedResource;
+  }): ISerializedPrice {
+    return {
+      id: this.id,
+      amount: this.amount,
+      currency: this.currency,
+      bundle:
+        this.bundle instanceof Bundle
+          ? this.bundle.serialize({ for: options?.for })
+          : this.bundle,
+      active: this.active,
+    };
+  }
 
-        return Promise.all(result.rows.map(row => Price.deserialize(row, options?.expand)));
-    }
+  private static async deserialize(
+    data: IDatabasePrice,
+    expand?: string[]
+  ): Promise<Price> {
+    const bundle = expand?.includes("bundle")
+      ? await Bundle.retrieve(
+          data.bundle,
+          Utilities.getNestedExpandQuery(expand, "bundle")
+        )
+      : { id: data.bundle };
 
-    public serialize(options?: {
-        for?: User | INotExpandedResource,
-    }): ISerializedPrice
-    {
-        return {
-            id: this.id,
-            amount: this.amount,
-            currency: this.currency,
-            bundle: this.bundle instanceof Bundle
-                ? this.bundle.serialize({ for: options?.for })
-                : this.bundle,
-            active: this.active,
-        };
-    }
-
-    private static async deserialize(data: IDatabasePrice, expand?: string[]): Promise<Price>
-    {
-        const bundle = expand?.includes("bundle")
-            ? await Bundle.retrieve(data.bundle, Utilities.getNestedExpandQuery(expand, "bundle"))
-            : { id: data.bundle };
-
-        return new Price(
-            data.id,
-            data.amount,
-            data.currency,
-            bundle,
-            data.active,
-            data.stripe_price_id,
-        );
-    }
+    return new Price(
+      data.id,
+      data.amount,
+      data.currency,
+      bundle,
+      data.active,
+      data.stripe_price_id
+    );
+  }
 }

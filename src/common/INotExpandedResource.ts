@@ -1,4 +1,3 @@
-export interface INotExpandedResource
-{
-    id: string,
+export interface INotExpandedResource {
+  id: string;
 }

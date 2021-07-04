@@ -6,51 +6,47 @@ import Database from "../utilities/Database";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
-export class Author implements ISerializable<ISerializedAuthor>
-{
-    private constructor
-    (
-        public readonly id: string,
-        public readonly user: User | INotExpandedResource,
-        public readonly publisher: Publisher | INotExpandedResource,
-    )
-    {}
+export class Author implements ISerializable<ISerializedAuthor> {
+  private constructor(
+    public readonly id: string,
+    public readonly user: User | INotExpandedResource,
+    public readonly publisher: Publisher | INotExpandedResource
+  ) {}
 
-    //////////
-    // CRUD //
-    //////////
+  //////////
+  // CRUD //
+  //////////
 
-    public static async retrieve(id: string, expand?: string[]): Promise<Author>
-    {
-        const result = await Database.pool.query(
-            `select * from "authors" where "id" = $1`,
-            [ id ],
-        );
+  public static async retrieve(id: string, expand?: string[]): Promise<Author> {
+    const result = await Database.pool.query(
+      `select * from "authors" where "id" = $1`,
+      [id]
+    );
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
-
-        return Author.deserialize(result.rows[0], expand);
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public async delete(): Promise<void>
-    {
-        await Database.pool.query(
-            `delete from "authors" where "id" = $1`,
-            [ this.id ],
-        );
-    }
+    return Author.deserialize(result.rows[0], expand);
+  }
 
-    ///////////////
-    // UTILITIES //
-    ///////////////
+  public async delete(): Promise<void> {
+    await Database.pool.query(`delete from "authors" where "id" = $1`, [
+      this.id,
+    ]);
+  }
 
-    public static async retrieveWithUserAndPublisher(user: User | string, publisher: Publisher | string, expand?: string[]): Promise<Author>
-    {
-        const result = await Database.pool.query(
-            `
+  ///////////////
+  // UTILITIES //
+  ///////////////
+
+  public static async retrieveWithUserAndPublisher(
+    user: User | string,
+    publisher: Publisher | string,
+    expand?: string[]
+  ): Promise<Author> {
+    const result = await Database.pool.query(
+      `
             select *
             from "authors"
             where
@@ -59,77 +55,79 @@ export class Author implements ISerializable<ISerializedAuthor>
                 "publisher" = $2
             limit 1
             `,
-            [
-                user instanceof User
-                    ? user.id
-                    : user,
-                publisher instanceof Publisher
-                    ? publisher.id
-                    : publisher,
-            ],
-        );
+      [
+        user instanceof User ? user.id : user,
+        publisher instanceof Publisher ? publisher.id : publisher,
+      ]
+    );
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
-
-        return Author.deserialize(result.rows[0], expand);
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public static async forPublisher(publisher: Publisher, expand?: string[]): Promise<Author[]>
-    {
-        const result = await Database.pool.query(
-            `select * from "authors" where "publisher" = $1`,
-            [ publisher.id ],
-        );
+    return Author.deserialize(result.rows[0], expand);
+  }
 
-        return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
-    }
+  public static async forPublisher(
+    publisher: Publisher,
+    expand?: string[]
+  ): Promise<Author[]> {
+    const result = await Database.pool.query(
+      `select * from "authors" where "publisher" = $1`,
+      [publisher.id]
+    );
 
-    public static async forUser(user: User, expand?: string[]): Promise<Author[]>
-    {
-        const result = await Database.pool.query(
-            `select * from "authors" where "user" = $1`,
-            [ user.id ],
-        );
+    return Promise.all(
+      result.rows.map((row) => Author.deserialize(row, expand))
+    );
+  }
 
-        return Promise.all(result.rows.map(row => Author.deserialize(row, expand)));
-    }
+  public static async forUser(
+    user: User,
+    expand?: string[]
+  ): Promise<Author[]> {
+    const result = await Database.pool.query(
+      `select * from "authors" where "user" = $1`,
+      [user.id]
+    );
 
-    ///////////////////
-    // SERIALIZATION //
-    ///////////////////
+    return Promise.all(
+      result.rows.map((row) => Author.deserialize(row, expand))
+    );
+  }
 
-    public serialize(options?: {
-        for?: User | INotExpandedResource,
-    }): ISerializedAuthor
-    {
-        return {
-            id: this.id,
-            user: this.user instanceof User
-                ? this.user.serialize({ for: options?.for })
-                : this.user,
-            publisher: this.publisher instanceof Publisher
-                ? this.publisher.serialize({ for: options?.for })
-                : this.publisher,
-        };
-    }
+  ///////////////////
+  // SERIALIZATION //
+  ///////////////////
 
-    private static async deserialize(data: IDatabaseAuthor, expand?: string[]): Promise<Author>
-    {
-        const user = expand?.includes("user")
-            ? await User.retrieve(data.user)
-            : { id: data.user };
+  public serialize(options?: {
+    for?: User | INotExpandedResource;
+  }): ISerializedAuthor {
+    return {
+      id: this.id,
+      user:
+        this.user instanceof User
+          ? this.user.serialize({ for: options?.for })
+          : this.user,
+      publisher:
+        this.publisher instanceof Publisher
+          ? this.publisher.serialize({ for: options?.for })
+          : this.publisher,
+    };
+  }
 
-        const publisher = expand?.includes("publisher")
-            ? await Publisher.retrieve(data.publisher)
-            : { id: data.publisher };
+  private static async deserialize(
+    data: IDatabaseAuthor,
+    expand?: string[]
+  ): Promise<Author> {
+    const user = expand?.includes("user")
+      ? await User.retrieve(data.user)
+      : { id: data.user };
 
-        return new Author(
-            data.id,
-            user,
-            publisher,
-        );
-    }
+    const publisher = expand?.includes("publisher")
+      ? await Publisher.retrieve(data.publisher)
+      : { id: data.publisher };
+
+    return new Author(data.id, user, publisher);
+  }
 }
