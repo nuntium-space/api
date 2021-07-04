@@ -70,7 +70,7 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider
             }
             else if (await User.existsWithEmail(provider.getEmail(profile)))
             {
-                return h.redirect(Config.CLIENT_URL); // TODO: Redirect to sign in page and tell to sign in with a linked account and then link this one
+                return h.redirect(`${Config.CLIENT_URL}/signin?error=account-not-linked`);
             }
             else
             {
