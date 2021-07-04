@@ -68,6 +68,10 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider
 
                 user = account.user;
             }
+            else if (await User.existsWithEmail(provider.getEmail(profile)))
+            {
+                return h.redirect(Config.CLIENT_URL); // TODO: Redirect to sign in page and tell to sign in with a linked account and then link this one
+            }
             else
             {
                 user = await User.create({
@@ -210,7 +214,7 @@ export default <ServerRoute[]>[
 
             let user: User | INotExpandedResource;
 
-            if (await User.exists(email))
+            if (await User.existsWithEmail(email))
             {
                 user = await User.retrieveWithEmail(email);
             }

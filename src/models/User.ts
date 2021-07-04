@@ -124,14 +124,18 @@ export class User implements ISerializable<ISerializedUser>
         return User.deserialize(result.rows[0]);
     }
 
-    public static async exists(email: string): Promise<boolean>
+    public static async existsWithEmail(email: string): Promise<boolean>
     {
         const result = await Database.pool.query(
-            `select count(*) as "count" from "users" where "email" = $1 limit 1`,
+            `
+            select 1
+            from "users"
+            where "email" = $1
+            limit 1`,
             [ email ],
         );
 
-        return result.rows[0].count > 0;
+        return result.rows.length > 0;
     }
 
     public async update(data: IUpdateUser): Promise<void>
@@ -354,14 +358,15 @@ export class User implements ISerializable<ISerializedUser>
         const authorCountResult = await Database.pool
             .query(
                 `
-                select count(*) as "count"
+                select 1
                 from "authors"
                 where "user" = $1
+                limit 1
                 `,
                 [ this.id ],
             );
 
-        if (authorCountResult.rows[0].count > 0)
+        if (authorCountResult.rows.length > 0)
         {
             return false;
         }
@@ -369,7 +374,7 @@ export class User implements ISerializable<ISerializedUser>
         const authorCountForOwnedPublishersResult = await Database.pool
             .query(
                 `
-                select count(*) as "count"
+                select 1
                 from
                     "publishers" as "p"
                     inner join
@@ -379,11 +384,12 @@ export class User implements ISerializable<ISerializedUser>
                     "authors" as "a"
                     on "a"."publisher" = "p"."id"
                 where "o"."user" = $1
+                limit 1
                 `,
                 [ this.id ],
             );
 
-        return authorCountForOwnedPublishersResult.rows[0].count === BigInt(0);
+        return authorCountForOwnedPublishersResult.rows.length === 0;
     }
 
     public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
@@ -391,7 +397,7 @@ export class User implements ISerializable<ISerializedUser>
         const result = await Database.pool
             .query(
                 `
-                select count(*) as "count"
+                select 1
                 from
                     "subscriptions" as s
                     inner join
@@ -403,11 +409,12 @@ export class User implements ISerializable<ISerializedUser>
                     "s"."user" = $1
                     and
                     "p"."bundle" = $2
+                limit 1
                 `,
                 [ this.id, bundle.id ],
             );
 
-        return result.rows[0].count === BigInt(0);
+        return result.rows.length === 0;
     }
 
     public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean>
@@ -415,17 +422,18 @@ export class User implements ISerializable<ISerializedUser>
         const result = await Database.pool
             .query(
                 `
-                select count(*) as "count"
+                select 1
                 from "authors"
                 where
                     "user" = $1
                     and
                     "publisher" = $2
+                limit 1
                 `,
                 [ this.id, publisher.id ],
             );
 
-        return result.rows[0].count > 0;
+        return result.rows.length > 0;
     }
 
     public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>
@@ -441,7 +449,7 @@ export class User implements ISerializable<ISerializedUser>
         const result = await Database.pool
             .query(
                 `
-                select count(*) as "count"
+                select 1
                 from
                     "v_active_subscriptions" as s
                     inner join
@@ -454,11 +462,12 @@ export class User implements ISerializable<ISerializedUser>
                     "user" = $1
                     and
                     "publisher" = $2
+                limit 1
                 `,
                 [ this.id, publisher.id ],
             );
 
-        return result.rows[0].count > 0;
+        return result.rows.length > 0;
     }
 
     public async hasActiveSubscriptions(): Promise<boolean>
@@ -466,14 +475,15 @@ export class User implements ISerializable<ISerializedUser>
         const result = await Database.pool
             .query(
                 `
-                select count(*) as "count"
+                select 1
                 from "v_active_subscriptions"
                 where "user" = $1
+                limit 1
                 `,
                 [ this.id ],
             );
 
-        return result.rows[0].count > 0;
+        return result.rows.length > 0;
     }
 
     public serialize(options?: {
