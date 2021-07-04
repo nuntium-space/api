@@ -1,13 +1,12 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedAccount, ICreateAccount, IDatabaseAccount } from "../types/account";
+import { ICreateAccount, IDatabaseAccount } from "../types/account";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Account implements ISerializable<ISerializedAccount>
+export class Account
 {
     private constructor
     (
@@ -153,17 +152,6 @@ export class Account implements ISerializable<ISerializedAccount>
     ///////////////////
     // SERIALIZATION //
     ///////////////////
-
-    public serialize(): ISerializedAccount
-    {
-        return {
-            id: this.id,
-            user: this.user instanceof User
-                ? this.user.serialize()
-                : this.user,
-            type: this.type,
-        };
-    }
 
     private static async deserialize(data: IDatabaseAccount, expand?: string[]): Promise<Account>
     {

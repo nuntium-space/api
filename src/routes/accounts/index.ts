@@ -4,6 +4,7 @@ import Joi from "joi";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Account } from "../../models/Account";
+import { ACCOUNT_SCHEMA } from "../../types/account";
 import Utilities from "../../utilities/Utilities";
 
 const accountLinkingRoutes: ServerRoute[] = Config.AUTH_PROVIDERS.map(provider =>
@@ -44,6 +45,9 @@ export default <ServerRoute[]>[
                     id: Schema.ID.USER.required(),
                 }),
             },
+            response: {
+                schema: Schema.ARRAY(ACCOUNT_SCHEMA.OBJ),
+            },
         },
         handler: async (request, h) =>
         {
@@ -56,7 +60,14 @@ export default <ServerRoute[]>[
 
             const accounts = await Account.forUser(authenticatedUser);
 
-            return accounts.map(_ => _.serialize());
+            return Promise.all(Config.AUTH_PROVIDERS.map(async _ =>
+            {
+                return {
+                    id: _.id,
+                    display_name: _.display_name,
+                    is_linked: accounts.find(account => account.type === _.id) instanceof Account,
+                };
+            }));
         },
     },
     ...accountLinkingRoutes,

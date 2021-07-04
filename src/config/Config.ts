@@ -96,18 +96,21 @@ export class Config
     public static readonly AUTH_PROVIDERS = [
         {
             id: "facebook",
+            display_name: "Facebook",
             getId: (profile: any) => profile.id,
             getEmail: (profile: any) => profile.email,
             getFullName: (profile: any) => profile.displayName,
         },
         {
             id: "google",
+            display_name: "Google",
             getId: (profile: any) => profile.id,
             getEmail: (profile: any) => profile.email,
             getFullName: (profile: any) => profile.displayName,
         },
         {
             id: "twitter",
+            display_name: "Twitter",
             getId: (profile: any) => profile.id,
             getEmail: (profile: any) => profile.raw.email,
             getFullName: (profile: any) => undefined,
