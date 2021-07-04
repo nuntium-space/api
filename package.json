@@ -38,6 +38,7 @@
     "@types/hapi__hapi": "^20.0.8",
     "@types/pg": "^8.6.0",
     "@types/qs": "^6.9.6",
+    "prettier": "^2.3.2",
     "serverless-localstack": "^0.4.32",
     "serverless-plugin-typescript": "^1.1.9",
     "ts-node-dev": "^1.1.6",

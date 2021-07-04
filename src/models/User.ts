@@ -2,154 +2,144 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedUser, ICreateUser, IUpdateUser, IUserSettings, IUpdateUserSettings, IDatabaseUser, UserType } from "../types/user";
+import {
+  ISerializedUser,
+  ICreateUser,
+  IUpdateUser,
+  IUserSettings,
+  IUpdateUserSettings,
+  IDatabaseUser,
+  UserType,
+} from "../types/user";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
-export class User implements ISerializable<ISerializedUser>
-{
-    private constructor
-    (
-        public readonly id: string,
-        public readonly type: UserType,
-        private _full_name: string | null,
-        private _email: string,
-        public readonly stripe_customer_id: string | null,
-    )
-    {}
+export class User implements ISerializable<ISerializedUser> {
+  private constructor(
+    public readonly id: string,
+    public readonly type: UserType,
+    private _full_name: string | null,
+    private _email: string,
+    public readonly stripe_customer_id: string | null
+  ) {}
 
-    public get full_name(): string | null
-    {
-        return this._full_name;
-    }
+  public get full_name(): string | null {
+    return this._full_name;
+  }
 
-    public get email(): string
-    {
-        return this._email;
-    }
+  public get email(): string {
+    return this._email;
+  }
 
-    public static async create(data: ICreateUser): Promise<INotExpandedResource>
-    {
-        const id = Utilities.id(Config.ID_PREFIXES.USER);
+  public static async create(data: ICreateUser): Promise<INotExpandedResource> {
+    const id = Utilities.id(Config.ID_PREFIXES.USER);
 
-        const client = await Database.pool.connect();
-        await client.query("begin");
+    const client = await Database.pool.connect();
+    await client.query("begin");
 
-        const result = await client
-            .query(
-                `
+    const result = await client
+      .query(
+        `
                 insert into "users"
                     ("id", "full_name", "email")
                 values
                     ($1, $2, $3)
                 returning *
                 `,
-                [
-                    id,
-                    data.full_name,
-                    data.email,
-                ],
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
+        [id, data.full_name, data.email]
+      )
+      .catch(async () => {
+        await client.query("rollback");
 
-                throw Boom.badRequest();
-            });
+        throw Boom.badRequest();
+      });
 
-        await Config.STRIPE.customers
-            .create({
-                email: data.email,
-                metadata: {
-                    user_id: result.rows[0].id,
-                },
-            })
-            .catch(async () =>
-            {
-                await client.query("rollback");
+    await Config.STRIPE.customers
+      .create({
+        email: data.email,
+        metadata: {
+          user_id: result.rows[0].id,
+        },
+      })
+      .catch(async () => {
+        await client.query("rollback");
 
-                throw Boom.badRequest();
-            });
+        throw Boom.badRequest();
+      });
 
-        await client.query("commit");
-        client.release();
+    await client.query("commit");
+    client.release();
 
-        return { id };
+    return { id };
+  }
+
+  public static async retrieve(id: string): Promise<User> {
+    const result = await Database.pool.query(
+      `select * from "users" where "id" = $1`,
+      [id]
+    );
+
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public static async retrieve(id: string): Promise<User>
-    {
-        const result = await Database.pool.query(
-            `select * from "users" where "id" = $1`,
-            [ id ],
-        );
+    return User.deserialize(result.rows[0]);
+  }
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
+  public static async retrieveWithEmail(email: string): Promise<User> {
+    const result = await Database.pool.query(
+      `select * from "users" where "email" = $1`,
+      [email]
+    );
 
-        return User.deserialize(result.rows[0]);
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public static async retrieveWithEmail(email: string): Promise<User>
-    {
-        const result = await Database.pool.query(
-            `select * from "users" where "email" = $1`,
-            [ email ],
-        );
+    return User.deserialize(result.rows[0]);
+  }
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
+  public static async retrieveWithCustomerId(
+    customerId: string
+  ): Promise<User> {
+    const result = await Database.pool.query(
+      `select * from "users" where "stripe_customer_id" = $1`,
+      [customerId]
+    );
 
-        return User.deserialize(result.rows[0]);
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public static async retrieveWithCustomerId(customerId: string): Promise<User>
-    {
-        const result = await Database.pool.query(
-            `select * from "users" where "stripe_customer_id" = $1`,
-            [ customerId ],
-        );
+    return User.deserialize(result.rows[0]);
+  }
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
-
-        return User.deserialize(result.rows[0]);
-    }
-
-    public static async existsWithEmail(email: string): Promise<boolean>
-    {
-        const result = await Database.pool.query(
-            `
+  public static async existsWithEmail(email: string): Promise<boolean> {
+    const result = await Database.pool.query(
+      `
             select 1
             from "users"
             where "email" = $1
             limit 1`,
-            [ email ],
-        );
+      [email]
+    );
 
-        return result.rows.length > 0;
-    }
+    return result.rows.length > 0;
+  }
 
-    public async update(data: IUpdateUser): Promise<void>
-    {
-        this._full_name = data.full_name ?? this.full_name;
-        this._email = data.email ?? this.email;
+  public async update(data: IUpdateUser): Promise<void> {
+    this._full_name = data.full_name ?? this.full_name;
+    this._email = data.email ?? this.email;
 
-        const client = await Database.pool.connect();
+    const client = await Database.pool.connect();
 
-        await client.query("begin");
+    await client.query("begin");
 
-        await client
-            .query(
-                `
+    await client
+      .query(
+        `
                 update "users"
                 set
                     "full_name" = $1,
@@ -157,223 +147,191 @@ export class User implements ISerializable<ISerializedUser>
                 where
                     "id" = $3
                 `,
-                [
-                    this.full_name,
-                    this.email,
-                    this.id,
-                ],
-            )
-            .catch(async () =>
-            {
-                await client.query("rollback");
+        [this.full_name, this.email, this.id]
+      )
+      .catch(async () => {
+        await client.query("rollback");
 
-                throw Boom.badRequest();
-            });
+        throw Boom.badRequest();
+      });
 
-        if (this.stripe_customer_id)
-        {
-            await Config.STRIPE.customers
-                .update(this.stripe_customer_id, {
-                    name: this.full_name ?? undefined,
-                    email: this.email,
-                })
-                .catch(async () =>
-                {
-                    await client.query("rollback");
+    if (this.stripe_customer_id) {
+      await Config.STRIPE.customers
+        .update(this.stripe_customer_id, {
+          name: this.full_name ?? undefined,
+          email: this.email,
+        })
+        .catch(async () => {
+          await client.query("rollback");
 
-                    throw Boom.badRequest();
-                });
-        }
-
-        await client.query("commit");
-
-        client.release();
+          throw Boom.badRequest();
+        });
     }
 
-    public async delete(): Promise<void>
-    {
-        if (!await this.canBeDeleted())
+    await client.query("commit");
+
+    client.release();
+  }
+
+  public async delete(): Promise<void> {
+    if (!(await this.canBeDeleted())) {
+      throw Boom.forbidden(undefined, [
         {
-            throw Boom.forbidden(undefined, [
-                {
-                    field: "user",
-                    error: `Cannot delete user '${this.id}'`,
-                },
-            ]);
-        }
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        await client.query(
-            `delete from "users" where "id" = $1`,
-            [ this.id ],
-        );
-
-        if (this.stripe_customer_id)
-        {
-            await Config.STRIPE.customers
-                .del(this.stripe_customer_id)
-                .catch(async () =>
-                {
-                    await client.query("rollback");
-
-                    throw Boom.badRequest();
-                });
-        }
-
-        await client.query("commit");
-
-        client.release();
+          field: "user",
+          error: `Cannot delete user '${this.id}'`,
+        },
+      ]);
     }
 
-    public async removeDefaultPaymentMethod(): Promise<void>
-    {
-        await Database.pool
-            .query(
-                `delete from "default_payment_methods" where "user" = $1`,
-                [ this.id ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badImplementation();
-            });
+    const client = await Database.pool.connect();
+
+    await client.query("begin");
+
+    await client.query(`delete from "users" where "id" = $1`, [this.id]);
+
+    if (this.stripe_customer_id) {
+      await Config.STRIPE.customers
+        .del(this.stripe_customer_id)
+        .catch(async () => {
+          await client.query("rollback");
+
+          throw Boom.badRequest();
+        });
     }
 
-    public async retrieveSettings(): Promise<IUserSettings>
-    {
-        const { rows: [ row ] } = await Database.pool
-            .query(
-                `
+    await client.query("commit");
+
+    client.release();
+  }
+
+  public async removeDefaultPaymentMethod(): Promise<void> {
+    await Database.pool
+      .query(`delete from "default_payment_methods" where "user" = $1`, [
+        this.id,
+      ])
+      .catch(() => {
+        throw Boom.badImplementation();
+      });
+  }
+
+  public async retrieveSettings(): Promise<IUserSettings> {
+    const {
+      rows: [row],
+    } = await Database.pool
+      .query(
+        `
                 select "language"
                 from "user_settings"
                 where "user" = $1
                 `,
-                [ this.id ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badImplementation();
-            });
+        [this.id]
+      )
+      .catch(() => {
+        throw Boom.badImplementation();
+      });
 
-        return {
-            language: row?.language ?? null,
-        };
-    }
+    return {
+      language: row?.language ?? null,
+    };
+  }
 
-    public async hasSettings(): Promise<boolean>
-    {
-        const { rowCount } = await Database.pool
-            .query(
-                `
+  public async hasSettings(): Promise<boolean> {
+    const { rowCount } = await Database.pool
+      .query(
+        `
                 select "user"
                 from "user_settings"
                 where "user" = $1
                 limit 1
                 `,
-                [ this.id ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badImplementation();
-            });
+        [this.id]
+      )
+      .catch(() => {
+        throw Boom.badImplementation();
+      });
 
-        return rowCount > 0;
+    return rowCount > 0;
+  }
+
+  public async updateSettings(data: IUpdateUserSettings): Promise<void> {
+    const settings = await this.retrieveSettings();
+
+    settings.language = data.language ?? settings.language;
+
+    if (!Config.LANGUAGES.find((l) => l.id === settings.language)) {
+      throw Boom.badData(undefined, [
+        {
+          field: "language",
+          error: `Unsupported language: '${data.language}'`,
+        },
+      ]);
     }
 
-    public async updateSettings(data: IUpdateUserSettings): Promise<void>
-    {
-        const settings = await this.retrieveSettings();
+    const hasSettings = await this.hasSettings();
 
-        settings.language = data.language ?? settings.language;
+    const client = await Database.pool.connect();
 
-        if (!Config.LANGUAGES.find(l => l.id === settings.language))
-        {
-            throw Boom.badData(undefined, [
-                {
-                    field: "language",
-                    error: `Unsupported language: '${data.language}'`,
-                },
-            ]);
-        }
+    await client.query("begin");
 
-        const hasSettings = await this.hasSettings();
-
-        const client = await Database.pool.connect();
-
-        await client.query("begin");
-
-        const query = hasSettings
-            ?
-                `
+    const query = hasSettings
+      ? `
                 update "user_settings"
                 set
                     "language" = $1
                 where
                     "user" = $2
                 `
-            :
-                `
+      : `
                 insert into "user_settings"
                     ("user", "language")
                 values
                     ($1, $2)
                 `;
-        
-        const params = hasSettings
-            ? [ settings.language, this.id ]
-            : [ this.id, settings.language ];
 
-        await client
-            .query(query, params)
-            .catch(async () =>
-            {
-                await client.query("rollback");
+    const params = hasSettings
+      ? [settings.language, this.id]
+      : [this.id, settings.language];
 
-                throw Boom.badImplementation();
-            });
+    await client.query(query, params).catch(async () => {
+      await client.query("rollback");
 
-        if (this.stripe_customer_id && settings.language)
-        {
-            await Config.STRIPE.customers
-                .update(this.stripe_customer_id, {
-                    preferred_locales: [ settings.language ],
-                })
-                .catch(async () =>
-                {
-                    await client.query("rollback");
+      throw Boom.badImplementation();
+    });
 
-                    throw Boom.badRequest();
-                });
-        }
+    if (this.stripe_customer_id && settings.language) {
+      await Config.STRIPE.customers
+        .update(this.stripe_customer_id, {
+          preferred_locales: [settings.language],
+        })
+        .catch(async () => {
+          await client.query("rollback");
 
-        await client.query("commit");
-
-        client.release();
+          throw Boom.badRequest();
+        });
     }
 
-    public async canBeDeleted(): Promise<boolean>
-    {
-        const authorCountResult = await Database.pool
-            .query(
-                `
+    await client.query("commit");
+
+    client.release();
+  }
+
+  public async canBeDeleted(): Promise<boolean> {
+    const authorCountResult = await Database.pool.query(
+      `
                 select 1
                 from "authors"
                 where "user" = $1
                 limit 1
                 `,
-                [ this.id ],
-            );
+      [this.id]
+    );
 
-        if (authorCountResult.rows.length > 0)
-        {
-            return false;
-        }
+    if (authorCountResult.rows.length > 0) {
+      return false;
+    }
 
-        const authorCountForOwnedPublishersResult = await Database.pool
-            .query(
-                `
+    const authorCountForOwnedPublishersResult = await Database.pool.query(
+      `
                 select 1
                 from
                     "publishers" as "p"
@@ -386,17 +344,15 @@ export class User implements ISerializable<ISerializedUser>
                 where "o"."user" = $1
                 limit 1
                 `,
-                [ this.id ],
-            );
+      [this.id]
+    );
 
-        return authorCountForOwnedPublishersResult.rows.length === 0;
-    }
+    return authorCountForOwnedPublishersResult.rows.length === 0;
+  }
 
-    public async canSubscribeToBundle(bundle: Bundle): Promise<boolean>
-    {
-        const result = await Database.pool
-            .query(
-                `
+  public async canSubscribeToBundle(bundle: Bundle): Promise<boolean> {
+    const result = await Database.pool.query(
+      `
                 select 1
                 from
                     "subscriptions" as s
@@ -411,17 +367,15 @@ export class User implements ISerializable<ISerializedUser>
                     "p"."bundle" = $2
                 limit 1
                 `,
-                [ this.id, bundle.id ],
-            );
+      [this.id, bundle.id]
+    );
 
-        return result.rows.length === 0;
-    }
+    return result.rows.length === 0;
+  }
 
-    public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean>
-    {
-        const result = await Database.pool
-            .query(
-                `
+  public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean> {
+    const result = await Database.pool.query(
+      `
                 select 1
                 from "authors"
                 where
@@ -430,25 +384,22 @@ export class User implements ISerializable<ISerializedUser>
                     "publisher" = $2
                 limit 1
                 `,
-                [ this.id, publisher.id ],
-            );
+      [this.id, publisher.id]
+    );
 
-        return result.rows.length > 0;
+    return result.rows.length > 0;
+  }
+
+  public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean> {
+    /**
+     * The owner of the publisher is considered subscribed to it
+     */
+    if (publisher.isOwnedByUser(this)) {
+      return true;
     }
 
-    public async isSubscribedToPublisher(publisher: Publisher): Promise<boolean>
-    {
-        /**
-         * The owner of the publisher is considered subscribed to it
-         */
-        if (publisher.isOwnedByUser(this))
-        {
-            return true;
-        }
-
-        const result = await Database.pool
-            .query(
-                `
+    const result = await Database.pool.query(
+      `
                 select 1
                 from
                     "v_active_subscriptions" as s
@@ -464,64 +415,59 @@ export class User implements ISerializable<ISerializedUser>
                     "publisher" = $2
                 limit 1
                 `,
-                [ this.id, publisher.id ],
-            );
+      [this.id, publisher.id]
+    );
 
-        return result.rows.length > 0;
-    }
+    return result.rows.length > 0;
+  }
 
-    public async hasActiveSubscriptions(): Promise<boolean>
-    {
-        const result = await Database.pool
-            .query(
-                `
+  public async hasActiveSubscriptions(): Promise<boolean> {
+    const result = await Database.pool.query(
+      `
                 select 1
                 from "v_active_subscriptions"
                 where "user" = $1
                 limit 1
                 `,
-                [ this.id ],
-            );
+      [this.id]
+    );
 
-        return result.rows.length > 0;
+    return result.rows.length > 0;
+  }
+
+  public serialize(options?: {
+    /**
+     * The authenticated user (or just its ID) that requested this user's data
+     *
+     * This param is used to remove sensitive information from
+     * the response if the authenticated user does not match
+     * the user that will be serialized
+     */
+    for?: User | INotExpandedResource;
+  }): ISerializedUser {
+    let response: any = {
+      id: this.id,
+      full_name: this.full_name,
+    };
+
+    if (options?.for?.id === this.id) {
+      response = {
+        ...response,
+        type: this.type,
+        email: this.email,
+      };
     }
 
-    public serialize(options?: {
-        /**
-         * The authenticated user (or just its ID) that requested this user's data
-         * 
-         * This param is used to remove sensitive information from
-         * the response if the authenticated user does not match
-         * the user that will be serialized
-         */
-        for?: User | INotExpandedResource,
-    }): ISerializedUser
-    {
-        let response: any = {
-            id: this.id,
-            full_name: this.full_name,
-        };
+    return response;
+  }
 
-        if (options?.for?.id === this.id)
-        {
-            response = {
-                ...response,
-                type: this.type,
-                email: this.email,
-            };
-        }
-
-        return response;
-    }
-
-    private static async deserialize(data: IDatabaseUser): Promise<User>
-    {
-        return new User(
-            data.id,
-            data.type,
-            data.full_name,
-            data.email,
-            data.stripe_customer_id,
-        );
-    }
+  private static async deserialize(data: IDatabaseUser): Promise<User> {
+    return new User(
+      data.id,
+      data.type,
+      data.full_name,
+      data.email,
+      data.stripe_customer_id
+    );
+  }
 }

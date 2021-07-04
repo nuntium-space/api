@@ -13,70 +13,74 @@ import Database from "../../utilities/Database";
 import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
-    {
-        method: "GET",
-        path: "/articles/trending",
-        options: {
-            validate: {
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).max(Config.TRENDING_ARTICLES_MAX_LENGTH),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
-
-            const articles = await Article.trending(request.query.expand);
-
-            return Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser })));
-        },
+  {
+    method: "GET",
+    path: "/articles/trending",
+    options: {
+      validate: {
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).max(
+          Config.TRENDING_ARTICLES_MAX_LENGTH
+        ),
+      },
     },
-    {
-        method: "GET",
-        path: "/articles/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.ARTICLE.required(),
-                }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: ARTICLE_SCHEMA.OBJ,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-            const article = await Article.retrieve(request.params.id, request.query.expand);
+      const articles = await Article.trending(request.query.expand);
 
-            const author = await Author.retrieve(article.author.id, [ "publisher" ]);
+      return Promise.all(
+        articles.map((_) => _.serialize({ for: authenticatedUser }))
+      );
+    },
+  },
+  {
+    method: "GET",
+    path: "/articles/{id}",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.ARTICLE.required(),
+        }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: ARTICLE_SCHEMA.OBJ,
+      },
+    },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-            if (!(author.publisher instanceof Publisher))
-            {
-                throw Boom.badImplementation();
-            }
+      const article = await Article.retrieve(
+        request.params.id,
+        request.query.expand
+      );
 
-            if (!await authenticatedUser.isSubscribedToPublisher(author.publisher))
-            {
-                return h
-                    .response(await article.serialize({ for: authenticatedUser })) // Only the metadata (content is excluded by default)
-                    .code(402); // Payment Required
-            }
+      const author = await Author.retrieve(article.author.id, ["publisher"]);
 
-            // TODO:
-            // Increment article view_count
+      if (!(author.publisher instanceof Publisher)) {
+        throw Boom.badImplementation();
+      }
 
-            const { rowCount } = await Database.pool
-                .query(
-                    `
+      if (
+        !(await authenticatedUser.isSubscribedToPublisher(author.publisher))
+      ) {
+        return h
+          .response(await article.serialize({ for: authenticatedUser })) // Only the metadata (content is excluded by default)
+          .code(402); // Payment Required
+      }
+
+      // TODO:
+      // Increment article view_count
+
+      const { rowCount } = await Database.pool.query(
+        `
                     select 1
                     from "user_history"
                     where
@@ -85,130 +89,126 @@ export default <ServerRoute[]>[
                         "article" = $2
                     limit 1
                     `,
-                    [
-                        authenticatedUser.id,
-                        article.id,
-                    ],
-                );
+        [authenticatedUser.id, article.id]
+      );
 
-            const query = rowCount === 0
-                ? `insert into "user_history" ("user", "article", "last_viewed_at") values ($1, $2, $3)`
-                : `update "user_history" set "last_viewed_at" = $3 where "user" = $1 and "article" = $2`;
+      const query =
+        rowCount === 0
+          ? `insert into "user_history" ("user", "article", "last_viewed_at") values ($1, $2, $3)`
+          : `update "user_history" set "last_viewed_at" = $3 where "user" = $1 and "article" = $2`;
 
-            await Database.pool
-                .query(
-                    query,
-                    [
-                        authenticatedUser.id,
-                        article.id,
-                        new Date().toISOString(),
-                    ],
-                );
+      await Database.pool.query(query, [
+        authenticatedUser.id,
+        article.id,
+        new Date().toISOString(),
+      ]);
 
-            return article.serialize({
-                for: authenticatedUser,
-                includeContent: true,
-                includeMetadata: true,
-            });
-        },
+      return article.serialize({
+        for: authenticatedUser,
+        includeContent: true,
+        includeMetadata: true,
+      });
     },
-    {
-        method: "GET",
-        path: "/articles/{id}/sources",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.ARTICLE.required(),
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(SOURCE_SCHEMA.OBJ),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
-
-            const article = await Article.retrieve(request.params.id, request.query.expand);
-
-            const author = await Author.retrieve(article.author.id, [ "publisher" ]);
-
-            if (!(author.publisher instanceof Publisher))
-            {
-                throw Boom.badImplementation();
-            }
-
-            if (!await authenticatedUser.isSubscribedToPublisher(author.publisher))
-            {
-                throw Boom.paymentRequired();
-            }
-
-            const sources = await Source.forArticle(article);
-
-            return sources.map(_ => _.serialize());
-        },
+  },
+  {
+    method: "GET",
+    path: "/articles/{id}/sources",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.ARTICLE.required(),
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(SOURCE_SCHEMA.OBJ),
+      },
     },
-    {
-        method: "GET",
-        path: "/publishers/{id}/articles",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.PUBLISHER.required(),
-                }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-            const publisher = await Publisher.retrieve(request.params.id);
+      const article = await Article.retrieve(
+        request.params.id,
+        request.query.expand
+      );
 
-            if (!await authenticatedUser.isSubscribedToPublisher(publisher))
-            {
-                throw Boom.paymentRequired();
-            }
+      const author = await Author.retrieve(article.author.id, ["publisher"]);
 
-            const articles = await Article.forPublisher(publisher, request.query.expand);
+      if (!(author.publisher instanceof Publisher)) {
+        throw Boom.badImplementation();
+      }
 
-            return Promise.all(articles.map(_ => _.serialize({ for: authenticatedUser })));
-        },
+      if (
+        !(await authenticatedUser.isSubscribedToPublisher(author.publisher))
+      ) {
+        throw Boom.paymentRequired();
+      }
+
+      const sources = await Source.forArticle(article);
+
+      return sources.map((_) => _.serialize());
     },
-    {
-        method: "DELETE",
-        path: "/articles/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.ARTICLE.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const article = await Article.retrieve(request.params.id, [ "author" ]);
-
-            if (!(article.author instanceof Author))
-            {
-                throw Boom.badImplementation();
-            }
-
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
-
-            if (article.author.user.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await article.delete();
-
-            return h.response();
-        },
+  },
+  {
+    method: "GET",
+    path: "/publishers/{id}/articles",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.PUBLISHER.required(),
+        }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).required(),
+      },
     },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      const publisher = await Publisher.retrieve(request.params.id);
+
+      if (!(await authenticatedUser.isSubscribedToPublisher(publisher))) {
+        throw Boom.paymentRequired();
+      }
+
+      const articles = await Article.forPublisher(
+        publisher,
+        request.query.expand
+      );
+
+      return Promise.all(
+        articles.map((_) => _.serialize({ for: authenticatedUser }))
+      );
+    },
+  },
+  {
+    method: "DELETE",
+    path: "/articles/{id}",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.ARTICLE.required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const article = await Article.retrieve(request.params.id, ["author"]);
+
+      if (!(article.author instanceof Author)) {
+        throw Boom.badImplementation();
+      }
+
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      if (article.author.user.id !== authenticatedUser.id) {
+        throw Boom.forbidden();
+      }
+
+      await article.delete();
+
+      return h.response();
+    },
+  },
 ];

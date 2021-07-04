@@ -8,155 +8,152 @@ import { AUTHOR_INVITE_SCHEMA } from "../../types/author-invite";
 import Utilities from "../../utilities/Utilities";
 
 export default <ServerRoute[]>[
-    {
-        method: "GET",
-        path: "/publishers/{id}/authors/invites",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.PUBLISHER.required(),
-                }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(AUTHOR_INVITE_SCHEMA.OBJ).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const publisher = await Publisher.retrieve(request.params.id);
-
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
-
-            if (!publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
-
-            const invites = await AuthorInvite.forPublisher(publisher, request.query.expand);
-
-            // Pass the author.user to load email address
-            return invites.map(_ => _.serialize({ for: _.user }));
-        },
+  {
+    method: "GET",
+    path: "/publishers/{id}/authors/invites",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.PUBLISHER.required(),
+        }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(AUTHOR_INVITE_SCHEMA.OBJ).required(),
+      },
     },
-    {
-        method: "GET",
-        path: "/users/{id}/authors/invites",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.USER.required(),
-                }),
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(AUTHOR_INVITE_SCHEMA.OBJ).required(),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+    handler: async (request, h) => {
+      const publisher = await Publisher.retrieve(request.params.id);
 
-            if (request.params.id !== authenticatedUser.id)
-            {
-                throw Boom.forbidden();
-            }
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-            const invites = await AuthorInvite.forUser(authenticatedUser, request.query.expand);
+      if (!publisher.isOwnedByUser(authenticatedUser)) {
+        throw Boom.forbidden();
+      }
 
-            // Pass the author.user to load email address
-            return invites.map(_ => _.serialize({ for: _.user }));
-        },
+      const invites = await AuthorInvite.forPublisher(
+        publisher,
+        request.query.expand
+      );
+
+      // Pass the author.user to load email address
+      return invites.map((_) => _.serialize({ for: _.user }));
     },
-    {
-        method: "POST",
-        path: "/authors/invites/{id}/accept",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.AUTHOR_INVITE.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
-
-            const invite = await AuthorInvite.retrieve(request.params.id);
-
-            if (authenticatedUser.id !== invite.user.id)
-            {
-                throw Boom.forbidden();
-            }
-
-            await invite.accept();
-
-            return h.response();
-        },
+  },
+  {
+    method: "GET",
+    path: "/users/{id}/authors/invites",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.USER.required(),
+        }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(AUTHOR_INVITE_SCHEMA.OBJ).required(),
+      },
     },
-    {
-        method: "POST",
-        path: "/publishers/{id}/authors/invites",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.PUBLISHER.required(),
-                }),
-                payload: AUTHOR_INVITE_SCHEMA.CREATE,
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const publisher = await Publisher.retrieve(request.params.id);
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+      if (request.params.id !== authenticatedUser.id) {
+        throw Boom.forbidden();
+      }
 
-            if (!publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
+      const invites = await AuthorInvite.forUser(
+        authenticatedUser,
+        request.query.expand
+      );
 
-            await AuthorInvite.create({
-                email: (request.payload as any).email,
-                publisher: publisher.id,
-            });
-
-            return h.response();
-        },
+      // Pass the author.user to load email address
+      return invites.map((_) => _.serialize({ for: _.user }));
     },
-    {
-        method: "DELETE",
-        path: "/authors/invites/{id}",
-        options: {
-            validate: {
-                params: Joi.object({
-                    id: Schema.ID.AUTHOR_INVITE.required(),
-                }),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const invite = await AuthorInvite.retrieve(request.params.id, [ "publisher" ]);
-
-            if (!(invite.publisher instanceof Publisher))
-            {
-                throw Boom.badImplementation();
-            }
-
-            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
-
-            if (!invite.publisher.isOwnedByUser(authenticatedUser))
-            {
-                throw Boom.forbidden();
-            }
-
-            await invite.delete();
-
-            return h.response();
-        },
+  },
+  {
+    method: "POST",
+    path: "/authors/invites/{id}/accept",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.AUTHOR_INVITE.required(),
+        }),
+      },
     },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      const invite = await AuthorInvite.retrieve(request.params.id);
+
+      if (authenticatedUser.id !== invite.user.id) {
+        throw Boom.forbidden();
+      }
+
+      await invite.accept();
+
+      return h.response();
+    },
+  },
+  {
+    method: "POST",
+    path: "/publishers/{id}/authors/invites",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.PUBLISHER.required(),
+        }),
+        payload: AUTHOR_INVITE_SCHEMA.CREATE,
+      },
+    },
+    handler: async (request, h) => {
+      const publisher = await Publisher.retrieve(request.params.id);
+
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      if (!publisher.isOwnedByUser(authenticatedUser)) {
+        throw Boom.forbidden();
+      }
+
+      await AuthorInvite.create({
+        email: (request.payload as any).email,
+        publisher: publisher.id,
+      });
+
+      return h.response();
+    },
+  },
+  {
+    method: "DELETE",
+    path: "/authors/invites/{id}",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.AUTHOR_INVITE.required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const invite = await AuthorInvite.retrieve(request.params.id, [
+        "publisher",
+      ]);
+
+      if (!(invite.publisher instanceof Publisher)) {
+        throw Boom.badImplementation();
+      }
+
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      if (!invite.publisher.isOwnedByUser(authenticatedUser)) {
+        throw Boom.forbidden();
+      }
+
+      await invite.delete();
+
+      return h.response();
+    },
+  },
 ];

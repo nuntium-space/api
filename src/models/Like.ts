@@ -7,49 +7,46 @@ import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Like implements ISerializable<Promise<ISerializedLike>>
-{
-    private constructor
-    (
-        public readonly user: User | INotExpandedResource,
-        public readonly article: Article | INotExpandedResource,
-    )
-    {}
+export class Like implements ISerializable<Promise<ISerializedLike>> {
+  private constructor(
+    public readonly user: User | INotExpandedResource,
+    public readonly article: Article | INotExpandedResource
+  ) {}
 
-    //////////
-    // CRUD //
-    //////////
+  //////////
+  // CRUD //
+  //////////
 
-    public static async create(user: User | string, article: Article | string): Promise<void>
-    {
-        await Database.pool
-            .query(
-                `
+  public static async create(
+    user: User | string,
+    article: Article | string
+  ): Promise<void> {
+    await Database.pool
+      .query(
+        `
                 insert into "likes"
                     ("user", "article")
                 values
                     ($1, $2)
                 returning *
                 `,
-                [
-                    user instanceof User
-                        ? user.id
-                        : user,
-                    article instanceof Article
-                        ? article.id
-                        : article,
-                ],
-            )
-            .catch(() =>
-            {
-                throw Boom.badImplementation();
-            });
-    }
+        [
+          user instanceof User ? user.id : user,
+          article instanceof Article ? article.id : article,
+        ]
+      )
+      .catch(() => {
+        throw Boom.badImplementation();
+      });
+  }
 
-    public static async retrieveWithUserAndArticle(user: User | string, article: Article | string, expand?: string[]): Promise<Like>
-    {
-        const result = await Database.pool.query(
-            `
+  public static async retrieveWithUserAndArticle(
+    user: User | string,
+    article: Article | string,
+    expand?: string[]
+  ): Promise<Like> {
+    const result = await Database.pool.query(
+      `
             select *
             from "likes"
             where
@@ -57,50 +54,42 @@ export class Like implements ISerializable<Promise<ISerializedLike>>
                 and
                 "article" = $2
             `,
-            [
-                user instanceof User
-                    ? user.id
-                    : user,
-                article instanceof Article
-                    ? article.id
-                    : article,
-            ],
-        );
+      [
+        user instanceof User ? user.id : user,
+        article instanceof Article ? article.id : article,
+      ]
+    );
 
-        if (result.rowCount === 0)
-        {
-            throw Boom.notFound();
-        }
-
-        return Like.deserialize(result.rows[0], expand);
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
     }
 
-    public async delete(): Promise<void>
-    {
-        await Database.pool
-            .query(
-                `
+    return Like.deserialize(result.rows[0], expand);
+  }
+
+  public async delete(): Promise<void> {
+    await Database.pool.query(
+      `
                 delete from "likes"
                 where
                     "user" = $1
                     and
                     "article" = $2
                 `,
-                [
-                    this.user.id,
-                    this.article.id,
-                ],
-            );
-    }
+      [this.user.id, this.article.id]
+    );
+  }
 
-    ///////////////
-    // UTILITIES //
-    ///////////////
+  ///////////////
+  // UTILITIES //
+  ///////////////
 
-    public static async existsWithUserAndArticle(user: User | string, article: Article | string): Promise<boolean>
-    {
-        const result = await Database.pool.query(
-            `
+  public static async existsWithUserAndArticle(
+    user: User | string,
+    article: Article | string
+  ): Promise<boolean> {
+    const result = await Database.pool.query(
+      `
             select 1
             from "likes"
             where
@@ -109,63 +98,59 @@ export class Like implements ISerializable<Promise<ISerializedLike>>
                 "article" = $2
             limit 1
             `,
-            [
-                user instanceof User
-                    ? user.id
-                    : user,
-                article instanceof Article
-                    ? article.id
-                    : article,
-            ],
-        );
+      [
+        user instanceof User ? user.id : user,
+        article instanceof Article ? article.id : article,
+      ]
+    );
 
-        return result.rows.length > 0;
-    }
+    return result.rows.length > 0;
+  }
 
-    public static async forUser(user: User | string, expand?: string[]): Promise<Like[]>
-    {
-        const result = await Database.pool.query(
-            `
+  public static async forUser(
+    user: User | string,
+    expand?: string[]
+  ): Promise<Like[]> {
+    const result = await Database.pool.query(
+      `
             select *
             from "likes"
             where "user" = $1
             `,
-            [
-                user instanceof User
-                    ? user.id
-                    : user,
-            ],
-        );
+      [user instanceof User ? user.id : user]
+    );
 
-        return Promise.all(result.rows.map(row => Like.deserialize(row, expand)));
-    }
+    return Promise.all(result.rows.map((row) => Like.deserialize(row, expand)));
+  }
 
-    ///////////////////
-    // SERIALIZATION //
-    ///////////////////
+  ///////////////////
+  // SERIALIZATION //
+  ///////////////////
 
-    public async serialize(): Promise<ISerializedLike>
-    {
-        return {
-            article: this.article instanceof Article
-                ? await this.article.serialize()
-                : this.article,
-        };
-    }
+  public async serialize(): Promise<ISerializedLike> {
+    return {
+      article:
+        this.article instanceof Article
+          ? await this.article.serialize()
+          : this.article,
+    };
+  }
 
-    private static async deserialize(data: IDatabaseLike, expand?: string[]): Promise<Like>
-    {
-        const user = expand?.includes("user")
-            ? await User.retrieve(data.user)
-            : { id: data.user };
+  private static async deserialize(
+    data: IDatabaseLike,
+    expand?: string[]
+  ): Promise<Like> {
+    const user = expand?.includes("user")
+      ? await User.retrieve(data.user)
+      : { id: data.user };
 
-        const article = expand?.includes("article")
-            ? await Article.retrieve(data.article, Utilities.getNestedExpandQuery(expand, "article"))
-            : { id: data.article };
+    const article = expand?.includes("article")
+      ? await Article.retrieve(
+          data.article,
+          Utilities.getNestedExpandQuery(expand, "article")
+        )
+      : { id: data.article };
 
-        return new Like(
-            user,
-            article,
-        );
-    }
+    return new Like(user, article);
+  }
 }

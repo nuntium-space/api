@@ -10,22 +10,22 @@
 ### Creation
 
 1. Draft is created
-3. Draft is modified
-4. Draft is submitted for verification
-    1. Draft is rejected (go to step 2.)
-    2. Draft is accepted
-        1. Article is created
-        2. Draft is deleted
+2. Draft is modified
+3. Draft is submitted for verification
+   1. Draft is rejected (go to step 2.)
+   2. Draft is accepted
+      1. Article is created
+      2. Draft is deleted
 
 ### Update
 
 1. Draft is created
 2. Draft is modified
 3. Draft is submitted for verification
-    1. Draft is rejected (go to step 2.)
-    2. Draft is accepted
-        1. Update is published
-        2. Draft is deleted
+   1. Draft is rejected (go to step 2.)
+   2. Draft is accepted
+      1. Update is published
+      2. Draft is deleted
 
 ## Test
 
@@ -69,7 +69,7 @@ AWS_PUBLISHER_ICONS_BUCKET_NAME=publisher-icons
 SENDGRID_API_KEY=
 ```
 
-***Note:** `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network.*
+**\*Note:** `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network.\*
 
 ### Serve locally
 
@@ -87,7 +87,6 @@ Run
 sls deploy
 ```
 
-***Note:** if the deployment fails try to delete the `.build` folder.*
+**\*Note:** if the deployment fails try to delete the `.build` folder.\*
 
 [nuntium]: https://github.com/nuntium-space/nuntium
-

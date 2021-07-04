@@ -11,101 +11,102 @@ import { ARTICLE_DRAFT_SCHEMA } from "../../../types/article-draft";
 import { Email } from "../../../utilities/Email";
 
 export default <ServerRoute[]>[
-    {
-        method: "GET",
-        path: "/articles/drafts/submitted",
-        options: {
-            validate: {
-                query: Joi.object({
-                    expand: Schema.EXPAND_QUERY,
-                }),
-            },
-            response: {
-                schema: Schema.ARRAY(ARTICLE_DRAFT_SCHEMA.OBJ),
-            },
-        },
-        handler: async (request, h) =>
-        {
-            const drafts = await ArticleDraft.listSubmitted(request.query.expand);
-
-            return Promise.all(drafts.map(_ => _.serialize()));
-        },
+  {
+    method: "GET",
+    path: "/articles/drafts/submitted",
+    options: {
+      validate: {
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(ARTICLE_DRAFT_SCHEMA.OBJ),
+      },
     },
-    {
-        method: "POST",
-        path: "/articles/drafts/{id}/publish",
-        handler: async (request, h) =>
-        {
-            const draft = await ArticleDraft.retrieve(request.params.id, [ "author", "author.user", "author.publisher" ]);
+    handler: async (request, h) => {
+      const drafts = await ArticleDraft.listSubmitted(request.query.expand);
 
-            if
-            (
-                !(draft.author instanceof Author)
-                || !(draft.author.user instanceof User)
-                || !(draft.author.publisher instanceof Publisher)
-                || !draft.author.user.full_name
-            )
-            {
-                throw Boom.badImplementation();
-            }
-
-            const { id } = await draft.publish();
-
-            await Email.send({
-                to: draft.author.user,
-                type: Email.TYPE.ARTICLE_DRAFT_PUBLISHED,
-                replace: {
-                    ARTICLE_DRAFT_TITLE: draft.title,
-                    AUTHOR_NAME: draft.author.user.full_name,
-                    PUBLISHER_NAME: draft.author.publisher.name,
-                    CLIENT_URL: Config.CLIENT_URL,
-                    ARTICLE_DRAFT_ID: id,
-                },
-            });
-
-            return h.response();
-        },
+      return Promise.all(drafts.map((_) => _.serialize()));
     },
-    {
-        method: "POST",
-        path: "/articles/drafts/{id}/reject",
-        options: {
-            validate: {
-                payload: Joi.object({
-                    reason: Schema.STRING.min(1).required(),
-                }),
-            },
+  },
+  {
+    method: "POST",
+    path: "/articles/drafts/{id}/publish",
+    handler: async (request, h) => {
+      const draft = await ArticleDraft.retrieve(request.params.id, [
+        "author",
+        "author.user",
+        "author.publisher",
+      ]);
+
+      if (
+        !(draft.author instanceof Author) ||
+        !(draft.author.user instanceof User) ||
+        !(draft.author.publisher instanceof Publisher) ||
+        !draft.author.user.full_name
+      ) {
+        throw Boom.badImplementation();
+      }
+
+      const { id } = await draft.publish();
+
+      await Email.send({
+        to: draft.author.user,
+        type: Email.TYPE.ARTICLE_DRAFT_PUBLISHED,
+        replace: {
+          ARTICLE_DRAFT_TITLE: draft.title,
+          AUTHOR_NAME: draft.author.user.full_name,
+          PUBLISHER_NAME: draft.author.publisher.name,
+          CLIENT_URL: Config.CLIENT_URL,
+          ARTICLE_DRAFT_ID: id,
         },
-        handler: async (request, h) =>
-        {
-            const draft = await ArticleDraft.retrieve(request.params.id, [ "author", "author.user", "author.publisher" ]);
+      });
 
-            if
-            (
-                !(draft.author instanceof Author)
-                || !(draft.author.user instanceof User)
-                || !(draft.author.publisher instanceof Publisher)
-                || !draft.author.user.full_name
-            )
-            {
-                throw Boom.badImplementation();
-            }
-
-            await draft.reject((request.payload as any).reason);
-
-            await Email.send({
-                to: draft.author.user,
-                type: Email.TYPE.ARTICLE_DRAFT_REJECTED,
-                replace: {
-                    ARTICLE_DRAFT_TITLE: draft.title,
-                    AUTHOR_NAME: draft.author.user.full_name,
-                    PUBLISHER_NAME: draft.author.publisher.name,
-                    CLIENT_URL: Config.CLIENT_URL,
-                    ARTICLE_DRAFT_ID: draft.id,
-                },
-            });
-
-            return h.response();
-        },
+      return h.response();
     },
+  },
+  {
+    method: "POST",
+    path: "/articles/drafts/{id}/reject",
+    options: {
+      validate: {
+        payload: Joi.object({
+          reason: Schema.STRING.min(1).required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const draft = await ArticleDraft.retrieve(request.params.id, [
+        "author",
+        "author.user",
+        "author.publisher",
+      ]);
+
+      if (
+        !(draft.author instanceof Author) ||
+        !(draft.author.user instanceof User) ||
+        !(draft.author.publisher instanceof Publisher) ||
+        !draft.author.user.full_name
+      ) {
+        throw Boom.badImplementation();
+      }
+
+      await draft.reject((request.payload as any).reason);
+
+      await Email.send({
+        to: draft.author.user,
+        type: Email.TYPE.ARTICLE_DRAFT_REJECTED,
+        replace: {
+          ARTICLE_DRAFT_TITLE: draft.title,
+          AUTHOR_NAME: draft.author.user.full_name,
+          PUBLISHER_NAME: draft.author.publisher.name,
+          CLIENT_URL: Config.CLIENT_URL,
+          ARTICLE_DRAFT_ID: draft.id,
+        },
+      });
+
+      return h.response();
+    },
+  },
 ];
