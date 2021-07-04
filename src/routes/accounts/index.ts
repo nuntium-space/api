@@ -70,5 +70,32 @@ export default <ServerRoute[]>[
             }));
         },
     },
+    {
+        method: "DELETE",
+        path: "/users/{user_id}/accounts/{account_id}",
+        options: {
+            validate: {
+                params: Joi.object({
+                    user_id: Schema.ID.USER.required(),
+                    account_id: Schema.STRING.valid(...Config.AUTH_PROVIDERS.map(_ => _.id)).required(),
+                }),
+            },
+        },
+        handler: async (request, h) =>
+        {
+            const [ authenticatedUser ] = Utilities.getAuthenticatedUser(request);
+
+            if (authenticatedUser.id !== request.params.user_id)
+            {
+                throw Boom.forbidden();
+            }
+
+            const account = await Account.retrieveWithUserAndType(authenticatedUser, request.params.account_id);
+
+            await account.delete();
+
+            return h.response();
+        },
+    },
     ...accountLinkingRoutes,
 ];

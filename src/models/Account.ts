@@ -66,6 +66,33 @@ export class Account
         return Account.deserialize(result.rows[0]);
     }
 
+    public static async retrieveWithUserAndType(user: User | INotExpandedResource | string, type: string): Promise<Account>
+    {
+        const result = await Database.pool.query(
+            `
+            select *
+            from "accounts"
+            where
+                "user" = $1
+                and
+                "type" = $2
+            `,
+            [
+                typeof user === "string"
+                    ? user
+                    : user.id,
+                type,
+            ],
+        );
+
+        if (result.rowCount === 0)
+        {
+            throw Boom.notFound();
+        }
+
+        return Account.deserialize(result.rows[0]);
+    }
+
     public static async retrieveWithExternalId(id: string): Promise<Account>
     {
         const result = await Database.pool.query(
