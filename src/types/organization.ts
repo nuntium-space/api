@@ -29,9 +29,9 @@ export interface ISerializedOrganization {
 export const ORGANIZATION_SCHEMA = {
   OBJ: Joi.object({
     id: Schema.ID.ORGANIZATION.required(),
-    name: Schema.STRING.max(50).required(),
-    owner: USER_SCHEMA.OBJ.required(),
-    stripe_account_enabled: Schema.BOOLEAN.required(),
+    name: Schema.STRING.max(50).optional(), // Not sent to users other than the owner
+    owner: USER_SCHEMA.OBJ.optional(), // Not sent to users other than the owner
+    stripe_account_enabled: Schema.BOOLEAN.optional(), // Not sent to users other than the owner
   }),
   CREATE: Joi.object({
     name: Schema.STRING.max(50).required(),

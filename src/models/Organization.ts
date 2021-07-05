@@ -136,6 +136,11 @@ export class Organization implements ISerializable<ISerializedOrganization> {
   public serialize(options?: {
     for?: User | INotExpandedResource;
   }): ISerializedOrganization {
+    if (options?.for?.id !== this.owner.id)
+    {
+      return { id: this.id } as any;
+    }
+
     return {
       id: this.id,
       name: this.name,
