@@ -2,6 +2,7 @@
 
 [![Deployment](https://github.com/nuntium-space/api/actions/workflows/cd.yml/badge.svg)](https://github.com/nuntium-space/api/actions/workflows/cd.yml)
 [![Format](https://github.com/nuntium-space/api/actions/workflows/format.yml/badge.svg)](https://github.com/nuntium-space/api/actions/workflows/format.yml)
+[![Lint](https://github.com/nuntium-space/api/actions/workflows/lint.yml/badge.svg)](https://github.com/nuntium-space/api/actions/workflows/lint.yml)
 
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
