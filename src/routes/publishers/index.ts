@@ -14,6 +14,35 @@ import Utilities from "../../utilities/Utilities";
 export default <ServerRoute[]>[
   {
     method: "GET",
+    path: "/publishers",
+    options: {
+      validate: {
+        query: Joi.object({
+          name: PUBLISHER_SCHEMA.OBJ.extract("name").required(),
+        }),
+      },
+      response: {
+        schema: PUBLISHER_SCHEMA.OBJ,
+      },
+    },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      const publisher = await Publisher.retrieveWithName(request.query.name);
+
+      return {
+        ...publisher.serialize({ for: authenticatedUser }),
+        __metadata: {
+          is_author: await authenticatedUser.isAuthorOfPublisher(publisher),
+          is_subscribed: await authenticatedUser.isSubscribedToPublisher(
+            publisher
+          ),
+        },
+      };
+    },
+  },
+  {
+    method: "GET",
     path: "/publishers/{id}",
     options: {
       validate: {

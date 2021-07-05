@@ -110,6 +110,19 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     return Publisher.deserialize(result.rows[0]);
   }
 
+  public static async retrieveWithName(name: string): Promise<Publisher> {
+    const result = await Database.pool.query(
+      `select * from "publishers" where "name" = $1`,
+      [name]
+    );
+
+    if (result.rowCount === 0) {
+      throw Boom.notFound();
+    }
+
+    return Publisher.deserialize(result.rows[0]);
+  }
+
   public static async retrieveMultiple(ids: string[]): Promise<Publisher[]> {
     const result = await Database.pool.query(
       `select * from "publishers" where "id" = any ($1)`,
