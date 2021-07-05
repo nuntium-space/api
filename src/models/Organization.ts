@@ -59,12 +59,12 @@ export class Organization implements ISerializable<ISerializedOrganization> {
     await Database.pool
       .query(
         `
-                insert into "organizations"
-                    ("id", "name", "user", "stripe_account_id")
-                values
-                    ($1, $2, $3, $4)
-                returning *
-                `,
+        insert into "organizations"
+          ("id", "name", "user", "stripe_account_id")
+        values
+          ($1, $2, $3, $4)
+        returning *
+        `,
         [id, data.name, user.id, account.id]
       )
       .catch(() => {
@@ -104,13 +104,13 @@ export class Organization implements ISerializable<ISerializedOrganization> {
     await Database.pool
       .query(
         `
-                update "organizations"
-                set
-                    "name" = $1,
-                    "stripe_account_enabled" = $2
-                where
-                    "id" = $3
-                `,
+        update "organizations"
+        set
+          "name" = $1,
+          "stripe_account_enabled" = $2
+        where
+          "id" = $3
+        `,
         [this.name, this.stripe_account_enabled, this.id]
       )
       .catch(() => {

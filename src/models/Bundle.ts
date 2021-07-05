@@ -52,12 +52,12 @@ export class Bundle implements ISerializable<ISerializedBundle> {
     const result = await client
       .query(
         `
-                insert into "bundles"
-                    ("id", "name", "organization", "active")
-                values
-                    ($1, $2, $3, $4)
-                returning *
-                `,
+        insert into "bundles"
+          ("id", "name", "organization", "active")
+        values
+          ($1, $2, $3, $4)
+        returning *
+        `,
         [id, data.name, organization.id, true]
       )
       .catch(async () => {
@@ -126,13 +126,13 @@ export class Bundle implements ISerializable<ISerializedBundle> {
     await client
       .query(
         `
-                update "bundles"
-                set
-                    "name" = $1,
-                    "active" = $2
-                where
-                    "id" = $3
-                `,
+        update "bundles"
+        set
+          "name" = $1,
+          "active" = $2
+        where
+          "id" = $3
+        `,
         [this.name, this.active, this.id]
       )
       .catch(async () => {
@@ -224,13 +224,13 @@ export class Bundle implements ISerializable<ISerializedBundle> {
   ): Promise<Bundle[]> {
     const result = await Database.pool.query(
       `
-            select b.*
-            from
-                bundles_publishers as bp
-                inner join
-                v_active_bundles as b
-                on bp.bundle = b.id
-            where bp.publisher = $1`,
+      select b.*
+      from
+        bundles_publishers as bp
+        inner join
+        v_active_bundles as b
+        on bp.bundle = b.id
+      where bp.publisher = $1`,
       [publisher.id]
     );
 

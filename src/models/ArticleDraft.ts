@@ -64,11 +64,11 @@ export class ArticleDraft
     await client
       .query(
         `
-                insert into "article_drafts"
-                    ("id", "title", "content", "author")
-                values
-                    ($1, $2, $3, $4)
-                `,
+        insert into "article_drafts"
+          ("id", "title", "content", "author")
+        values
+          ($1, $2, $3, $4)
+        `,
         [id, data.title, data.content, author.id]
       )
       .catch(async () => {
@@ -96,11 +96,11 @@ export class ArticleDraft
     await client
       .query(
         `
-                insert into "article_drafts"
-                    ("id", "title", "content", "author", "article")
-                values
-                    ($1, $2, $3, $4, $5)
-                `,
+        insert into "article_drafts"
+          ("id", "title", "content", "author", "article")
+        values
+          ($1, $2, $3, $4, $5)
+        `,
         [id, article.title, article.content, article.author.id, article.id]
       )
       .catch(async () => {
@@ -124,10 +124,10 @@ export class ArticleDraft
   ): Promise<ArticleDraft> {
     const result = await Database.pool.query(
       `
-                select *
-                from "article_drafts"
-                where "id" = $1
-                `,
+      select *
+      from "article_drafts"
+      where "id" = $1
+      `,
       [id]
     );
 
@@ -152,14 +152,14 @@ export class ArticleDraft
     const result = await client
       .query(
         `
-                update "article_drafts"
-                set
-                    "title" = $1,
-                    "content" = $2
-                where
-                    "id" = $3
-                returning "updated_at"
-                `,
+        update "article_drafts"
+        set
+          "title" = $1,
+          "content" = $2
+        where
+          "id" = $3
+        returning "updated_at"
+        `,
         [this.title, this.content, this.id]
       )
       .catch(() => {
@@ -180,9 +180,9 @@ export class ArticleDraft
   public async delete(): Promise<void> {
     await Database.pool.query(
       `
-                delete from "article_drafts"
-                where "id" = $1
-                `,
+      delete from "article_drafts"
+      where "id" = $1
+      `,
       [this.id]
     );
   }
@@ -198,11 +198,11 @@ export class ArticleDraft
     const result = await client
       .query(
         `
-                update "article_drafts"
-                set "status" = 'pending-verification'
-                where "id" = $1
-                returning "updated_at"
-                `,
+        update "article_drafts"
+        set "status" = 'pending-verification'
+        where "id" = $1
+        returning "updated_at"
+        `,
         [this.id]
       )
       .catch(() => {
@@ -228,12 +228,12 @@ export class ArticleDraft
       await client
         .query(
           `
-                    insert into "articles"
-                        ("id", "title", "content", "author", "reading_time")
-                    values
-                        ($1, $2, $3, $4, $5)
-                    returning *
-                    `,
+          insert into "articles"
+            ("id", "title", "content", "author", "reading_time")
+          values
+            ($1, $2, $3, $4, $5)
+          returning *
+          `,
           [
             id,
             this.title,
@@ -264,15 +264,15 @@ export class ArticleDraft
       await client
         .query(
           `
-                    update "articles"
-                    set
-                        "title" = $1,
-                        "content" = $2,
-                        "reading_time" = $3
-                    where
-                        "id" = $4
-                    returning "updated_at"
-                    `,
+          update "articles"
+          set
+            "title" = $1,
+            "content" = $2,
+            "reading_time" = $3
+          where
+            "id" = $4
+          returning "updated_at"
+          `,
           [
             this.title,
             this.content,
@@ -312,9 +312,9 @@ export class ArticleDraft
     await client
       .query(
         `
-                delete from "article_drafts"
-                where "id" = $1
-                `,
+        delete from "article_drafts"
+        where "id" = $1
+        `,
         [this.id]
       )
       .catch(async () => {
@@ -333,14 +333,14 @@ export class ArticleDraft
     await Database.pool
       .query(
         `
-                update "article_drafts"
-                set
-                    "status" = 'rejected'
-                    and
-                    "reason" = $1
-                where
-                    "id" = $2
-                `,
+        update "article_drafts"
+        set
+          "status" = 'rejected'
+          and
+          "reason" = $1
+        where
+          "id" = $2
+        `,
         [this.id, reason]
       )
       .catch(() => {
@@ -353,11 +353,11 @@ export class ArticleDraft
   ): Promise<ArticleDraft[]> {
     const result = await Database.pool.query(
       `
-            select *
-            from "article_drafts"
-            where "status" = 'pending-verification'
-            order by "created_at" desc
-            `
+      select *
+      from "article_drafts"
+      where "status" = 'pending-verification'
+      order by "created_at" desc
+      `,
     );
 
     return Promise.all(
@@ -371,11 +371,11 @@ export class ArticleDraft
   ): Promise<ArticleDraft[]> {
     const result = await Database.pool.query(
       `
-            select *
-            from "article_drafts"
-            where "author" = $1
-            order by "created_at" desc
-            `,
+      select *
+      from "article_drafts"
+      where "author" = $1
+      order by "created_at" desc
+      `,
       [author.id]
     );
 
@@ -390,17 +390,17 @@ export class ArticleDraft
   ): Promise<ArticleDraft[]> {
     const result = await Database.pool.query(
       `
-            select "art".*
-            from
-                "article_drafts" as "art"
-                inner join
-                "authors" as "aut"
-                on
-                    "art"."author" = "aut"."id"
-                    and
-                    "aut"."publisher" = $1
-            order by "created_at" desc
-            `,
+      select "art".*
+      from
+        "article_drafts" as "art"
+        inner join
+        "authors" as "aut"
+        on
+          "art"."author" = "aut"."id"
+          and
+          "aut"."publisher" = $1
+      order by "created_at" desc
+      `,
       [publisher.id]
     );
 

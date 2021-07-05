@@ -80,11 +80,11 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
       select
         *,
         (
-            ("like_count" * 0.2)
-            + ("view_count" * 0.1)
+          ("like_count" * 0.2)
+          + ("view_count" * 0.1)
         )
         / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
-            as "score"
+          as "score"
       from "articles"
       group by "id"
       order by "score" desc
