@@ -32,12 +32,12 @@ export class Source implements ISerializable<ISerializedSource> {
       data.map((_) => {
         return client.query(
           `
-                        insert into "sources"
-                            ("id", "url", "article")
-                        values
-                            ($1, $2, $3)
-                        returning *
-                        `,
+          insert into "sources"
+            ("id", "url", "article")
+          values
+            ($1, $2, $3)
+          returning *
+          `,
           [
             Utilities.id(Config.ID_PREFIXES.SOURCE),
             _.url,
@@ -57,9 +57,9 @@ export class Source implements ISerializable<ISerializedSource> {
   ): Promise<void> {
     await Database.pool.query(
       `
-                delete from "sources"
-                where "article" = $1
-                `,
+      delete from "sources"
+      where "article" = $1
+      `,
       [typeof article === "string" ? article : article.id]
     );
   }
@@ -71,10 +71,10 @@ export class Source implements ISerializable<ISerializedSource> {
   public static async forArticle(article: Article | string): Promise<Source[]> {
     const result = await Database.pool.query(
       `
-                select *
-                from "sources"
-                where "article" = $1
-                `,
+      select *
+      from "sources"
+      where "article" = $1
+      `,
       [article instanceof Article ? article.id : article]
     );
 

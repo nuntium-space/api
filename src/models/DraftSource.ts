@@ -32,12 +32,12 @@ export class DraftSource implements ISerializable<ISerializedDraftSource> {
       data.map((_) => {
         return client.query(
           `
-                        insert into "draft_sources"
-                            ("id", "url", "draft")
-                        values
-                            ($1, $2, $3)
-                        returning *
-                        `,
+          insert into "draft_sources"
+            ("id", "url", "draft")
+          values
+            ($1, $2, $3)
+          returning *
+          `,
           [
             Utilities.id(Config.ID_PREFIXES.DRAFT_SOURCE),
             _.url,
@@ -57,9 +57,9 @@ export class DraftSource implements ISerializable<ISerializedDraftSource> {
   ): Promise<void> {
     await Database.pool.query(
       `
-                delete from "draft_sources"
-                where "draft" = $1
-                `,
+      delete from "draft_sources"
+      where "draft" = $1
+      `,
       [typeof draft === "string" ? draft : draft.id]
     );
   }
@@ -73,10 +73,10 @@ export class DraftSource implements ISerializable<ISerializedDraftSource> {
   ): Promise<DraftSource[]> {
     const result = await Database.pool.query(
       `
-                select *
-                from "draft_sources"
-                where "draft" = $1
-                `,
+      select *
+      from "draft_sources"
+      where "draft" = $1
+      `,
       [draft instanceof ArticleDraft ? draft.id : draft]
     );
 

@@ -53,12 +53,12 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     const result = await client
       .query(
         `
-                insert into "publishers"
-                    ("id", "name", "url", "organization", "verified", "dns_txt_value")
-                values
-                    ($1, $2, $3, $4, $5, $6)
-                returning *
-                `,
+        insert into "publishers"
+          ("id", "name", "url", "organization", "verified", "dns_txt_value")
+        values
+          ($1, $2, $3, $4, $5, $6)
+        returning *
+        `,
         [
           id,
           data.name,
@@ -133,14 +133,14 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     await client
       .query(
         `
-                update "publishers"
-                set
-                    "name" = $1,
-                    "url" = $2,
-                    "verified" = $3
-                where
-                    "id" = $4
-                `,
+        update "publishers"
+        set
+          "name" = $1,
+          "url" = $2,
+          "verified" = $3
+        where
+          "id" = $4
+        `,
         [this.name, this.url, !shouldInvalidateDomainVerification, this.id]
       )
       .catch(async () => {
@@ -213,14 +213,14 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
   public static async forBundle(bundle: Bundle): Promise<Publisher[]> {
     const result = await Database.pool.query(
       `
-            select p.*
-            from
-                bundles_publishers as bp
-                inner join
-                publishers as p
-                on bp.publisher = p.id
-            where bp.bundle = $1
-            `,
+      select p.*
+      from
+        bundles_publishers as bp
+        inner join
+        publishers as p
+        on bp.publisher = p.id
+      where bp.bundle = $1
+      `,
       [bundle.id]
     );
 
@@ -238,18 +238,18 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
 
     if (options.not_in_bundle) {
       query = `
-            select *
-            from publishers
-            where
-                id not in
-                (
-                    select publisher
-                    from bundles_publishers
-                    where bundle = $1
-                )
-                and
-                organization = $2
-            `;
+      select *
+      from publishers
+      where
+        id not in
+          (
+            select publisher
+            from bundles_publishers
+            where bundle = $1
+          )
+        and
+        organization = $2
+      `;
 
       params = [options.not_in_bundle, organization.id];
     }
