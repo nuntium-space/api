@@ -3,6 +3,7 @@ import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
 import { CredentialsOptions } from "aws-sdk/lib/credentials";
 import Stripe from "stripe";
 
+/* eslint @typescript-eslint/no-var-requires: "off" */
 const createAwsElasticsearchConnector = require("aws-elasticsearch-connector");
 
 export interface IdPrefixes<T> {
