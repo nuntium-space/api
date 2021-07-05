@@ -357,7 +357,7 @@ export class ArticleDraft
       from "article_drafts"
       where "status" = 'pending-verification'
       order by "created_at" desc
-      `,
+      `
     );
 
     return Promise.all(
