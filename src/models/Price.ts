@@ -72,12 +72,12 @@ export class Price implements ISerializable<ISerializedPrice> {
     const result = await client
       .query(
         `
-                insert into "prices"
-                    ("id", "amount", "currency", "bundle", "active")
-                values
-                    ($1, $2, $3, $4, $5)
-                returning *
-                `,
+        insert into "prices"
+          ("id", "amount", "currency", "bundle", "active")
+        values
+          ($1, $2, $3, $4, $5)
+        returning *
+        `,
         [id, data.amount, data.currency, bundle.id, true]
       )
       .catch(async () => {

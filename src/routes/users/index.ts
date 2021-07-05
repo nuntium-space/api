@@ -66,11 +66,11 @@ export default <ServerRoute[]>[
 
       const result = await Database.pool.query(
         `
-                    select "article", "last_viewed_at"
-                    from "user_history"
-                    where "user" = $1
-                    order by "last_viewed_at" desc
-                    `,
+        select "article", "last_viewed_at"
+        from "user_history"
+        where "user" = $1
+        order by "last_viewed_at" desc
+        `,
         [authenticatedUser.id]
       );
 
@@ -246,9 +246,9 @@ export default <ServerRoute[]>[
 
       await Database.pool.query(
         `
-                    delete from "user_history"
-                    where "user" = $1
-                    `,
+        delete from "user_history"
+        where "user" = $1
+        `,
         [authenticatedUser.id]
       );
 

@@ -81,14 +81,14 @@ export default <ServerRoute[]>[
 
       const { rowCount } = await Database.pool.query(
         `
-                    select 1
-                    from "user_history"
-                    where
-                        "user" = $1
-                        and
-                        "article" = $2
-                    limit 1
-                    `,
+        select 1
+        from "user_history"
+        where
+          "user" = $1
+          and
+          "article" = $2
+        limit 1
+        `,
         [authenticatedUser.id, article.id]
       );
 

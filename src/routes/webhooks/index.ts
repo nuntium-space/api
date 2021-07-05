@@ -103,11 +103,11 @@ export default <ServerRoute[]>[
           await Database.pool
             .query(
               `
-                            insert into "subscriptions"
-                                ("id", "status", "user", "price", "current_period_end", "cancel_at_period_end", "deleted", "stripe_subscription_id")
-                            values
-                                ($1, $2, $3, $4, $5, $6, $7, $8)
-                            `,
+              insert into "subscriptions"
+                ("id", "status", "user", "price", "current_period_end", "cancel_at_period_end", "deleted", "stripe_subscription_id")
+              values
+                ($1, $2, $3, $4, $5, $6, $7, $8)
+              `,
               [
                 Utilities.id(Config.ID_PREFIXES.SUBSCRIPTION),
                 subscription.status,
@@ -131,13 +131,13 @@ export default <ServerRoute[]>[
           await Database.pool
             .query(
               `
-                            update "subscriptions"
-                            set
-                                "status" = $1,
-                                "deleted" = $2
-                            where
-                                "stripe_subscription_id" = $3
-                            `,
+              update "subscriptions"
+              set
+                "status" = $1,
+                "deleted" = $2
+              where
+                "stripe_subscription_id" = $3
+              `,
               [subscription.status, true, subscription.id]
             )
             .catch(() => {
@@ -152,13 +152,13 @@ export default <ServerRoute[]>[
           await Database.pool
             .query(
               `
-                            update "subscriptions"
-                            set
-                                "status" = $1,
-                                "cancel_at_period_end" = $2
-                            where
-                                "stripe_subscription_id" = $3
-                            `,
+              update "subscriptions"
+              set
+                "status" = $1,
+                "cancel_at_period_end" = $2
+              where
+                "stripe_subscription_id" = $3
+              `,
               [
                 subscription.status,
                 subscription.cancel_at_period_end,
@@ -210,12 +210,12 @@ export default <ServerRoute[]>[
           await Database.pool
             .query(
               `
-                            update "subscriptions"
-                            set
-                                "status" = $1
-                            where
-                                "stripe_subscription_id" = $2
-                            `,
+              update "subscriptions"
+              set
+                "status" = $1
+              where
+                "stripe_subscription_id" = $2
+              `,
               [subscription.status, subscription.id]
             )
             .catch(() => {
@@ -238,11 +238,11 @@ export default <ServerRoute[]>[
           await Database.pool
             .query(
               `
-                            insert into "payment_methods"
-                                ("id", "type", "data", "user", "stripe_id")
-                            values
-                                ($1, $2, $3, $4, $5)
-                            `,
+              insert into "payment_methods"
+                ("id", "type", "data", "user", "stripe_id")
+              values
+                ($1, $2, $3, $4, $5)
+              `,
               [
                 Utilities.id(Config.ID_PREFIXES.PAYMENT_METHOD),
                 paymentMethod.type,

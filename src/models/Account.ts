@@ -26,12 +26,12 @@ export class Account {
     await Database.pool
       .query(
         `
-                insert into "accounts"
-                    ("id", "user", "type", "external_id")
-                values
-                    ($1, $2, $3, $4)
-                returning *
-                `,
+        insert into "accounts"
+          ("id", "user", "type", "external_id")
+        values
+          ($1, $2, $3, $4)
+        returning *
+        `,
         [
           id,
           typeof data.user === "string" ? data.user : data.user.id,
@@ -65,13 +65,13 @@ export class Account {
   ): Promise<Account> {
     const result = await Database.pool.query(
       `
-            select *
-            from "accounts"
-            where
-                "user" = $1
-                and
-                "type" = $2
-            `,
+      select *
+      from "accounts"
+      where
+        "user" = $1
+        and
+        "type" = $2
+      `,
       [typeof user === "string" ? user : user.id, type]
     );
 
@@ -88,12 +88,13 @@ export class Account {
   ): Promise<Account> {
     const result = await Database.pool.query(
       `
-            select *
-            from "accounts"
-            where
-                "type" = $1
-                and
-                "external_id" = $2`,
+      select *
+      from "accounts"
+      where
+        "type" = $1
+        and
+        "external_id" = $2
+      `,
       [type, externalId]
     );
 
@@ -120,14 +121,14 @@ export class Account {
   ): Promise<boolean> {
     const result = await Database.pool.query(
       `
-            select 1
-            from "accounts"
-            where
-                "user" = $1
-                and
-                "type" = $2
-            limit 1
-            `,
+      select 1
+      from "accounts"
+      where
+        "user" = $1
+        and
+        "type" = $2
+      limit 1
+      `,
       [typeof user === "string" ? user : user.id, type]
     );
 
@@ -140,14 +141,14 @@ export class Account {
   ): Promise<boolean> {
     const result = await Database.pool.query(
       `
-            select 1
-            from "accounts"
-            where
-                "type" = $1
-                and
-                "external_id" = $2
-            limit 1
-            `,
+      select 1
+      from "accounts"
+      where
+        "type" = $1
+        and
+        "external_id" = $2
+      limit 1
+      `,
       [type, externalId]
     );
 
@@ -160,10 +161,10 @@ export class Account {
   ): Promise<Account[]> {
     const result = await Database.pool.query(
       `
-            select *
-            from "accounts"
-            where "user" = $1
-            `,
+      select *
+      from "accounts"
+      where "user" = $1
+      `,
       [typeof user === "string" ? user : user.id]
     );
 

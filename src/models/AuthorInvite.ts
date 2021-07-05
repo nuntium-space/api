@@ -49,12 +49,12 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
     await Database.pool
       .query(
         `
-                insert into "author_invites"
-                    ("id", "user", "publisher", "expires_at")
-                values
-                    ($1, $2, $3, $4)
-                returning *
-                `,
+        insert into "author_invites"
+          ("id", "user", "publisher", "expires_at")
+        values
+          ($1, $2, $3, $4)
+        returning *
+        `,
         [id, user.id, publisher.id, expiresAt.toISOString()]
       )
       .catch(async () => {
@@ -128,11 +128,11 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
     if (!this.hasExpired()) {
       await client.query(
         `
-                insert into "authors"
-                    ("id", "user", "publisher")
-                values
-                    ($1, $2, $3)
-                `,
+        insert into "authors"
+          ("id", "user", "publisher")
+        values
+          ($1, $2, $3)
+        `,
         [
           Utilities.id(Config.ID_PREFIXES.AUTHOR),
           this.user.id,
@@ -143,9 +143,9 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
 
     await client.query(
       `
-            delete from "author_invites"
-            where "id" = $1
-            `,
+      delete from "author_invites"
+      where "id" = $1
+      `,
       [this.id]
     );
 

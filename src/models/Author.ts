@@ -47,14 +47,14 @@ export class Author implements ISerializable<ISerializedAuthor> {
   ): Promise<Author> {
     const result = await Database.pool.query(
       `
-            select *
-            from "authors"
-            where
-                "user" = $1
-                and
-                "publisher" = $2
-            limit 1
-            `,
+      select *
+      from "authors"
+      where
+        "user" = $1
+        and
+        "publisher" = $2
+      limit 1
+      `,
       [
         user instanceof User ? user.id : user,
         publisher instanceof Publisher ? publisher.id : publisher,

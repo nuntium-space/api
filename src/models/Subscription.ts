@@ -56,13 +56,13 @@ export class Subscription implements ISerializable<ISerializedSubscription> {
     await Database.pool
       .query(
         `
-                update "subscriptions"
-                set
-                    "current_period_end" = $1,
-                    "cancel_at_period_end" = $2
-                where
-                    "stripe_subscription_id" = $3
-                `,
+        update "subscriptions"
+        set
+          "current_period_end" = $1,
+          "cancel_at_period_end" = $2
+        where
+          "stripe_subscription_id" = $3
+        `,
         [
           this.current_period_end.toISOString(),
           this.cancel_at_period_end,

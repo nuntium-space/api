@@ -77,19 +77,19 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   public static async trending(expand?: string[]): Promise<Article[]> {
     const result = await Database.pool.query(
       `
-            select
-                *,
-                (
-                    ("like_count" * 0.2)
-                    + ("view_count" * 0.1)
-                )
-                / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
-                    as "score"
-            from "articles"
-            group by "id"
-            order by "score" desc
-            limit $1
-            `,
+      select
+        *,
+        (
+            ("like_count" * 0.2)
+            + ("view_count" * 0.1)
+        )
+        / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
+            as "score"
+      from "articles"
+      group by "id"
+      order by "score" desc
+      limit $1
+      `,
       [Config.TRENDING_ARTICLES_MAX_LENGTH]
     );
 
@@ -133,29 +133,29 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   ): Promise<Article[]> {
     const result = await Database.pool.query(
       `
-                select
-                    distinct on ("art"."created_at", "art"."id")
-                    "art"."id", "art"."title", "art"."content", "art"."author", "art"."created_at", "art"."updated_at"
-                from
-                    "v_active_subscriptions" as "s"
-                    inner join
-                    "prices" as "p"
-                    on "s"."price" = "p"."id"
-                    inner join
-                    "bundles_publishers" as "bp"
-                    on "p"."bundle" = "bp"."bundle"
-                    inner join
-                    "authors" as "aut"
-                    on "aut"."publisher" = "bp"."publisher"
-                    inner join
-                    "articles" as "art"
-                    on "art"."author" = "aut"."id"
-                where
-                    "s"."user" = $1
-                order by "art"."created_at", "art"."id" desc
-                limit $2
-                offset $3
-                `,
+      select
+        distinct on ("art"."created_at", "art"."id")
+        "art"."id", "art"."title", "art"."content", "art"."author", "art"."created_at", "art"."updated_at"
+      from
+        "v_active_subscriptions" as "s"
+        inner join
+        "prices" as "p"
+        on "s"."price" = "p"."id"
+        inner join
+        "bundles_publishers" as "bp"
+        on "p"."bundle" = "bp"."bundle"
+        inner join
+        "authors" as "aut"
+        on "aut"."publisher" = "bp"."publisher"
+        inner join
+        "articles" as "art"
+        on "art"."author" = "aut"."id"
+      where
+        "s"."user" = $1
+      order by "art"."created_at", "art"."id" desc
+      limit $2
+      offset $3
+      `,
       [user.id, options.limit, options.offset]
     );
 
@@ -170,17 +170,17 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   ): Promise<Article[]> {
     const result = await Database.pool.query(
       `
-            select art.*
-            from
-                articles as art
-                inner join
-                authors as aut
-                on
-                    art.author = aut.id
-                    and
-                    aut.publisher = $1
-            order by "created_at" desc
-            `,
+      select art.*
+      from
+        articles as art
+        inner join
+        authors as aut
+        on
+          art.author = aut.id
+          and
+          aut.publisher = $1
+      order by "created_at" desc
+      `,
       [publisher.id]
     );
 

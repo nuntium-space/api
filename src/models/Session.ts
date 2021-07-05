@@ -27,12 +27,12 @@ export class Session implements ISerializable<ISerializedSession> {
     await Database.pool
       .query(
         `
-                insert into "sessions"
-                    ("id", "user", "expires_at")
-                values
-                    ($1, $2, $3)
-                returning *
-                `,
+        insert into "sessions"
+          ("id", "user", "expires_at")
+        values
+          ($1, $2, $3)
+        returning *
+        `,
         [id, typeof user === "string" ? user : user.id, expiresAt.toISOString()]
       )
       .catch(() => {
