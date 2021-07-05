@@ -25,12 +25,12 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
     await Database.pool
       .query(
         `
-                insert into "bookmarks"
-                    ("user", "article")
-                values
-                    ($1, $2)
-                returning *
-                `,
+        insert into "bookmarks"
+          ("user", "article")
+        values
+          ($1, $2)
+        returning *
+        `,
         [
           user instanceof User ? user.id : user,
           article instanceof Article ? article.id : article,
@@ -48,13 +48,13 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
   ): Promise<Bookmark> {
     const result = await Database.pool.query(
       `
-            select *
-            from "bookmarks"
-            where
-                "user" = $1
-                and
-                "article" = $2
-            `,
+      select *
+      from "bookmarks"
+      where
+        "user" = $1
+        and
+        "article" = $2
+      `,
       [
         user instanceof User ? user.id : user,
         article instanceof Article ? article.id : article,
@@ -71,12 +71,12 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
   public async delete(): Promise<void> {
     await Database.pool.query(
       `
-                delete from "bookmarks"
-                where
-                    "user" = $1
-                    and
-                    "article" = $2
-                `,
+      delete from "bookmarks"
+      where
+        "user" = $1
+        and
+        "article" = $2
+      `,
       [this.user.id, this.article.id]
     );
   }
@@ -91,14 +91,14 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
   ): Promise<boolean> {
     const result = await Database.pool.query(
       `
-            select 1
-            from "bookmarks"
-            where
-                "user" = $1
-                and
-                "article" = $2
-            limit 1
-            `,
+      select 1
+      from "bookmarks"
+      where
+        "user" = $1
+        and
+        "article" = $2
+      limit 1
+      `,
       [
         user instanceof User ? user.id : user,
         article instanceof Article ? article.id : article,
@@ -114,10 +114,10 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
   ): Promise<Bookmark[]> {
     const result = await Database.pool.query(
       `
-            select *
-            from "bookmarks"
-            where "user" = $1
-            `,
+      select *
+      from "bookmarks"
+      where "user" = $1
+      `,
       [user instanceof User ? user.id : user]
     );
 

@@ -42,12 +42,12 @@ export class User implements ISerializable<ISerializedUser> {
     const result = await client
       .query(
         `
-                insert into "users"
-                    ("id", "full_name", "email")
-                values
-                    ($1, $2, $3)
-                returning *
-                `,
+        insert into "users"
+          ("id", "full_name", "email")
+        values
+          ($1, $2, $3)
+        returning *
+        `,
         [id, data.full_name, data.email]
       )
       .catch(async () => {
@@ -119,10 +119,11 @@ export class User implements ISerializable<ISerializedUser> {
   public static async existsWithEmail(email: string): Promise<boolean> {
     const result = await Database.pool.query(
       `
-            select 1
-            from "users"
-            where "email" = $1
-            limit 1`,
+      select 1
+      from "users"
+      where "email" = $1
+      limit 1
+      `,
       [email]
     );
 
@@ -140,13 +141,13 @@ export class User implements ISerializable<ISerializedUser> {
     await client
       .query(
         `
-                update "users"
-                set
-                    "full_name" = $1,
-                    "email" = $2
-                where
-                    "id" = $3
-                `,
+        update "users"
+        set
+          "full_name" = $1,
+          "email" = $2
+        where
+          "id" = $3
+        `,
         [this.full_name, this.email, this.id]
       )
       .catch(async () => {
@@ -220,10 +221,10 @@ export class User implements ISerializable<ISerializedUser> {
     } = await Database.pool
       .query(
         `
-                select "language"
-                from "user_settings"
-                where "user" = $1
-                `,
+        select "language"
+        from "user_settings"
+        where "user" = $1
+        `,
         [this.id]
       )
       .catch(() => {
@@ -239,11 +240,11 @@ export class User implements ISerializable<ISerializedUser> {
     const { rowCount } = await Database.pool
       .query(
         `
-                select "user"
-                from "user_settings"
-                where "user" = $1
-                limit 1
-                `,
+        select "user"
+        from "user_settings"
+        where "user" = $1
+        limit 1
+        `,
         [this.id]
       )
       .catch(() => {
@@ -275,18 +276,18 @@ export class User implements ISerializable<ISerializedUser> {
 
     const query = hasSettings
       ? `
-                update "user_settings"
-                set
-                    "language" = $1
-                where
-                    "user" = $2
-                `
+        update "user_settings"
+        set
+          "language" = $1
+        where
+          "user" = $2
+        `
       : `
-                insert into "user_settings"
-                    ("user", "language")
-                values
-                    ($1, $2)
-                `;
+        insert into "user_settings"
+          ("user", "language")
+        values
+          ($1, $2)
+        `;
 
     const params = hasSettings
       ? [settings.language, this.id]
@@ -318,11 +319,11 @@ export class User implements ISerializable<ISerializedUser> {
   public async canBeDeleted(): Promise<boolean> {
     const authorCountResult = await Database.pool.query(
       `
-                select 1
-                from "authors"
-                where "user" = $1
-                limit 1
-                `,
+      select 1
+      from "authors"
+      where "user" = $1
+      limit 1
+      `,
       [this.id]
     );
 
@@ -332,18 +333,18 @@ export class User implements ISerializable<ISerializedUser> {
 
     const authorCountForOwnedPublishersResult = await Database.pool.query(
       `
-                select 1
-                from
-                    "publishers" as "p"
-                    inner join
-                    "organizations" as "o"
-                    on "p"."organization" = "o"."id"
-                    inner join
-                    "authors" as "a"
-                    on "a"."publisher" = "p"."id"
-                where "o"."user" = $1
-                limit 1
-                `,
+      select 1
+      from
+        "publishers" as "p"
+        inner join
+        "organizations" as "o"
+        on "p"."organization" = "o"."id"
+        inner join
+        "authors" as "a"
+        on "a"."publisher" = "p"."id"
+      where "o"."user" = $1
+      limit 1
+      `,
       [this.id]
     );
 
@@ -353,20 +354,20 @@ export class User implements ISerializable<ISerializedUser> {
   public async canSubscribeToBundle(bundle: Bundle): Promise<boolean> {
     const result = await Database.pool.query(
       `
-                select 1
-                from
-                    "subscriptions" as s
-                    inner join
-                    "prices" as p
-                    on s.price = p.id
-                where
-                    "s"."deleted" = false
-                    and
-                    "s"."user" = $1
-                    and
-                    "p"."bundle" = $2
-                limit 1
-                `,
+      select 1
+      from
+        "subscriptions" as s
+        inner join
+        "prices" as p
+        on s.price = p.id
+      where
+        "s"."deleted" = false
+        and
+        "s"."user" = $1
+        and
+        "p"."bundle" = $2
+      limit 1
+      `,
       [this.id, bundle.id]
     );
 
@@ -376,14 +377,14 @@ export class User implements ISerializable<ISerializedUser> {
   public async isAuthorOfPublisher(publisher: Publisher): Promise<boolean> {
     const result = await Database.pool.query(
       `
-                select 1
-                from "authors"
-                where
-                    "user" = $1
-                    and
-                    "publisher" = $2
-                limit 1
-                `,
+      select 1
+      from "authors"
+      where
+        "user" = $1
+        and
+        "publisher" = $2
+      limit 1
+      `,
       [this.id, publisher.id]
     );
 
@@ -400,21 +401,21 @@ export class User implements ISerializable<ISerializedUser> {
 
     const result = await Database.pool.query(
       `
-                select 1
-                from
-                    "v_active_subscriptions" as s
-                    inner join
-                    "prices" as p
-                    on s.price = p.id
-                    inner join
-                    "bundles_publishers" as bp
-                    on p.bundle = bp.bundle
-                where
-                    "user" = $1
-                    and
-                    "publisher" = $2
-                limit 1
-                `,
+      select 1
+      from
+        "v_active_subscriptions" as s
+        inner join
+        "prices" as p
+        on s.price = p.id
+        inner join
+        "bundles_publishers" as bp
+        on p.bundle = bp.bundle
+      where
+        "user" = $1
+        and
+        "publisher" = $2
+      limit 1
+      `,
       [this.id, publisher.id]
     );
 
@@ -424,11 +425,11 @@ export class User implements ISerializable<ISerializedUser> {
   public async hasActiveSubscriptions(): Promise<boolean> {
     const result = await Database.pool.query(
       `
-                select 1
-                from "v_active_subscriptions"
-                where "user" = $1
-                limit 1
-                `,
+      select 1
+      from "v_active_subscriptions"
+      where "user" = $1
+      limit 1
+      `,
       [this.id]
     );
 

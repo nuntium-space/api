@@ -24,12 +24,12 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     await Database.pool
       .query(
         `
-                insert into "likes"
-                    ("user", "article")
-                values
-                    ($1, $2)
-                returning *
-                `,
+        insert into "likes"
+          ("user", "article")
+        values
+          ($1, $2)
+        returning *
+        `,
         [
           user instanceof User ? user.id : user,
           article instanceof Article ? article.id : article,
@@ -47,13 +47,13 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
   ): Promise<Like> {
     const result = await Database.pool.query(
       `
-            select *
-            from "likes"
-            where
-                "user" = $1
-                and
-                "article" = $2
-            `,
+      select *
+      from "likes"
+      where
+        "user" = $1
+        and
+        "article" = $2
+      `,
       [
         user instanceof User ? user.id : user,
         article instanceof Article ? article.id : article,
@@ -70,12 +70,12 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
   public async delete(): Promise<void> {
     await Database.pool.query(
       `
-                delete from "likes"
-                where
-                    "user" = $1
-                    and
-                    "article" = $2
-                `,
+      delete from "likes"
+      where
+        "user" = $1
+        and
+        "article" = $2
+      `,
       [this.user.id, this.article.id]
     );
   }
@@ -90,14 +90,14 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
   ): Promise<boolean> {
     const result = await Database.pool.query(
       `
-            select 1
-            from "likes"
-            where
-                "user" = $1
-                and
-                "article" = $2
-            limit 1
-            `,
+      select 1
+      from "likes"
+      where
+        "user" = $1
+        and
+        "article" = $2
+      limit 1
+      `,
       [
         user instanceof User ? user.id : user,
         article instanceof Article ? article.id : article,
@@ -113,10 +113,10 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
   ): Promise<Like[]> {
     const result = await Database.pool.query(
       `
-            select *
-            from "likes"
-            where "user" = $1
-            `,
+      select *
+      from "likes"
+      where "user" = $1
+      `,
       [user instanceof User ? user.id : user]
     );
 
