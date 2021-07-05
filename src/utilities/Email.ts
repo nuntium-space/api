@@ -86,6 +86,7 @@ export class Email {
     replace: { [key: string]: string },
     lang: string
   ): string {
+    /* eslint @typescript-eslint/no-var-requires: "off" */
     const translations = require(`../assets/translations/email/${lang}.json`);
 
     let subject = translations[type].subject as string;
@@ -102,6 +103,7 @@ export class Email {
     replace: { [key: string]: string },
     lang: string
   ): string {
+    /* eslint @typescript-eslint/no-var-requires: "off" */
     const translations = require(`../assets/translations/email/${lang}.json`);
 
     let text = (translations[type].lines as string[]).join("\n");
