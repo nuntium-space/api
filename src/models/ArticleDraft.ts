@@ -28,6 +28,7 @@ export class ArticleDraft
     public readonly author: Author | INotExpandedResource,
     public readonly article: Article | INotExpandedResource | null,
     private _status: ArticleDraftStatus,
+    private _reason: string | null,
     public readonly created_at: Date,
     private _updated_at: Date
   ) {}
@@ -42,6 +43,10 @@ export class ArticleDraft
 
   public get status(): ArticleDraftStatus {
     return this._status;
+  }
+
+  public get reason(): string | null {
+    return this._reason;
   }
 
   public get updated_at(): Date {
@@ -439,6 +444,7 @@ export class ArticleDraft
           ? await this.article.serialize({ for: options.for })
           : this.article,
       status: this.status,
+      reason: this.reason,
       created_at: this.created_at.toISOString(),
       updated_at: this.updated_at.toISOString(),
     };
@@ -473,6 +479,7 @@ export class ArticleDraft
       author,
       article,
       data.status,
+      data.reason,
       data.created_at,
       data.updated_at
     );
