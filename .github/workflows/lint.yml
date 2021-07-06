@@ -1,15 +1,10 @@
 name: Lint
 
-on:
-  workflow_run:
-    workflows: ["Format"]
-    types:
-      - completed
+on: push
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: checkout
         uses: actions/checkout@master
