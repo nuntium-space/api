@@ -1,6 +1,8 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
+import type Stripe from "stripe";
+import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Bundle } from "../../models/Bundle";
 import { Organization } from "../../models/Organization";
@@ -34,6 +36,122 @@ export default <ServerRoute[]>[
       );
 
       return price.serialize({ for: authenticatedUser });
+    },
+  },
+  {
+    method: "GET",
+    path: "/prices/{id}/checkout",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.PRICE.required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      if (!authenticatedUser.stripe_customer_id) {
+        throw Boom.badImplementation();
+      }
+
+      const price = await Price.retrieve(request.params.id, [
+        "bundle",
+        "bundle.organization",
+      ]);
+
+      if (
+        !price.stripe_price_id ||
+        !(price.bundle instanceof Bundle) ||
+        !(price.bundle.organization instanceof Organization)
+      ) {
+        throw Boom.badImplementation();
+      }
+
+      if (!price.bundle.organization.stripe_account_enabled) {
+        throw Boom.badRequest(undefined, [
+          {
+            field: "subscription",
+            error: `The organization that owns the bundle '${price.bundle.id}' hasn't enabled payments`,
+          },
+        ]);
+      }
+
+      if (!(await authenticatedUser.canSubscribeToBundle(price.bundle))) {
+        throw Boom.conflict(undefined, [
+          {
+            field: "subscription",
+            error: `The user '${authenticatedUser.id}' is already subscribed to the bundle '${price.bundle.id}'`,
+          },
+        ]);
+      }
+
+      if (!price.active) {
+        throw Boom.forbidden(undefined, [
+          {
+            field: "subscription",
+            error: `The price '${price.id}' is not active`,
+          },
+        ]);
+      }
+
+      if (!price.bundle.active) {
+        throw Boom.forbidden(undefined, [
+          {
+            field: "subscription",
+            error: `The bundle '${price.bundle.id}' is not active`,
+          },
+        ]);
+      }
+
+      const userSettings = await authenticatedUser.retrieveSettings();
+
+      const { url } = await Config.STRIPE.checkout.sessions
+        .create({
+          mode: "subscription",
+          payment_method_types: ["card"],
+          locale:
+            (userSettings.language as Stripe.Checkout.SessionCreateParams.Locale) ??
+            "en",
+          success_url: Config.CLIENT_URL,
+          cancel_url: Config.CLIENT_URL,
+          customer: authenticatedUser.stripe_customer_id,
+          /*
+          TODO: Remove comment once Stripe Tax is available
+          automatic_tax: {
+            enabled: true,
+          },
+          */
+          line_items: [
+            {
+              price: price.stripe_price_id,
+              quantity: 1,
+            },
+          ],
+          subscription_data: {
+            application_fee_percent: Config.STRIPE_CONNECT_FEE_PERCENT,
+            transfer_data: {
+              destination: price.bundle.organization.stripe_account_id,
+            },
+            metadata: {
+              user_id: authenticatedUser.id,
+              price_id: price.id,
+            },
+          },
+          metadata: {
+            user_id: authenticatedUser.id,
+            price_id: price.id,
+          },
+        })
+        .catch(async () => {
+          throw Boom.badRequest();
+        });
+
+      if (!url) {
+        throw Boom.badImplementation();
+      }
+
+      return h.redirect(url);
     },
   },
   {
