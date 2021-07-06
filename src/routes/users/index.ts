@@ -151,7 +151,7 @@ export default <ServerRoute[]>[
           throw Boom.badImplementation();
         });
 
-      return { url };
+      return h.redirect(url);
     },
   },
   {
