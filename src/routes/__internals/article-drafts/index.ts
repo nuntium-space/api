@@ -102,7 +102,9 @@ export default <ServerRoute[]>[
         throw Boom.badImplementation();
       }
 
-      await draft.reject((request.payload as any).reason);
+      const { reason } = request.payload as any;
+
+      await draft.reject(reason);
 
       await Email.send({
         to: draft.author.user,
@@ -111,6 +113,7 @@ export default <ServerRoute[]>[
           ARTICLE_DRAFT_TITLE: draft.title,
           AUTHOR_NAME: draft.author.user.full_name,
           PUBLISHER_NAME: draft.author.publisher.name,
+          REASON: reason,
           CLIENT_URL: Config.CLIENT_URL,
           ARTICLE_DRAFT_ID: draft.id,
         },
