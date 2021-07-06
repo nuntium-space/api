@@ -344,7 +344,7 @@ export class ArticleDraft
         where
           "id" = $2
         `,
-        [this.id, reason]
+        [reason, this.id]
       )
       .catch(() => {
         throw Boom.badRequest();
