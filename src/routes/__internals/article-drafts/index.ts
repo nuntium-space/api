@@ -33,6 +33,13 @@ export default <ServerRoute[]>[
   {
     method: "POST",
     path: "/articles/drafts/{id}/publish",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.ARTICLE_DRAFT.required(),
+        }),
+      }
+    },
     handler: async (request, h) => {
       const draft = await ArticleDraft.retrieve(request.params.id, [
         "author",
@@ -71,6 +78,9 @@ export default <ServerRoute[]>[
     path: "/articles/drafts/{id}/reject",
     options: {
       validate: {
+        params: Joi.object({
+          id: Schema.ID.ARTICLE_DRAFT.required(),
+        }),
         payload: Joi.object({
           reason: Schema.STRING.min(1).required(),
         }),
