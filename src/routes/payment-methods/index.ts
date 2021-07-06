@@ -1,6 +1,7 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
+import type Stripe from "stripe";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { PaymentMethod } from "../../models/PaymentMethod";
@@ -43,41 +44,36 @@ export default <ServerRoute[]>[
     },
   },
   {
-    method: "POST",
-    path: "/users/{id}/payment-methods",
-    options: {
-      validate: {
-        params: Joi.object({
-          id: Schema.ID.USER.required(),
-        }),
-        payload: Joi.object({
-          // ID of a Stripe Payment Method
-          id: Schema.STRING.required(),
-        }),
-      },
-    },
+    method: "GET",
+    path: "/payment-methods/new",
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
-
-      if (request.params.id !== authenticatedUser.id) {
-        throw Boom.forbidden();
-      }
 
       if (!authenticatedUser.stripe_customer_id) {
         throw Boom.badImplementation();
       }
 
-      const paymentMethodId = (request.payload as any).id as string;
+      const userSettings = await authenticatedUser.retrieveSettings();
 
-      await Config.STRIPE.paymentMethods
-        .attach(paymentMethodId, {
+      const { url } = await Config.STRIPE.checkout.sessions
+        .create({
+          mode: "setup",
+          payment_method_types: [ "card" ],
+          locale: userSettings.language as Stripe.Checkout.SessionCreateParams.Locale ?? "en",
+          success_url: Config.CLIENT_URL,
+          cancel_url: Config.CLIENT_URL,
           customer: authenticatedUser.stripe_customer_id,
         })
         .catch(() => {
           throw Boom.badImplementation();
         });
 
-      return h.response();
+        if (!url)
+        {
+          throw Boom.badImplementation();
+        }
+  
+        return h.redirect(url).code(303);
     },
   },
   {
