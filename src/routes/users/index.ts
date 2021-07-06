@@ -126,11 +126,6 @@ export default <ServerRoute[]>[
           id: Schema.ID.USER.required(),
         }),
       },
-      response: {
-        schema: Joi.object({
-          url: Schema.URL.required(),
-        }),
-      },
     },
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
