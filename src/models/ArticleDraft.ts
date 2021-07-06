@@ -335,8 +335,7 @@ export class ArticleDraft
         `
         update "article_drafts"
         set
-          "status" = 'rejected'
-          and
+          "status" = 'rejected',
           "reason" = $1
         where
           "id" = $2
