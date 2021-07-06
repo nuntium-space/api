@@ -42,11 +42,6 @@ export default <ServerRoute[]>[
           id: Schema.ID.ORGANIZATION.required(),
         }),
       },
-      response: {
-        schema: Joi.object({
-          url: Schema.URL.required(),
-        }),
-      },
     },
     handler: async (request, h) => {
       const organization = await Organization.retrieve(request.params.id);
@@ -68,7 +63,7 @@ export default <ServerRoute[]>[
           throw Boom.badImplementation();
         });
 
-      return { url };
+      return h.redirect(url);
     },
   },
   {
@@ -78,11 +73,6 @@ export default <ServerRoute[]>[
       validate: {
         params: Joi.object({
           id: Schema.ID.ORGANIZATION.required(),
-        }),
-      },
-      response: {
-        schema: Joi.object({
-          url: Schema.URL.required(),
         }),
       },
     },
@@ -101,7 +91,7 @@ export default <ServerRoute[]>[
           throw Boom.badImplementation();
         });
 
-      return { url };
+      return h.redirect(url);
     },
   },
   {
