@@ -114,7 +114,7 @@ export default <ServerRoute[]>[
             (userSettings.language as Stripe.Checkout.SessionCreateParams.Locale) ??
             "en",
           success_url: Config.CLIENT_URL,
-          cancel_url: Config.CLIENT_URL,
+          cancel_url: `${Config.CLIENT_URL}/bundle/${price.bundle.id}/subscribe`,
           customer: authenticatedUser.stripe_customer_id,
           /*
           TODO: Remove comment once Stripe Tax is available

@@ -62,8 +62,8 @@ export default <ServerRoute[]>[
           locale:
             (userSettings.language as Stripe.Checkout.SessionCreateParams.Locale) ??
             "en",
-          success_url: Config.CLIENT_URL,
-          cancel_url: Config.CLIENT_URL,
+          success_url: `${Config.CLIENT_URL}/settings/payment-methods`,
+          cancel_url: `${Config.CLIENT_URL}/settings/payment-methods`,
           customer: authenticatedUser.stripe_customer_id,
         })
         .catch(() => {
