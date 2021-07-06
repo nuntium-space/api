@@ -44,7 +44,4 @@ export const SUBSCRIPTION_SCHEMA = {
     cancel_at_period_end: Schema.BOOLEAN.required(),
     deleted: Schema.BOOLEAN.required(),
   }),
-  CREATE: Joi.object({
-    price: Schema.ID.PRICE.required(),
-  }),
 } as const;
