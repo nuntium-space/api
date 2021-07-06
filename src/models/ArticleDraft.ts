@@ -139,7 +139,7 @@ export class ArticleDraft
   }
 
   public async update(data: IUpdateArticleDraft): Promise<void> {
-    if (this.status === "pending-verification") {
+    if (!this.isEditable()) {
       throw Boom.forbidden();
     }
 
@@ -190,6 +190,10 @@ export class ArticleDraft
   ///////////////
   // UTILITIES //
   ///////////////
+
+  public isEditable(): boolean {
+    return this.status !== "pending-verification";
+  }
 
   public async submitForVerification(): Promise<void> {
     const client = await Database.pool.connect();
