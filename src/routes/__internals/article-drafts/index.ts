@@ -38,7 +38,7 @@ export default <ServerRoute[]>[
         params: Joi.object({
           id: Schema.ID.ARTICLE_DRAFT.required(),
         }),
-      }
+      },
     },
     handler: async (request, h) => {
       const draft = await ArticleDraft.retrieve(request.params.id, [
