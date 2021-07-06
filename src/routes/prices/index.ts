@@ -109,8 +109,10 @@ export default <ServerRoute[]>[
       const { url } = await Config.STRIPE.checkout.sessions
         .create({
           mode: "subscription",
-          payment_method_types: [ "card" ],
-          locale: userSettings.language as Stripe.Checkout.SessionCreateParams.Locale ?? "en",
+          payment_method_types: ["card"],
+          locale:
+            (userSettings.language as Stripe.Checkout.SessionCreateParams.Locale) ??
+            "en",
           success_url: Config.CLIENT_URL,
           cancel_url: Config.CLIENT_URL,
           customer: authenticatedUser.stripe_customer_id,
@@ -145,8 +147,7 @@ export default <ServerRoute[]>[
           throw Boom.badRequest();
         });
 
-      if (!url)
-      {
+      if (!url) {
         throw Boom.badImplementation();
       }
 

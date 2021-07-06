@@ -58,8 +58,10 @@ export default <ServerRoute[]>[
       const { url } = await Config.STRIPE.checkout.sessions
         .create({
           mode: "setup",
-          payment_method_types: [ "card" ],
-          locale: userSettings.language as Stripe.Checkout.SessionCreateParams.Locale ?? "en",
+          payment_method_types: ["card"],
+          locale:
+            (userSettings.language as Stripe.Checkout.SessionCreateParams.Locale) ??
+            "en",
           success_url: Config.CLIENT_URL,
           cancel_url: Config.CLIENT_URL,
           customer: authenticatedUser.stripe_customer_id,
@@ -68,12 +70,11 @@ export default <ServerRoute[]>[
           throw Boom.badImplementation();
         });
 
-        if (!url)
-        {
-          throw Boom.badImplementation();
-        }
-  
-        return h.redirect(url);
+      if (!url) {
+        throw Boom.badImplementation();
+      }
+
+      return h.redirect(url);
     },
   },
   {
