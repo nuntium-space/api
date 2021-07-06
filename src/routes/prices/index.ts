@@ -1,6 +1,7 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
+import type Stripe from "stripe";
 import { Config } from "../../config/Config";
 import { Schema } from "../../config/Schema";
 import { Bundle } from "../../models/Bundle";
@@ -103,12 +104,22 @@ export default <ServerRoute[]>[
         ]);
       }
 
+      const userSettings = await authenticatedUser.retrieveSettings();
+
       const { url } = await Config.STRIPE.checkout.sessions
         .create({
           mode: "subscription",
+          payment_method_types: [ "card" ],
+          locale: userSettings.language as Stripe.Checkout.SessionCreateParams.Locale ?? "en",
           success_url: Config.CLIENT_URL,
           cancel_url: Config.CLIENT_URL,
           customer: authenticatedUser.stripe_customer_id,
+          /*
+          TODO: Remove comment once Stripe Tax is available
+          automatic_tax: {
+            enabled: true,
+          },
+          */
           line_items: [
             {
               price: price.stripe_price_id,
