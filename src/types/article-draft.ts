@@ -14,7 +14,7 @@ export interface IDatabaseArticleDraft {
   author: string;
   article: string | null;
   status: ArticleDraftStatus;
-  reason: string | null,
+  reason: string | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -38,7 +38,7 @@ export interface ISerializedArticleDraft {
   author: ISerializedAuthor | INotExpandedResource;
   article: ISerializedArticle | INotExpandedResource | null;
   status: ArticleDraftStatus;
-  reason: string | null,
+  reason: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -57,7 +57,11 @@ export const ARTICLE_DRAFT_SCHEMA = {
         Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ARTICLE)
       )
     ).required(),
-    status: Schema.STRING.valid("draft", "rejected", "pending-verification").required(),
+    status: Schema.STRING.valid(
+      "draft",
+      "rejected",
+      "pending-verification"
+    ).required(),
     reason: Schema.NULLABLE(Schema.STRING.min(1)).required(),
     created_at: Schema.DATETIME.required(),
     updated_at: Schema.DATETIME.required(),
