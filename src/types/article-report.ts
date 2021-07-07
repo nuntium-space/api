@@ -28,8 +28,8 @@ export interface ISerializedArticleReport {
 
 export const ARTICLE_REPORT_SCHEMA = {
   OBJ: Joi.object({
-    id: Schema.ID.ARTICLE_DRAFT.required(),
-    author: Joi.alternatives()
+    id: Schema.ID.ARTICLE_REPORT.required(),
+    user: Joi.alternatives()
       .try(USER_SCHEMA.OBJ, Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER))
       .required(),
     article: Joi.alternatives()
