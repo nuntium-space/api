@@ -1,7 +1,8 @@
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../../config/Schema";
-import { ARTICLE_DRAFT_SCHEMA } from "../../../types/article-draft";
+import { ArticleReport } from "../../../models/ArticleReport";
+import { ARTICLE_REPORT_SCHEMA } from "../../../types/article-report";
 
 export default <ServerRoute[]>[
   {
@@ -14,11 +15,11 @@ export default <ServerRoute[]>[
         }),
       },
       response: {
-        schema: Schema.ARRAY(ARTICLE_DRAFT_SCHEMA.OBJ),
+        schema: Schema.ARRAY(ARTICLE_REPORT_SCHEMA.OBJ),
       },
     },
-    handler: async (request, h) => {
-      // TODO
+    handler: (request, h) => {
+      return ArticleReport.list(request.query.expand);
     },
   },
 ];
