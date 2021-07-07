@@ -10,6 +10,7 @@ export interface IdPrefixes<T> {
   ACCOUNT: T;
   ARTICLE: T;
   ARTICLE_DRAFT: T;
+  ARTICLE_REPORT: T;
   AUTHOR: T;
   AUTHOR_INVITE: T;
   BUNDLE: T;
@@ -55,6 +56,7 @@ export class Config {
     ACCOUNT: "acc",
     ARTICLE: "art",
     ARTICLE_DRAFT: "dft",
+    ARTICLE_REPORT: "rep",
     AUTHOR: "aut",
     AUTHOR_INVITE: "inv",
     BUNDLE: "bdl",
