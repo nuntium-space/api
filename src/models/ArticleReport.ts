@@ -30,7 +30,7 @@ export class ArticleReport
   public static async create(
     data: ICreateArticleReport
   ): Promise<INotExpandedResource> {
-    const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
+    const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_REPORT);
 
     await Database.pool
       .query(
