@@ -20,7 +20,7 @@ export class ArticleReport
     public readonly user: User | INotExpandedResource,
     public readonly article: Article | INotExpandedResource,
     public readonly reason: string,
-    public readonly created_at: Date,
+    public readonly created_at: Date
   ) {}
 
   //////////
@@ -74,8 +74,7 @@ export class ArticleReport
   ///////////////
 
   public static async list(expand?: string[]): Promise<ArticleReport[]> {
-    const result = await Database.pool
-      .query(`
+    const result = await Database.pool.query(`
         select *
         from "article_reports"
         order by "created_at" desc
@@ -119,18 +118,18 @@ export class ArticleReport
       : { id: data.user };
 
     const article = expand?.includes("article")
-        ? await Article.retrieve(
-            data.article,
-            Utilities.getNestedExpandQuery(expand, "article")
-          )
-        : { id: data.article };
+      ? await Article.retrieve(
+          data.article,
+          Utilities.getNestedExpandQuery(expand, "article")
+        )
+      : { id: data.article };
 
     return new ArticleReport(
       data.id,
       user,
       article,
       data.reason,
-      data.created_at,
+      data.created_at
     );
   }
 }
