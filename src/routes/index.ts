@@ -1,5 +1,6 @@
 import accounts from "./accounts";
 import articleDrafts from "./article-drafts";
+import articleReports from "./article-reports";
 import articles from "./articles";
 import auth from "./auth";
 import authorInvites from "./author-invites";
@@ -20,6 +21,7 @@ import __internals from "./__internals";
 export = [
   accounts,
   articleDrafts,
+  articleReports,
   articles,
   auth,
   authorInvites,
