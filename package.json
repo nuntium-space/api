@@ -5,7 +5,7 @@
   "main": "api/index.ts",
   "scripts": {
     "start": "ts-node-dev api/index.ts",
-    "lint": "eslint api/**/*.ts src/**/*.ts"
+    "lint": "eslint api src --ext .ts"
   },
   "keywords": [],
   "author": "",
