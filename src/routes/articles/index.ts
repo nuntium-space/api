@@ -174,9 +174,11 @@ export default <ServerRoute[]>[
         request.query.expand
       );
 
-      const response = h.response(await Promise.all(
-        articles.map((_) => _.serialize({ for: authenticatedUser }))
-      ));
+      const response = h.response(
+        await Promise.all(
+          articles.map((_) => _.serialize({ for: authenticatedUser }))
+        )
+      );
 
       if (!(await authenticatedUser.isSubscribedToPublisher(publisher))) {
         return response.code(402); // Payment Required
