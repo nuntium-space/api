@@ -7,6 +7,7 @@ import {
   ICreatePrice,
   IUpdatePrice,
   IDatabasePrice,
+  PriceBillingPeriod,
 } from "../types/price";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -18,6 +19,7 @@ export class Price implements ISerializable<ISerializedPrice> {
     public readonly id: string,
     public readonly amount: number,
     public readonly currency: string,
+    public readonly billing_period: PriceBillingPeriod,
     public readonly bundle: Bundle | INotExpandedResource,
     private _active: boolean,
     public readonly stripe_price_id: string | null
@@ -73,12 +75,12 @@ export class Price implements ISerializable<ISerializedPrice> {
       .query(
         `
         insert into "prices"
-          ("id", "amount", "currency", "bundle", "active")
+          ("id", "amount", "currency", "billing_period", "bundle", "active")
         values
-          ($1, $2, $3, $4, $5)
+          ($1, $2, $3, $4, $5, $6)
         returning *
         `,
-        [id, data.amount, data.currency, bundle.id, true]
+        [id, data.amount, data.currency, data.billing_period, bundle.id, true]
       )
       .catch(async () => {
         await client.query("rollback");
@@ -92,7 +94,7 @@ export class Price implements ISerializable<ISerializedPrice> {
         unit_amount: data.amount,
         currency: data.currency,
         recurring: {
-          interval: "month",
+          interval: data.billing_period,
         },
         tax_behavior: "exclusive",
         metadata: {
@@ -184,6 +186,7 @@ export class Price implements ISerializable<ISerializedPrice> {
       id: this.id,
       amount: this.amount,
       currency: this.currency,
+      billing_period: this.billing_period,
       bundle:
         this.bundle instanceof Bundle
           ? this.bundle.serialize({ for: options?.for })
@@ -207,6 +210,7 @@ export class Price implements ISerializable<ISerializedPrice> {
       data.id,
       data.amount,
       data.currency,
+      data.billing_period,
       bundle,
       data.active,
       data.stripe_price_id
