@@ -141,6 +141,7 @@ export default <ServerRoute[]>[
       const { url } = await Config.STRIPE.billingPortal.sessions
         .create({
           customer: authenticatedUser.stripe_customer_id,
+          return_url: `${Config.CLIENT_URL}/settings/subscriptions`,
         })
         .catch(() => {
           throw Boom.badImplementation();
