@@ -169,18 +169,20 @@ export default <ServerRoute[]>[
 
       const publisher = await Publisher.retrieve(request.params.id);
 
-      if (!(await authenticatedUser.isSubscribedToPublisher(publisher))) {
-        throw Boom.paymentRequired();
-      }
-
       const articles = await Article.forPublisher(
         publisher,
         request.query.expand
       );
 
-      return Promise.all(
+      const response = h.response(await Promise.all(
         articles.map((_) => _.serialize({ for: authenticatedUser }))
-      );
+      ));
+
+      if (!(await authenticatedUser.isSubscribedToPublisher(publisher))) {
+        return response.code(402); // Payment Required
+      }
+
+      return response;
     },
   },
   {
