@@ -116,6 +116,9 @@ export default <ServerRoute[]>[
           success_url: Config.CLIENT_URL,
           cancel_url: `${Config.CLIENT_URL}/bundle/${price.bundle.id}/subscribe`,
           customer: authenticatedUser.stripe_customer_id,
+          customer_update: {
+            address: "auto",
+          },
           automatic_tax: {
             enabled: true,
           },
