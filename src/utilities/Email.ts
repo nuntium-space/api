@@ -119,7 +119,7 @@ export class Email {
     let text = (translations[type].lines as string[]).join("<br>");
 
     for (const _ in replace) {
-      text = text.replace(new RegExp(`\{\{ ${_} \}\}`, "g"), replace[_]);
+      text = text.replace(new RegExp(`{{ ${_} }}`, "g"), replace[_]);
     }
 
     text += "<br><br>";
