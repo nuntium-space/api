@@ -1,14 +1,14 @@
 import Boom from "@hapi/boom";
 import { Request } from "@hapi/hapi";
-import { createHmac, timingSafeEqual } from "crypto";
-import cuid from "cuid";
+import { randomBytes, createHmac, timingSafeEqual } from "crypto";
 import readingTime from "reading-time";
+import { Config } from "../config/Config";
 import { Session } from "../models/Session";
 import { User } from "../models/User";
 
 export default class Utilities {
   public static id(prefix: string): string {
-    return `${prefix}_${cuid()}`;
+    return `${prefix}_${randomBytes(Config.ID_BYTE_LENGTH).toString("hex")}`;
   }
 
   public static formatCurrencyAmount(amount: number, currency: string): number {

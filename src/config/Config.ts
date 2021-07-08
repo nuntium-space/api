@@ -52,6 +52,7 @@ export class Config {
 
   public static readonly SIGN_IN_REQUEST_TOKEN_BYTES = 60;
 
+  public static readonly ID_BYTE_LENGTH = 15;
   public static readonly ID_PREFIXES: IdPrefixes<string> = {
     ACCOUNT: "acc",
     ARTICLE: "art",
