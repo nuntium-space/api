@@ -94,6 +94,7 @@ export class Price implements ISerializable<ISerializedPrice> {
         recurring: {
           interval: "month",
         },
+        tax_behavior: "exclusive",
         metadata: {
           price_id: result.rows[0].id,
         },
