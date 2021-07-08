@@ -7,6 +7,7 @@ enum EmailType {
   ARTICLE_DRAFT_PUBLISHED = "ARTICLE_DRAFT_PUBLISHED",
   ARTICLE_DRAFT_REJECTED = "ARTICLE_DRAFT_REJECTED",
   AUTHOR_INVITE = "AUTHOR_INVITE",
+  AUTHOR_INVITE_NO_USER = "AUTHOR_INVITE_NO_USER",
 }
 
 interface EmailData {
@@ -47,6 +48,13 @@ export class Email {
       } as const,
       translation: "author_invite",
     } as const,
+    AUTHOR_INVITE_NO_USER: {
+      from: {
+        name: "nuntium",
+        email: "invites@nuntium.space",
+      } as const,
+      translation: "author_invite_no_user",
+    } as const,
   } as const;
 
   public static async send(data: {
@@ -71,7 +79,7 @@ export class Email {
         to: data.to,
         from: data.type.from,
         subject: Email.getSubject(data.type.translation, data.replace, lang),
-        text: Email.getText(data.type.translation, data.replace, lang),
+        html: Email.getText(data.type.translation, data.replace, lang),
         trackingSettings: {
           clickTracking: {
             enable: false,
@@ -108,14 +116,14 @@ export class Email {
     /* eslint @typescript-eslint/no-var-requires: "off" */
     const translations = require(`../assets/translations/email/${lang}.json`);
 
-    let text = (translations[type].lines as string[]).join("\n");
+    let text = (translations[type].lines as string[]).join("<br>");
 
     for (const _ in replace) {
-      text = text.replace(`{{ ${_} }}`, replace[_]);
+      text = text.replace(new RegExp(`\{\{ ${_} \}\}`, "g"), replace[_]);
     }
 
-    text += "\n\n";
-    text += (translations.__end.lines as string[]).join("\n");
+    text += "<br><br>";
+    text += (translations.__end.lines as string[]).join("<br>");
 
     return text;
   }

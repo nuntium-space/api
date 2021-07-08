@@ -6,7 +6,7 @@
       "We received a request to sign into your account",
       "If this is you click the link below to accept the sign in",
       "If you are not sure and decide not to click it no one will gain access to your account\n",
-      "{{ API_URL }}/auth/email/{{ TOKEN }}"
+      "<a href='{{ API_URL }}/auth/email/{{ TOKEN }}'>Accept Sign In Request</a>"
     ]
   },
   "article_draft_published": {
@@ -14,8 +14,7 @@
     "lines": [
       "Hi,",
       "The article \"{{ ARTICLE_DRAFT_TITLE }}\" written by \"{{ AUTHOR_NAME }}\" for \"{{ PUBLISHER_NAME }}\" has been approved and it's now available to read.",
-      "You can see it at the following link:",
-      "{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}"
+      "You can see it <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>here</a>."
     ]
   },
   "article_draft_rejected": {
@@ -26,8 +25,7 @@
       "----",
       "{{ REASON }}",
       "----\n",
-      "You can edit this draft at the following link and re-submit it when done:",
-      "{{ CLIENT_URL }}/draft/{{ ARTICLE_DRAFT_ID }}"
+      "You can edit this draft <a href='{{ CLIENT_URL }}/draft/{{ ARTICLE_DRAFT_ID }}'>here</a> and re-submit it when done."
     ]
   },
   "author_invite": {
@@ -35,11 +33,22 @@
     "lines": [
       "Hi,",
       "You've been invited to be an author for the publisher \"{{ PUBLISHER_NAME }}\"",
-      "To accept the invite click the following link and then the \"Accept\" button",
-      "{{ CLIENT_URL }}/settings/invites"
+      "To accept the invite go to <a href='{{ CLIENT_URL }}/settings/invites'>your account settings</a> and then click the \"Accept\" button.</li>"
+    ]
+  },
+  "author_invite_no_user": {
+    "subject": "You've been invited to be an author for \"{{ PUBLISHER_NAME }}\"",
+    "lines": [
+      "Hi,",
+      "You've been invited to be an author for the publisher \"{{ PUBLISHER_NAME }}\"",
+      "To accept the invite follow these steps:",
+      "<ol>",
+      "<li><a href='{{ CLIENT_URL }}/signin'>Create a nuntium account</a></li>",
+      "<li><a href='{{ CLIENT_URL }}/settings/invites'>Go to your account settings</a> and then click the \"Accept\" button</li>",
+      "</ol>"
     ]
   },
   "__end": {
-    "lines": ["The nuntium team"]
+    "lines": ["<i>The nuntium team</i>"]
   }
 }

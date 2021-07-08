@@ -31,7 +31,9 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
   ): Promise<INotExpandedResource> {
     const publisher = await Publisher.retrieve(data.publisher);
 
-    if (await User.existsWithEmail(data.email)) {
+    const userExists = await User.existsWithEmail(data.email);
+
+    if (userExists) {
       const user = await User.retrieveWithEmail(data.email);
 
       if (await user.isAuthorOfPublisher(publisher)) {
@@ -68,7 +70,9 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
 
     await Email.send({
       to: data.email,
-      type: Email.TYPE.AUTHOR_INVITE,
+      type: userExists
+        ? Email.TYPE.AUTHOR_INVITE
+        : Email.TYPE.AUTHOR_INVITE_NO_USER,
       replace: {
         PUBLISHER_NAME: publisher.name,
         CLIENT_URL: Config.CLIENT_URL,
