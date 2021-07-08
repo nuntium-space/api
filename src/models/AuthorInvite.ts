@@ -177,8 +177,8 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
     expand?: string[]
   ): Promise<AuthorInvite[]> {
     const result = await Database.pool.query(
-      `select * from "author_invites" where "user" = $1`,
-      [user.id]
+      `select * from "author_invites" where "user_email" = $1`,
+      [user.email]
     );
 
     return Promise.all(
