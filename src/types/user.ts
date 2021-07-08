@@ -39,7 +39,7 @@ export interface ISerializedUser {
 export const USER_SCHEMA = {
   OBJ: Joi.object({
     id: Schema.ID.USER.required(),
-    type: Schema.STRING.allow("admin", "user").optional(), // Not included if sent to another user
+    type: Schema.STRING.valid("admin", "user").optional(), // Not included if sent to another user
     full_name: Schema.NULLABLE(Schema.STRING).required(),
     email: Schema.EMAIL.optional(), // Not included if sent to another user
   }),
