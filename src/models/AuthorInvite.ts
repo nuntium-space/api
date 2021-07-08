@@ -34,8 +34,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
     if (await User.existsWithEmail(data.email)) {
       const user = await User.retrieveWithEmail(data.email);
 
-      if (await user.isAuthorOfPublisher(publisher))
-      {
+      if (await user.isAuthorOfPublisher(publisher)) {
         throw Boom.conflict();
       }
     }
@@ -135,11 +134,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
         values
           ($1, $2, $3)
         `,
-        [
-          Utilities.id(Config.ID_PREFIXES.AUTHOR),
-          user.id,
-          this.publisher.id,
-        ]
+        [Utilities.id(Config.ID_PREFIXES.AUTHOR), user.id, this.publisher.id]
       );
     }
 
