@@ -69,6 +69,7 @@ export class Bundle implements ISerializable<ISerializedBundle> {
     await Config.STRIPE.products
       .create({
         name: data.name,
+        tax_code: "txcd_10304100", // Digital newspaper -- subscription
         metadata: {
           bundle_id: result.rows[0].id,
         },
