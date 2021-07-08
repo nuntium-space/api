@@ -38,8 +38,7 @@ export default <ServerRoute[]>[
         request.query.expand
       );
 
-      // Pass the author.user to load email address
-      return invites.map((_) => _.serialize({ for: _.user }));
+      return invites.map((_) => _.serialize());
     },
   },
   {
@@ -70,8 +69,7 @@ export default <ServerRoute[]>[
         request.query.expand
       );
 
-      // Pass the author.user to load email address
-      return invites.map((_) => _.serialize({ for: _.user }));
+      return invites.map((_) => _.serialize());
     },
   },
   {
@@ -89,7 +87,7 @@ export default <ServerRoute[]>[
 
       const invite = await AuthorInvite.retrieve(request.params.id);
 
-      if (authenticatedUser.id !== invite.user.id) {
+      if (authenticatedUser.email !== invite.user_email) {
         throw Boom.forbidden();
       }
 
