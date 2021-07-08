@@ -228,11 +228,11 @@ export default <ServerRoute[]>[
       await client
         .query(
           `
-                    insert into "sign_in_requests"
-                        ("id", "token", "user", "expires_at")
-                    values
-                        ($1, $2, $3, $4)
-                    `,
+          insert into "sign_in_requests"
+            ("id", "token", "user", "expires_at")
+          values
+            ($1, $2, $3, $4)
+          `,
           [id, token, user.id, expiresAt.toISOString()]
         )
         .catch(async () => {
@@ -242,7 +242,7 @@ export default <ServerRoute[]>[
         });
 
       await Email.send({
-        to: user,
+        to: email,
         type: Email.TYPE.AUTH,
         replace: {
           API_URL: Config.API_URL,

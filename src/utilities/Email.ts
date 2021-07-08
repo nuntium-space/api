@@ -1,6 +1,5 @@
 import Boom from "@hapi/boom";
 import sendgrid from "@sendgrid/mail";
-import { INotExpandedResource } from "../common/INotExpandedResource";
 import { User } from "../models/User";
 
 enum EmailType {
@@ -51,22 +50,25 @@ export class Email {
   } as const;
 
   public static async send(data: {
-    to: User | INotExpandedResource;
+    to: string;
     type: EmailData;
     replace: {
       [key: string]: string;
     };
   }): Promise<void> {
-    const to =
-      data.to instanceof User ? data.to : await User.retrieve(data.to.id);
+    let lang = "en";
 
-    const userSettings = await to.retrieveSettings();
+    if (await User.existsWithEmail(data.to)) {
+      const user = await User.retrieveWithEmail(data.to);
 
-    const lang = userSettings.language ?? "en";
+      const userSettings = await user.retrieveSettings();
+
+      lang = userSettings.language ?? lang;
+    }
 
     await sendgrid
       .send({
-        to: to.email,
+        to: data.to,
         from: data.type.from,
         subject: Email.getSubject(data.type.translation, data.replace, lang),
         text: Email.getText(data.type.translation, data.replace, lang),

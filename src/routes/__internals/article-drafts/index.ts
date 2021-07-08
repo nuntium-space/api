@@ -59,7 +59,7 @@ export default <ServerRoute[]>[
       const { id } = await draft.publish();
 
       await Email.send({
-        to: draft.author.user,
+        to: draft.author.user.email,
         type: Email.TYPE.ARTICLE_DRAFT_PUBLISHED,
         replace: {
           ARTICLE_DRAFT_TITLE: draft.title,
@@ -107,7 +107,7 @@ export default <ServerRoute[]>[
       await draft.reject(reason);
 
       await Email.send({
-        to: draft.author.user,
+        to: draft.author.user.email,
         type: Email.TYPE.ARTICLE_DRAFT_REJECTED,
         replace: {
           ARTICLE_DRAFT_TITLE: draft.title,
