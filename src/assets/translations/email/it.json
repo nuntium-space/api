@@ -3,17 +3,17 @@
     "subject": "Accetta richiesta di accesso",
     "lines": [
       "Ciao,",
-      "Abbiamo ricevuto una richiesta di accesso al tuo account",
-      "Se sei stato tu clicca il link qui sotto per accettare l'accesso",
-      "Se non sei sicuro e decidi di non cliccarlo nessuno otterrà l'accesso al tuo account\n",
-      "<a href='{{ API_URL }}/auth/email/{{ TOKEN }}'>Accetta richiesta di accesso</a>"
+      "Abbiamo ricevuto una richiesta di accesso al tuo account.",
+      "Se sei stato tu clicca il link qui sotto per accettare l'accesso.",
+      "Se non sei sicuro e decidi di non cliccarlo nessuno otterrà l'accesso al tuo account.\n",
+      "<a href='{{ API_URL }}/auth/email/{{ TOKEN }}'>Accetta richiesta di accesso</a>."
     ]
   },
   "article_draft_published": {
     "subject": "Articolo pubblicato: \"{{ ARTICLE_DRAFT_TITLE }}\"",
     "lines": [
       "Ciao,",
-      "L'articolo \"{{ ARTICLE_DRAFT_TITLE }}\" scritto da \"{{ AUTHOR_NAME }}\" per \"{{ PUBLISHER_NAME }}\" è stato approvato ed è ora disponibile alla lettura.",
+      "L'articolo <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>{{ ARTICLE_DRAFT_TITLE }}</a> scritto da <a href='{{ CLIENT_URL }}/a/{{ AUTHOR_ID }}'>{{ AUTHOR_NAME }}</a> per <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a> è stato approvato ed è ora disponibile alla lettura.",
       "Puoi vederlo <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>qui</a>."
     ]
   },
@@ -21,18 +21,18 @@
     "subject": "Bozza di articolo rifiutata: \"{{ ARTICLE_DRAFT_TITLE }}\"",
     "lines": [
       "Ciao,",
-      "Ci dispiace informarti che la bozza di articolo \"{{ ARTICLE_DRAFT_TITLE }}\" scritta da \"{{ AUTHOR_NAME }}\" per \"{{ PUBLISHER_NAME }}\" è stata rifiutata con la seguente motivazione:\n",
+      "Ci dispiace informarti che la bozza di articolo <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>{{ ARTICLE_DRAFT_TITLE }}</a> scritta da <a href='{{ CLIENT_URL }}/a/{{ AUTHOR_ID }}'>{{ AUTHOR_NAME }}</a> per <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a> è stata rifiutata con la seguente motivazione:\n",
       "----",
       "{{ REASON }}",
       "----\n",
-      "Puoi modificare la bozza <a href='{{ CLIENT_URL }}/draft/{{ ARTICLE_DRAFT_ID }}'>qui</a> e reinviarla per la verifica quando hai finito"
+      "Puoi modificare la bozza <a href='{{ CLIENT_URL }}/draft/{{ ARTICLE_DRAFT_ID }}'>qui</a> e reinviarla per la verifica quando hai finito."
     ]
   },
   "author_invite": {
     "subject": "Sei stato invitato ad essere autore per \"{{ PUBLISHER_NAME }}\"",
     "lines": [
       "Ciao,",
-      "Sei stato invitato ad essere autore per l'editore \"{{ PUBLISHER_NAME }}\"",
+      "Sei stato invitato ad essere autore per l'editore <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a>.",
       "Per accettare l'invito vai alle <a href='{{ CLIENT_URL }}/settings/invites'>impostazioni del tuo account</a> e clicca sul pulsante \"Accetta\".</li>"
     ]
   },
@@ -40,7 +40,7 @@
     "subject": "You've been invited to be an author for \"{{ PUBLISHER_NAME }}\"",
     "lines": [
       "Ciao,",
-      "Sei stato invitato ad essere autore per l'editore \"{{ PUBLISHER_NAME }}\"",
+      "Sei stato invitato ad essere autore per l'editore <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a>.",
       "Per accettare l'invito segui questi passaggi:",
       "<ol>",
       "<li><a href='{{ CLIENT_URL }}/signin'>Create a nuntium account</a></li>",

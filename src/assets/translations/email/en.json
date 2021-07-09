@@ -3,17 +3,17 @@
     "subject": "Accept Sign In Request",
     "lines": [
       "Hi,",
-      "We received a request to sign into your account",
-      "If this is you click the link below to accept the sign in",
-      "If you are not sure and decide not to click it no one will gain access to your account\n",
-      "<a href='{{ API_URL }}/auth/email/{{ TOKEN }}'>Accept Sign In Request</a>"
+      "We received a request to sign into your account.",
+      "If this is you click the link below to accept the sign in.",
+      "If you are not sure and decide not to click it no one will gain access to your account.\n",
+      "<a href='{{ API_URL }}/auth/email/{{ TOKEN }}'>Accept Sign In Request</a>."
     ]
   },
   "article_draft_published": {
     "subject": "Article published: \"{{ ARTICLE_DRAFT_TITLE }}\"",
     "lines": [
       "Hi,",
-      "The article \"{{ ARTICLE_DRAFT_TITLE }}\" written by \"{{ AUTHOR_NAME }}\" for \"{{ PUBLISHER_NAME }}\" has been approved and it's now available to read.",
+      "The article <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>{{ ARTICLE_DRAFT_TITLE }}</a> written by <a href='{{ CLIENT_URL }}/a/{{ AUTHOR_ID }}'>{{ AUTHOR_NAME }}</a> for <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a> has been approved and it's now available to read.",
       "You can see it <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>here</a>."
     ]
   },
@@ -21,7 +21,7 @@
     "subject": "Article draft rejected: \"{{ ARTICLE_DRAFT_TITLE }}\"",
     "lines": [
       "Hi,",
-      "We are sorry to say that the article draft \"{{ ARTICLE_DRAFT_TITLE }}\" written by \"{{ AUTHOR_NAME }}\" for \"{{ PUBLISHER_NAME }}\" has been rejected with the following reason:\n",
+      "We are sorry to say that the article draft <a href='{{ CLIENT_URL }}/article/{{ ARTICLE_DRAFT_ID }}'>{{ ARTICLE_DRAFT_TITLE }}</a> written by <a href='{{ CLIENT_URL }}/a/{{ AUTHOR_ID }}'>{{ AUTHOR_NAME }}</a> for <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a> has been rejected with the following reason:\n",
       "----",
       "{{ REASON }}",
       "----\n",
@@ -32,7 +32,7 @@
     "subject": "You've been invited to be an author for \"{{ PUBLISHER_NAME }}\"",
     "lines": [
       "Hi,",
-      "You've been invited to be an author for the publisher \"{{ PUBLISHER_NAME }}\"",
+      "You've been invited to be an author for the publisher <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a>.",
       "To accept the invite go to <a href='{{ CLIENT_URL }}/settings/invites'>your account settings</a> and then click the \"Accept\" button.</li>"
     ]
   },
@@ -40,7 +40,7 @@
     "subject": "You've been invited to be an author for \"{{ PUBLISHER_NAME }}\"",
     "lines": [
       "Hi,",
-      "You've been invited to be an author for the publisher \"{{ PUBLISHER_NAME }}\"",
+      "You've been invited to be an author for the publisher <a href='{{ CLIENT_URL }}/p/{{ PUBLISHER_ID }}'>{{ PUBLISHER_NAME }}</a>.",
       "To accept the invite follow these steps:",
       "<ol>",
       "<li><a href='{{ CLIENT_URL }}/signin'>Create a nuntium account</a></li>",

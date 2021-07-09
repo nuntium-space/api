@@ -74,6 +74,7 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
         ? Email.TYPE.AUTHOR_INVITE
         : Email.TYPE.AUTHOR_INVITE_NO_USER,
       replace: {
+        PUBLISHER_ID: publisher.id,
         PUBLISHER_NAME: publisher.name,
         CLIENT_URL: Config.CLIENT_URL,
       },

@@ -62,11 +62,13 @@ export default <ServerRoute[]>[
         to: draft.author.user.email,
         type: Email.TYPE.ARTICLE_DRAFT_PUBLISHED,
         replace: {
+          ARTICLE_DRAFT_ID: id,
           ARTICLE_DRAFT_TITLE: draft.title,
+          AUTHOR_ID: draft.author.id,
           AUTHOR_NAME: draft.author.user.full_name,
+          PUBLISHER_ID: draft.author.publisher.id,
           PUBLISHER_NAME: draft.author.publisher.name,
           CLIENT_URL: Config.CLIENT_URL,
-          ARTICLE_DRAFT_ID: id,
         },
       });
 
@@ -110,12 +112,14 @@ export default <ServerRoute[]>[
         to: draft.author.user.email,
         type: Email.TYPE.ARTICLE_DRAFT_REJECTED,
         replace: {
+          ARTICLE_DRAFT_ID: draft.id,
           ARTICLE_DRAFT_TITLE: draft.title,
+          AUTHOR_ID: draft.author.id,
           AUTHOR_NAME: draft.author.user.full_name,
+          PUBLISHER_ID: draft.author.publisher.id,
           PUBLISHER_NAME: draft.author.publisher.name,
           REASON: reason,
           CLIENT_URL: Config.CLIENT_URL,
-          ARTICLE_DRAFT_ID: draft.id,
         },
       });
 
