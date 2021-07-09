@@ -50,9 +50,7 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
         set "like_count" = "like_count" + 1
         where "id" = $1
         `,
-        [
-          article instanceof Article ? article.id : article,
-        ]
+        [article instanceof Article ? article.id : article]
       )
       .catch(async () => {
         await client.query("rollback");
@@ -95,21 +93,22 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await client.query(
-      `
+    await client
+      .query(
+        `
       delete from "likes"
       where
         "user" = $1
         and
         "article" = $2
       `,
-      [this.user.id, this.article.id]
-    )
-    .catch(async () => {
-      await client.query("rollback");
+        [this.user.id, this.article.id]
+      )
+      .catch(async () => {
+        await client.query("rollback");
 
-      throw Boom.badImplementation();
-    });
+        throw Boom.badImplementation();
+      });
 
     await client
       .query(
@@ -118,9 +117,7 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
         set "like_count" = "like_count" - 1
         where "id" = $1
         `,
-        [
-          this.article.id,
-        ]
+        [this.article.id]
       )
       .catch(async () => {
         await client.query("rollback");

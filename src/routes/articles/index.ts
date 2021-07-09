@@ -94,7 +94,7 @@ export default <ServerRoute[]>[
         values
           ($1, $2)
         `,
-        [Utilities.id(Config.ID_PREFIXES.ARTICLE_VIEW), article.id],
+        [Utilities.id(Config.ID_PREFIXES.ARTICLE_VIEW), article.id]
       );
 
       await client.query(
@@ -103,7 +103,7 @@ export default <ServerRoute[]>[
         set "view_count" = "view_count" + 1
         where "id" = $1
         `,
-        [article.id],
+        [article.id]
       );
 
       const { rowCount } = await client.query(
