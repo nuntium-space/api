@@ -70,7 +70,10 @@ export default <ServerRoute[]>[
 
       // An author can read its own articles, but it does not count as a view
       if (author.user.id === authenticatedUser.id) {
-        return article.serialize({ for: authenticatedUser, includeContent: true });
+        return article.serialize({
+          for: authenticatedUser,
+          includeContent: true,
+        });
       }
 
       if (
