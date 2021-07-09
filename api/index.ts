@@ -308,9 +308,9 @@ const init = async () => {
         expand: request.query.expand,
       });
 
-      return Promise.all(articles.map((_) =>
-        _.serialize({ for: authenticatedUser })
-      ));
+      return Promise.all(
+        articles.map((_) => _.serialize({ for: authenticatedUser }))
+      );
     },
   });
 
