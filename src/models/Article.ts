@@ -172,6 +172,25 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     );
   }
 
+  public static async forAuthor(
+    author: Author | INotExpandedResource | string,
+    expand?: string[]
+  ): Promise<Article[]> {
+    const result = await Database.pool.query(
+      `
+      select *
+      from "articles"
+      where "author" = $1
+      order by "created_at" desc
+      `,
+      [typeof author === "string" ? author : author.id]
+    );
+
+    return Promise.all(
+      result.rows.map((row) => Article.deserialize(row, expand))
+    );
+  }
+
   public static async forPublisher(
     publisher: Publisher,
     expand?: string[]

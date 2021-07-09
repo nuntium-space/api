@@ -150,6 +150,35 @@ export default <ServerRoute[]>[
   },
   {
     method: "GET",
+    path: "/authors/{id}/articles",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.AUTHOR.required(),
+        }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
+      },
+      response: {
+        schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).required(),
+      },
+    },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      const articles = await Article.forAuthor(
+        request.params.id,
+        request.query.expand
+      );
+
+      return Promise.all(
+        articles.map((_) => _.serialize({ for: authenticatedUser }))
+      );
+    },
+  },
+  {
+    method: "GET",
     path: "/publishers/{id}/articles",
     options: {
       validate: {
