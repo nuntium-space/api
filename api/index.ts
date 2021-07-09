@@ -292,7 +292,7 @@ const init = async () => {
         }),
       },
       response: {
-        schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ).required(),
+        schema: Schema.ARRAY(ARTICLE_SCHEMA.OBJ),
       },
     },
     handler: async (request, h) => {
@@ -308,9 +308,9 @@ const init = async () => {
         expand: request.query.expand,
       });
 
-      return articles.map((article) =>
-        article.serialize({ for: authenticatedUser })
-      );
+      return Promise.all(articles.map((_) =>
+        _.serialize({ for: authenticatedUser })
+      ));
     },
   });
 
