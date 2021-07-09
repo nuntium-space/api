@@ -89,6 +89,16 @@ export default <ServerRoute[]>[
 
       await client.query(
         `
+        insert into "article_views"
+          ("id", "article")
+        values
+          ($1, $2)
+        `,
+        [Utilities.id(Config.ID_PREFIXES.ARTICLE_VIEW), article.id],
+      );
+
+      await client.query(
+        `
         update "articles"
         set "view_count" = "view_count" + 1
         where "id" = $1
