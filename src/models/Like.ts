@@ -96,12 +96,12 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     await client
       .query(
         `
-      delete from "likes"
-      where
-        "user" = $1
-        and
-        "article" = $2
-      `,
+        delete from "likes"
+        where
+          "user" = $1
+          and
+          "article" = $2
+        `,
         [this.user.id, this.article.id]
       )
       .catch(async () => {
