@@ -21,23 +21,47 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     user: User | string,
     article: Article | string
   ): Promise<void> {
-    await Database.pool
+    const client = await Database.pool.connect();
+    await client.query("begin");
+
+    await client
       .query(
         `
         insert into "likes"
           ("user", "article")
         values
           ($1, $2)
-        returning *
         `,
         [
           user instanceof User ? user.id : user,
           article instanceof Article ? article.id : article,
         ]
       )
-      .catch(() => {
+      .catch(async () => {
+        await client.query("rollback");
+
         throw Boom.badImplementation();
       });
+
+    await client
+      .query(
+        `
+        update "articles"
+        set "like_count" = "like_count" + 1
+        where "id" = $1
+        `,
+        [
+          article instanceof Article ? article.id : article,
+        ]
+      )
+      .catch(async () => {
+        await client.query("rollback");
+
+        throw Boom.badImplementation();
+      });
+
+    await client.query("commit");
+    client.release();
   }
 
   public static async retrieveWithUserAndArticle(
@@ -68,7 +92,10 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(
+    const client = await Database.pool.connect();
+    await client.query("begin");
+
+    await client.query(
       `
       delete from "likes"
       where
@@ -77,7 +104,32 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
         "article" = $2
       `,
       [this.user.id, this.article.id]
-    );
+    )
+    .catch(async () => {
+      await client.query("rollback");
+
+      throw Boom.badImplementation();
+    });
+
+    await client
+      .query(
+        `
+        update "articles"
+        set "like_count" = "like_count" - 1
+        where "id" = $1
+        `,
+        [
+          this.article.id,
+        ]
+      )
+      .catch(async () => {
+        await client.query("rollback");
+
+        throw Boom.badImplementation();
+      });
+
+    await client.query("commit");
+    client.release();
   }
 
   ///////////////

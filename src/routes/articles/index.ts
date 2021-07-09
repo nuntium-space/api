@@ -84,10 +84,19 @@ export default <ServerRoute[]>[
           .code(402); // Payment Required
       }
 
-      // TODO:
-      // Increment article view_count
+      const client = await Database.pool.connect();
+      await client.query("begin");
 
-      const { rowCount } = await Database.pool.query(
+      await client.query(
+        `
+        update "articles"
+        set "view_count" = "view_count" + 1
+        where "id" = $1
+        `,
+        [article.id],
+      );
+
+      const { rowCount } = await client.query(
         `
         select 1
         from "user_history"
@@ -105,11 +114,14 @@ export default <ServerRoute[]>[
           ? `insert into "user_history" ("user", "article", "last_viewed_at") values ($1, $2, $3)`
           : `update "user_history" set "last_viewed_at" = $3 where "user" = $1 and "article" = $2`;
 
-      await Database.pool.query(query, [
+      await client.query(query, [
         authenticatedUser.id,
         article.id,
         new Date().toISOString(),
       ]);
+
+      await client.query("commit");
+      client.release();
 
       return article.serialize({
         for: authenticatedUser,
