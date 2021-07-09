@@ -34,10 +34,10 @@ export const ARTICLE_SCHEMA = {
     id: Schema.ID.ARTICLE.required(),
     title: Schema.STRING.max(50).required(),
     content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
-    reading_time: Joi.number().integer().min(0).required(),
     author: Joi.alternatives()
       .try(AUTHOR_SCHEMA.OBJ, Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR))
       .required(),
+    reading_time: Joi.number().integer().min(0).required(),
     created_at: Schema.DATETIME.required(),
     updated_at: Schema.DATETIME.required(),
     __metadata: Joi.object({
