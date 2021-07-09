@@ -135,7 +135,15 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
       `
       select
         distinct on ("art"."created_at", "art"."id")
-        "art"."id", "art"."title", "art"."content", "art"."author", "art"."created_at", "art"."updated_at"
+        "art"."id",
+        "art"."title",
+        "art"."content",
+        "art"."author",
+        "art"."reading_time",
+        "art"."view_count",
+        "art"."like_count",
+        "art"."created_at",
+        "art"."updated_at"
       from
         "v_active_subscriptions" as "s"
         inner join
@@ -216,11 +224,11 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
       id: this.id,
       title: this.title,
       content: options.includeContent ? this.content : null,
-      reading_time: this.reading_time,
       author:
         this.author instanceof Author
           ? this.author.serialize({ for: options.for })
           : this.author,
+      reading_time: this.reading_time,
       created_at: this.created_at.toISOString(),
       updated_at: this.updated_at.toISOString(),
     };
