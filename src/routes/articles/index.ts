@@ -68,6 +68,11 @@ export default <ServerRoute[]>[
         throw Boom.badImplementation();
       }
 
+      // An author can read its own articles, but it does not count as a view
+      if (author.user.id === authenticatedUser.id) {
+        return article.serialize({ for: authenticatedUser, includeContent: true });
+      }
+
       if (
         !(await authenticatedUser.isSubscribedToPublisher(author.publisher))
       ) {
@@ -138,6 +143,7 @@ export default <ServerRoute[]>[
       }
 
       if (
+        author.user.id !== authenticatedUser.id &&
         !(await authenticatedUser.isSubscribedToPublisher(author.publisher))
       ) {
         throw Boom.paymentRequired();
