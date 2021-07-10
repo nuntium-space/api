@@ -99,7 +99,7 @@ export default <ServerRoute[]>[
 
       await client.query(
         `
-        update "articles"
+        update "article_stats"
         set "view_count" = "view_count" + 1
         where "id" = $1
         `,

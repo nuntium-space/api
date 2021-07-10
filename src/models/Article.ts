@@ -18,7 +18,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     private _content: any,
     public readonly author: Author | INotExpandedResource,
     private _reading_time: number,
-    public readonly view_count: number,
     public readonly created_at: Date,
     private _updated_at: Date
   ) {}
@@ -143,7 +142,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
         "art"."content",
         "art"."author",
         "art"."reading_time",
-        "art"."view_count",
         "art"."created_at",
         "art"."updated_at"
       from
@@ -287,7 +285,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
       data.content,
       author,
       parseInt(data.reading_time.toString()),
-      parseInt(data.view_count.toString()),
       data.created_at,
       data.updated_at
     );
