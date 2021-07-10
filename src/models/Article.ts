@@ -88,7 +88,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
         inner join
         "articles" as "a"
         using ("id")
-      group by "a"."id"
       order by "score" desc
       limit $1
       `,
