@@ -46,7 +46,7 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     await client
       .query(
         `
-        update "articles"
+        update "article_stats"
         set "like_count" = "like_count" + 1
         where "id" = $1
         `,
@@ -113,7 +113,7 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     await client
       .query(
         `
-        update "articles"
+        update "article_stats"
         set "like_count" = "like_count" - 1
         where "id" = $1
         `,

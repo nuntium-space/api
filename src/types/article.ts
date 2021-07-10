@@ -10,7 +10,6 @@ export interface IDatabaseArticle {
   author: string;
   reading_time: number;
   view_count: number;
-  like_count: number;
   created_at: Date;
   updated_at: Date;
 }

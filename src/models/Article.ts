@@ -19,7 +19,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     public readonly author: Author | INotExpandedResource,
     private _reading_time: number,
     public readonly view_count: number,
-    public readonly like_count: number,
     public readonly created_at: Date,
     private _updated_at: Date
   ) {}
@@ -78,15 +77,19 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     const result = await Database.pool.query(
       `
       select
-        *,
+        "a".*,
         (
           ("like_count" * 0.2)
           + ("view_count" * 0.1)
         )
         / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
           as "score"
-      from "articles"
-      group by "id"
+      from
+        "article_stats" as "s"
+        inner join
+        "articles" as "a"
+        using ("id")
+      group by "a"."id"
       order by "score" desc
       limit $1
       `,
@@ -141,7 +144,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
         "art"."author",
         "art"."reading_time",
         "art"."view_count",
-        "art"."like_count",
         "art"."created_at",
         "art"."updated_at"
       from
@@ -286,7 +288,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
       author,
       parseInt(data.reading_time.toString()),
       parseInt(data.view_count.toString()),
-      parseInt(data.like_count.toString()),
       data.created_at,
       data.updated_at
     );
