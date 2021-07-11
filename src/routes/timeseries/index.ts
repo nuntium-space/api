@@ -19,10 +19,12 @@ export default <ServerRoute[]>[
         }),
       },
       response: {
-        schema: Schema.ARRAY(Joi.object({
-          segment: Schema.DATETIME.required(),
-          count: Joi.number().min(0).required(),
-        })),
+        schema: Schema.ARRAY(
+          Joi.object({
+            segment: Schema.DATETIME.required(),
+            count: Joi.number().min(0).required(),
+          })
+        ),
       },
     },
     handler: async (request, h) => {
@@ -30,14 +32,12 @@ export default <ServerRoute[]>[
 
       const publisher = await Publisher.retrieve(request.params.id);
 
-      if (!publisher.isOwnedByUser(authenticatedUser))
-      {
+      if (!publisher.isOwnedByUser(authenticatedUser)) {
         throw Boom.forbidden();
       }
 
-      const result = await Database.pool
-        .query(
-          `
+      const result = await Database.pool.query(
+        `
           select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
           from
             "article_views" as "avw"
@@ -53,15 +53,15 @@ export default <ServerRoute[]>[
             "aut"."publisher" = $3
           group by date_trunc($4, "avw"."timestamp")
           `,
-          [
-            request.query.from.toISOString(),
-            request.query.to.toISOString(),
-            publisher.id,
-            request.query.precision,
-          ]
-        );
+        [
+          request.query.from.toISOString(),
+          request.query.to.toISOString(),
+          publisher.id,
+          request.query.precision,
+        ]
+      );
 
-      return result.rows.map(_ => ({
+      return result.rows.map((_) => ({
         segment: _.segment.toISOString(),
         count: parseInt(_.count),
       }));
