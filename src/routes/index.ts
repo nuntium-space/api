@@ -14,6 +14,7 @@ import prices from "./prices";
 import publishers from "./publishers";
 import sessions from "./sessions";
 import subscriptions from "./subscriptions";
+import timeseries from "./timeseries";
 import users from "./users";
 import webhooks from "./webhooks";
 import __internals from "./__internals";
@@ -35,6 +36,7 @@ export = [
   publishers,
   sessions,
   subscriptions,
+  timeseries,
   users,
   webhooks,
   __internals,
