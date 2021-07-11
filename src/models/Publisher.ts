@@ -209,7 +209,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
 
     await s3Client
       .deleteObject({
-        Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+        Bucket: process.env.AWS_PROFILE_IMAGES_BUCKET_NAME ?? "",
         Key: this.id,
       })
       .promise()
@@ -306,7 +306,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
 
     const upload = await s3Client
       .upload({
-        Bucket: process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME ?? "",
+        Bucket: process.env.AWS_PROFILE_IMAGES_BUCKET_NAME ?? "",
         Key: this.id,
         Body: image,
       })
@@ -326,7 +326,8 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
       endpoint: Config.AWS_ENDPOINT,
     });
 
-    const imageUrl = `${s3Client.endpoint.href}/${process.env.AWS_PUBLISHER_ICONS_BUCKET_NAME}/${this.id}`;
+    const imageUrl = new URL(s3Client.endpoint.href);
+    imageUrl.pathname = `${process.env.AWS_PROFILE_IMAGES_BUCKET_NAME}/${this.id}`;
 
     return {
       id: this.id,
@@ -334,7 +335,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
       url: this.url,
       organization: this.organization.serialize({ for: options?.for }),
       verified: this.verified,
-      imageUrl,
+      imageUrl: imageUrl.toString(),
     };
   }
 
