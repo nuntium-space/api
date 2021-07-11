@@ -36,7 +36,6 @@ export class DraftSource implements ISerializable<ISerializedDraftSource> {
             ("id", "url", "draft")
           values
             ($1, $2, $3)
-          returning *
           `,
           [
             Utilities.id(Config.ID_PREFIXES.DRAFT_SOURCE),

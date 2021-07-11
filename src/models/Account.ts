@@ -30,7 +30,6 @@ export class Account {
           ("id", "user", "type", "external_id")
         values
           ($1, $2, $3, $4)
-        returning *
         `,
         [
           id,

@@ -58,7 +58,6 @@ export class AuthorInvite implements ISerializable<ISerializedAuthorInvite> {
           ("id", "publisher", "user_email", "expires_at")
         values
           ($1, $2, $3, $4)
-        returning *
         `,
         [id, publisher.id, data.email, expiresAt.toISOString()]
       )

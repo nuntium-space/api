@@ -71,14 +71,13 @@ export class Price implements ISerializable<ISerializedPrice> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    const result = await client
+    await client
       .query(
         `
         insert into "prices"
           ("id", "amount", "currency", "billing_period", "bundle", "active")
         values
           ($1, $2, $3, $4, $5, $6)
-        returning *
         `,
         [id, data.amount, data.currency, data.billing_period, bundle.id, true]
       )
@@ -98,7 +97,7 @@ export class Price implements ISerializable<ISerializedPrice> {
         },
         tax_behavior: "exclusive",
         metadata: {
-          price_id: result.rows[0].id,
+          price_id: id,
         },
       })
       .catch(async () => {

@@ -63,7 +63,6 @@ export class Organization implements ISerializable<ISerializedOrganization> {
           ("id", "name", "user", "stripe_account_id")
         values
           ($1, $2, $3, $4)
-        returning *
         `,
         [id, data.name, user.id, account.id]
       )

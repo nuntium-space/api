@@ -31,7 +31,6 @@ export class Session implements ISerializable<ISerializedSession> {
           ("id", "user", "expires_at")
         values
           ($1, $2, $3)
-        returning *
         `,
         [id, typeof user === "string" ? user : user.id, expiresAt.toISOString()]
       )

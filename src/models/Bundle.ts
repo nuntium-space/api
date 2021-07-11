@@ -49,14 +49,13 @@ export class Bundle implements ISerializable<ISerializedBundle> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    const result = await client
+    await client
       .query(
         `
         insert into "bundles"
           ("id", "name", "organization", "active")
         values
           ($1, $2, $3, $4)
-        returning *
         `,
         [id, data.name, organization.id, true]
       )
@@ -71,7 +70,7 @@ export class Bundle implements ISerializable<ISerializedBundle> {
         name: data.name,
         tax_code: "txcd_10304100", // Digital newspaper -- subscription
         metadata: {
-          bundle_id: result.rows[0].id,
+          bundle_id: id,
         },
       })
       .catch(async () => {

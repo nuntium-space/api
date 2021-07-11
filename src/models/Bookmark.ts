@@ -29,7 +29,6 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
           ("user", "article")
         values
           ($1, $2)
-        returning *
         `,
         [
           user instanceof User ? user.id : user,

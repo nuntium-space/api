@@ -241,7 +241,6 @@ export class ArticleDraft
             ("id", "title", "content", "author", "reading_time")
           values
             ($1, $2, $3, $4, $5)
-          returning *
           `,
           [
             id,

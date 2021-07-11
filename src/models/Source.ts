@@ -36,7 +36,6 @@ export class Source implements ISerializable<ISerializedSource> {
             ("id", "url", "article")
           values
             ($1, $2, $3)
-          returning *
           `,
           [
             Utilities.id(Config.ID_PREFIXES.SOURCE),

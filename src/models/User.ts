@@ -39,14 +39,13 @@ export class User implements ISerializable<ISerializedUser> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    const result = await client
+    await client
       .query(
         `
         insert into "users"
           ("id", "full_name", "email")
         values
           ($1, $2, $3)
-        returning *
         `,
         [id, data.full_name, data.email]
       )
@@ -60,7 +59,7 @@ export class User implements ISerializable<ISerializedUser> {
       .create({
         email: data.email,
         metadata: {
-          user_id: result.rows[0].id,
+          user_id: id,
         },
       })
       .catch(async () => {
