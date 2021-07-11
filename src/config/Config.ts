@@ -129,9 +129,9 @@ export class Config {
    *
    * 1MiB
    */
-  public static readonly PUBLISHER_IMAGE_MAX_SIZE = 2 ** 20;
+  public static readonly PROFILE_IMAGE_MAX_SIZE = 2 ** 20;
 
-  public static readonly PUBLISHER_IMAGE_SUPPORTED_MIME_TYPES = [
+  public static readonly PROFILE_IMAGE_SUPPORTED_MIME_TYPES = [
     "image/jpeg",
     "image/png",
   ];

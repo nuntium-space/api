@@ -279,7 +279,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
   public async setImage(image: any): Promise<{ url: string }> {
     const { mime } = imageType(image) ?? { mime: "" };
 
-    if (!Config.PUBLISHER_IMAGE_SUPPORTED_MIME_TYPES.includes(mime)) {
+    if (!Config.PROFILE_IMAGE_SUPPORTED_MIME_TYPES.includes(mime)) {
       throw Boom.unsupportedMediaType(undefined, [
         {
           field: "image",
@@ -307,7 +307,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     const upload = await s3Client
       .upload({
         Bucket: process.env.AWS_PROFILE_IMAGES_BUCKET_NAME ?? "",
-        Key: this.id,
+        Key: `publishers/${this.id}`,
         Body: image,
       })
       .promise()
@@ -327,7 +327,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     });
 
     const imageUrl = new URL(s3Client.endpoint.href);
-    imageUrl.pathname = `${process.env.AWS_PROFILE_IMAGES_BUCKET_NAME}/${this.id}`;
+    imageUrl.pathname = `${process.env.AWS_PROFILE_IMAGES_BUCKET_NAME}/publishers/${this.id}`;
 
     return {
       id: this.id,

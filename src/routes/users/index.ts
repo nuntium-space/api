@@ -202,6 +202,41 @@ export default <ServerRoute[]>[
     },
   },
   {
+    method: "PUT",
+    path: "/users/{id}/image",
+    options: {
+      payload: {
+        allow: "multipart/form-data",
+        multipart: true,
+        maxBytes: Config.PROFILE_IMAGE_MAX_SIZE,
+      },
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.USER.required(),
+        }),
+        payload: Joi.object({
+          image: Joi.binary().required(),
+        }),
+      },
+      response: {
+        schema: Joi.object({
+          url: Schema.STRING.required(),
+        }),
+      },
+    },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      if (authenticatedUser.id !== request.params.id) {
+        throw Boom.forbidden();
+      }
+
+      const { image } = request.payload as any;
+
+      return authenticatedUser.setImage(image);
+    },
+  },
+  {
     method: "DELETE",
     path: "/users/{id}",
     options: {

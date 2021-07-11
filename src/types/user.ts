@@ -34,6 +34,7 @@ export interface ISerializedUser {
   type: UserType;
   full_name: string | null;
   email: string;
+  imageUrl: string;
 }
 
 export const USER_SCHEMA = {
@@ -42,6 +43,7 @@ export const USER_SCHEMA = {
     type: Schema.STRING.valid("admin", "user").optional(), // Not included if sent to another user
     full_name: Schema.NULLABLE(Schema.STRING).required(),
     email: Schema.EMAIL.optional(), // Not included if sent to another user
+    imageUrl: Schema.STRING.required(),
   }),
   UPDATE: Joi.object({
     full_name: Schema.STRING,

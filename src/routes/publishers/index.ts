@@ -322,7 +322,7 @@ export default <ServerRoute[]>[
       payload: {
         allow: "multipart/form-data",
         multipart: true,
-        maxBytes: Config.PUBLISHER_IMAGE_MAX_SIZE,
+        maxBytes: Config.PROFILE_IMAGE_MAX_SIZE,
       },
       validate: {
         params: Joi.object({

@@ -1,4 +1,7 @@
 import Boom from "@hapi/boom";
+import S3 from "aws-sdk/clients/s3";
+import imageSize from "image-size";
+import imageType from "image-type";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -435,6 +438,48 @@ export class User implements ISerializable<ISerializedUser> {
     return result.rows.length > 0;
   }
 
+  public async setImage(image: any): Promise<{ url: string }> {
+    const { mime } = imageType(image) ?? { mime: "" };
+
+    if (!Config.PROFILE_IMAGE_SUPPORTED_MIME_TYPES.includes(mime)) {
+      throw Boom.unsupportedMediaType(undefined, [
+        {
+          field: "image",
+          error: "custom.publisher.image.not_supported",
+        },
+      ]);
+    }
+
+    const { width, height } = imageSize(image);
+
+    if (width !== height) {
+      throw Boom.badData(undefined, [
+        {
+          field: "image",
+          error: "custom.publisher.image.must_be_square",
+        },
+      ]);
+    }
+
+    const s3Client = new S3({
+      endpoint: Config.AWS_ENDPOINT,
+      s3ForcePathStyle: true,
+    });
+
+    const upload = await s3Client
+      .upload({
+        Bucket: process.env.AWS_PROFILE_IMAGES_BUCKET_NAME ?? "",
+        Key: `users/${this.id}`,
+        Body: image,
+      })
+      .promise()
+      .catch(() => {
+        throw Boom.badImplementation();
+      });
+
+    return { url: upload.Location };
+  }
+
   public serialize(options?: {
     /**
      * The authenticated user (or just its ID) that requested this user's data
@@ -445,9 +490,18 @@ export class User implements ISerializable<ISerializedUser> {
      */
     for?: User | INotExpandedResource;
   }): ISerializedUser {
+    const s3Client = new S3({
+      credentials: Config.AWS_CREDENTIALS,
+      endpoint: Config.AWS_ENDPOINT,
+    });
+
+    const imageUrl = new URL(s3Client.endpoint.href);
+    imageUrl.pathname = `${process.env.AWS_PROFILE_IMAGES_BUCKET_NAME}/users/${this.id}`;
+
     let response: any = {
       id: this.id,
       full_name: this.full_name,
+      imageUrl: imageUrl.toString(),
     };
 
     if (options?.for?.id === this.id) {
