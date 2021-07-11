@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import S3 from "aws-sdk/clients/s3";
 import imageSize from "image-size";
 import imageType from "image-type";
+import jdenticon from "jdenticon";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -42,13 +43,14 @@ export class User implements ISerializable<ISerializedUser> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await client
+    const result = await client
       .query(
         `
         insert into "users"
           ("id", "full_name", "email")
         values
           ($1, $2, $3)
+        returning *
         `,
         [id, data.full_name, data.email]
       )
@@ -73,6 +75,11 @@ export class User implements ISerializable<ISerializedUser> {
 
     await client.query("commit");
     client.release();
+
+    const user = await User.deserialize(result.rows[0]);
+
+    const png = jdenticon.toPng(user.id, 500, { backColor: "#ffffff" });
+    await user.setImage(png);
 
     return { id };
   }

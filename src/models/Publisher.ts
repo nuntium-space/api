@@ -92,7 +92,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     const publisher = await Publisher.deserialize(result.rows[0]);
 
     const png = jdenticon.toPng(publisher.id, 500, { backColor: "#ffffff" });
-    publisher.setImage(png);
+    await publisher.setImage(png);
 
     return { id };
   }
