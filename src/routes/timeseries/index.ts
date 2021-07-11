@@ -38,21 +38,21 @@ export default <ServerRoute[]>[
 
       const result = await Database.pool.query(
         `
-          select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
-          from
-            "article_views" as "avw"
-            inner join
-            "articles" as "art"
-            on "avw"."article" = "art"."id"
-            inner join
-            "authors" as "aut"
-            on "art"."author" = "aut"."id"
-          where
-            "avw"."timestamp" between $1 and $2
-            and
-            "aut"."publisher" = $3
-          group by date_trunc($4, "avw"."timestamp")
-          `,
+        select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
+        from
+          "article_views" as "avw"
+          inner join
+          "articles" as "art"
+          on "avw"."article" = "art"."id"
+          inner join
+          "authors" as "aut"
+          on "art"."author" = "aut"."id"
+        where
+          "avw"."timestamp" between $1 and $2
+          and
+          "aut"."publisher" = $3
+        group by date_trunc($4, "avw"."timestamp")
+        `,
         [
           request.query.from.toISOString(),
           request.query.to.toISOString(),
