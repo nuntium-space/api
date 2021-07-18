@@ -1,6 +1,6 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
-import { addDays, differenceInDays } from "date-fns";
+import { addDays, addHours, differenceInDays, differenceInHours } from "date-fns";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
@@ -89,8 +89,6 @@ export default <ServerRoute[]>[
         for (let i = 0; i <= differenceInDays(to, from); i++)
         {
           date = addDays(from, i);
-
-          console.log(i, date, dataPointsWithValues.find(_ => _.segment.startsWith(`${date.toISOString().split("T")[0]}T`)))
 
           if (!dataPointsWithValues.find(_ => _.segment.startsWith(`${date.toISOString().split("T")[0]}T`)))
           {
