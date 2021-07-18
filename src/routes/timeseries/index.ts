@@ -1,6 +1,6 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
-import { addDays, addHours, differenceInDays, differenceInHours } from "date-fns";
+import { addDays, addHours, differenceInDays, differenceInHours, isSameDay, isSameHour } from "date-fns";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
@@ -84,16 +84,42 @@ export default <ServerRoute[]>[
 
       if (precision === "day")
       {
-        let date = from;
+        let date: Date;
 
         for (let i = 0; i <= differenceInDays(to, from); i++)
         {
           date = addDays(from, i);
 
-          if (!dataPointsWithValues.find(_ => _.segment.startsWith(`${date.toISOString().split("T")[0]}T`)))
+          if (!dataPointsWithValues.find(_ => isSameDay(date, new Date(_.segment))))
           {
+            date.setUTCHours(0);
+            date.setUTCMinutes(0);
+            date.setUTCSeconds(0);
+            date.setUTCMilliseconds(0);
+
             dataPointsWithValues.push({
-              segment: `${date.toISOString().split("T")[0]}T00:00:00.000Z`,
+              segment: date.toISOString(),
+              count: 0,
+            });
+          }
+        }
+      }
+      else if (precision === "hour")
+      {
+        let date: Date;
+
+        for (let i = 0; i <= differenceInHours(to, from); i++)
+        {
+          date = addHours(from, i);
+
+          if (!dataPointsWithValues.find(_ => isSameHour(date, new Date(_.segment))))
+          {
+            date.setUTCMinutes(0);
+            date.setUTCSeconds(0);
+            date.setUTCMilliseconds(0);
+
+            dataPointsWithValues.push({
+              segment: date.toISOString(),
               count: 0,
             });
           }
