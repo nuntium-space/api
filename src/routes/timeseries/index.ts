@@ -2,6 +2,8 @@ import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
+import { Article } from "../../models/Article";
+import { Author } from "../../models/Author";
 import { Publisher } from "../../models/Publisher";
 import Database from "../../utilities/Database";
 import Utilities from "../../utilities/Utilities";
@@ -33,33 +35,31 @@ export default <ServerRoute[]>[
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      const publisher = await Publisher.retrieve(request.params.id);
+      const article = await Article.retrieve(request.params.id, [ "author", "author.publisher" ]);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(article.author instanceof Author) || !(article.author.publisher instanceof Publisher))
+      {
+        throw Boom.badImplementation();
+      }
+
+      if (authenticatedUser.id !== article.author.user.id && !article.author.publisher.isOwnedByUser(authenticatedUser)) {
         throw Boom.forbidden();
       }
 
       const result = await Database.pool.query(
         `
-        select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
-        from
-          "article_views" as "avw"
-          inner join
-          "articles" as "art"
-          on "avw"."article" = "art"."id"
-          inner join
-          "authors" as "aut"
-          on "art"."author" = "aut"."id"
+        select date_trunc($4, "timestamp") as "segment", count(*) as "count"
+        from "article_views"
         where
-          "avw"."timestamp" between $1 and $2
+          "article" = $1
           and
-          "aut"."publisher" = $3
-        group by date_trunc($4, "avw"."timestamp")
+          "timestamp" between $2 and $3
+        group by date_trunc($4, "timestamp")
         `,
         [
           request.query.from.toISOString(),
           request.query.to.toISOString(),
-          publisher.id,
+          article.id,
           request.query.precision,
         ]
       );
