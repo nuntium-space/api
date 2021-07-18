@@ -3,7 +3,9 @@ import { ServerRoute } from "@hapi/hapi";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
+import { Author } from "../../models/Author";
 import { Like } from "../../models/Like";
+import { Publisher } from "../../models/Publisher";
 import { LIKE_SCHEMA } from "../../types/like";
 import Utilities from "../../utilities/Utilities";
 
@@ -57,7 +59,17 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const article = await Article.retrieve((request.payload as any).article);
+      const article = await Article.retrieve((request.payload as any).article, [ "author", "author.publisher" ]);
+
+      if (!(article.author instanceof Author) || !(article.author.publisher instanceof Publisher))
+      {
+        throw Boom.badImplementation();
+      }
+
+      if (!(await authenticatedUser.isSubscribedToPublisher(article.author.publisher)))
+      {
+        throw Boom.paymentRequired();
+      }
 
       await Like.create(authenticatedUser, article);
 
