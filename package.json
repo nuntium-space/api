@@ -21,6 +21,7 @@
     "@sendgrid/mail": "^7.4.5",
     "aws-elasticsearch-connector": "^9.0.3",
     "aws-sdk": "^2.930.0",
+    "date-fns": "^2.22.1",
     "dotenv": "^10.0.0",
     "image-size": "^1.0.0",
     "image-type": "^4.1.0",
