@@ -102,7 +102,7 @@ export default <ServerRoute[]>[
         }
       }
 
-      return dataPointsWithValues;
+      return dataPointsWithValues.sort((a, b) => new Date(a.segment).getTime() - new Date(b.segment).getTime());
     },
   },
   {
