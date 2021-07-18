@@ -1,6 +1,13 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
-import { addDays, addHours, differenceInDays, differenceInHours, isSameDay, isSameHour } from "date-fns";
+import {
+  addDays,
+  addHours,
+  differenceInDays,
+  differenceInHours,
+  isSameDay,
+  isSameHour,
+} from "date-fns";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
@@ -69,12 +76,7 @@ export default <ServerRoute[]>[
           "timestamp" between $2 and $3
         group by date_trunc($4, "timestamp")
         `,
-        [
-          article.id,
-          from.toISOString(),
-          to.toISOString(),
-          precision,
-        ]
+        [article.id, from.toISOString(), to.toISOString(), precision]
       );
 
       const dataPointsWithValues = result.rows.map((_) => ({
@@ -82,16 +84,17 @@ export default <ServerRoute[]>[
         count: parseInt(_.count),
       }));
 
-      if (precision === "day")
-      {
+      if (precision === "day") {
         let date: Date;
 
-        for (let i = 0; i <= differenceInDays(to, from); i++)
-        {
+        for (let i = 0; i <= differenceInDays(to, from); i++) {
           date = addDays(from, i);
 
-          if (!dataPointsWithValues.find(_ => isSameDay(date, new Date(_.segment))))
-          {
+          if (
+            !dataPointsWithValues.find((_) =>
+              isSameDay(date, new Date(_.segment))
+            )
+          ) {
             date.setUTCHours(0);
             date.setUTCMinutes(0);
             date.setUTCSeconds(0);
@@ -103,17 +106,17 @@ export default <ServerRoute[]>[
             });
           }
         }
-      }
-      else if (precision === "hour")
-      {
+      } else if (precision === "hour") {
         let date: Date;
 
-        for (let i = 0; i <= differenceInHours(to, from); i++)
-        {
+        for (let i = 0; i <= differenceInHours(to, from); i++) {
           date = addHours(from, i);
 
-          if (!dataPointsWithValues.find(_ => isSameHour(date, new Date(_.segment))))
-          {
+          if (
+            !dataPointsWithValues.find((_) =>
+              isSameHour(date, new Date(_.segment))
+            )
+          ) {
             date.setUTCMinutes(0);
             date.setUTCSeconds(0);
             date.setUTCMilliseconds(0);
@@ -126,7 +129,9 @@ export default <ServerRoute[]>[
         }
       }
 
-      return dataPointsWithValues.sort((a, b) => new Date(a.segment).getTime() - new Date(b.segment).getTime());
+      return dataPointsWithValues.sort(
+        (a, b) => new Date(a.segment).getTime() - new Date(b.segment).getTime()
+      );
     },
   },
   {
