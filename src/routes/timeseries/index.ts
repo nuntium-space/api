@@ -35,14 +35,22 @@ export default <ServerRoute[]>[
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      const article = await Article.retrieve(request.params.id, [ "author", "author.publisher" ]);
+      const article = await Article.retrieve(request.params.id, [
+        "author",
+        "author.publisher",
+      ]);
 
-      if (!(article.author instanceof Author) || !(article.author.publisher instanceof Publisher))
-      {
+      if (
+        !(article.author instanceof Author) ||
+        !(article.author.publisher instanceof Publisher)
+      ) {
         throw Boom.badImplementation();
       }
 
-      if (authenticatedUser.id !== article.author.user.id && !article.author.publisher.isOwnedByUser(authenticatedUser)) {
+      if (
+        authenticatedUser.id !== article.author.user.id &&
+        !article.author.publisher.isOwnedByUser(authenticatedUser)
+      ) {
         throw Boom.forbidden();
       }
 

@@ -27,15 +27,23 @@ export default <ServerRoute[]>[
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      const article = await Article.retrieve(request.params.id, [ "author", "author.publisher" ]);
+      const article = await Article.retrieve(request.params.id, [
+        "author",
+        "author.publisher",
+      ]);
 
-      if (!(article.author instanceof Author) || !(article.author.publisher instanceof Publisher))
-      {
+      if (
+        !(article.author instanceof Author) ||
+        !(article.author.publisher instanceof Publisher)
+      ) {
         throw Boom.badImplementation();
       }
 
-      if (!(await authenticatedUser.isSubscribedToPublisher(article.author.publisher)))
-      {
+      if (
+        !(await authenticatedUser.isSubscribedToPublisher(
+          article.author.publisher
+        ))
+      ) {
         throw Boom.paymentRequired();
       }
 

@@ -59,15 +59,23 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const article = await Article.retrieve((request.payload as any).article, [ "author", "author.publisher" ]);
+      const article = await Article.retrieve((request.payload as any).article, [
+        "author",
+        "author.publisher",
+      ]);
 
-      if (!(article.author instanceof Author) || !(article.author.publisher instanceof Publisher))
-      {
+      if (
+        !(article.author instanceof Author) ||
+        !(article.author.publisher instanceof Publisher)
+      ) {
         throw Boom.badImplementation();
       }
 
-      if (!(await authenticatedUser.isSubscribedToPublisher(article.author.publisher)))
-      {
+      if (
+        !(await authenticatedUser.isSubscribedToPublisher(
+          article.author.publisher
+        ))
+      ) {
         throw Boom.paymentRequired();
       }
 
