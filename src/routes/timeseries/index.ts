@@ -65,9 +65,9 @@ export default <ServerRoute[]>[
         group by date_trunc($4, "timestamp")
         `,
         [
+          article.id,
           request.query.from.toISOString(),
           request.query.to.toISOString(),
-          article.id,
           request.query.precision,
         ]
       );
