@@ -108,23 +108,42 @@ export default <ServerRoute[]>[
       const client = await Database.pool.connect();
       await client.query("begin");
 
-      await client.query(
-        `
-        insert into "article_views"
-          ("id", "user", "article")
-        values
-          ($1, $2, $3)
-        `,
-        [Utilities.id(Config.ID_PREFIXES.ARTICLE_VIEW), authenticatedUser.id, article.id]
-      );
+      {
+        const { rowCount } = await client.query(
+          `
+          select 1
+          from "article_views"
+          where
+            "user" = $1
+            and
+            "article" = $2
+          limit 1
+          `,
+          [authenticatedUser.id, article.id]
+        );
+
+        const isUniqueView = rowCount === 0;
+
+        await client.query(
+          `
+          update "article_stats"
+          set
+            "view_count" = "view_count" + 1,
+            "unique_view_count" = "unique_view_count" + $1
+          where "id" = $2
+          `,
+          [isUniqueView ? 1 : 0, article.id]
+        );
+      }
 
       await client.query(
         `
-        update "article_stats"
-        set "view_count" = "view_count" + 1
-        where "id" = $1
+        insert into "article_views"
+          ("user", "article")
+        values
+          ($1, $2)
         `,
-        [article.id]
+        [authenticatedUser.id, article.id]
       );
 
       const { rowCount } = await client.query(
