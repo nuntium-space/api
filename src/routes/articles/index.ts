@@ -47,7 +47,6 @@ export default <ServerRoute[]>[
           id: Schema.ID.ARTICLE.required(),
         }),
         query: Joi.object({
-          only_meta: Schema.BOOLEAN,
           expand: Schema.EXPAND_QUERY,
         }),
       },
@@ -63,32 +62,55 @@ export default <ServerRoute[]>[
         request.query.expand
       );
 
+      return article.serialize({
+        for: authenticatedUser,
+        includeMetadata: true,
+      });
+    },
+  },
+  {
+    method: "GET",
+    path: "/articles/{id}/content",
+    options: {
+      validate: {
+        params: Joi.object({
+          id: Schema.ID.ARTICLE.required(),
+        }),
+      },
+      response: {
+        schema: Schema.ARTICLE_CONTENT,
+      },
+    },
+    handler: async (request, h) => {
+      const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
+
+      const article = await Article.retrieve(request.params.id);
+
       const author = await Author.retrieve(article.author.id, ["publisher"]);
 
       if (!(author.publisher instanceof Publisher)) {
         throw Boom.badImplementation();
       }
 
-      // An author can read its own articles, but it does not count as a view
-      if (author.user.id === authenticatedUser.id) {
-        return article.serialize({
-          for: authenticatedUser,
-          includeContent: true,
-        });
-      }
-
-      // Do not send content and do not count as a view
-      if (request.query.only_meta)
-      {
-        return article.serialize({ for: authenticatedUser });
-      }
-
       if (
         !(await authenticatedUser.isSubscribedToPublisher(author.publisher))
       ) {
-        return h
-          .response(await article.serialize({ for: authenticatedUser })) // Only the metadata (content is excluded by default)
-          .code(402); // Payment Required
+        throw Boom.paymentRequired();
+      }
+
+      const { rows: [ { content } ] } = await Database.pool
+        .query(
+          `
+          select "content"
+          from "articles"
+          where "id" = $1
+          `,
+          [article.id],
+        );
+
+      // An author can read its own articles, but it does not count as a view
+      if (author.user.id === authenticatedUser.id) {
+        return content;
       }
 
       const client = await Database.pool.connect();
@@ -140,11 +162,7 @@ export default <ServerRoute[]>[
       await client.query("commit");
       client.release();
 
-      return article.serialize({
-        for: authenticatedUser,
-        includeContent: true,
-        includeMetadata: true,
-      });
+      return content;
     },
   },
   {
