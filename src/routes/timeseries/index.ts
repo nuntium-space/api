@@ -92,6 +92,7 @@ export default <ServerRoute[]>[
           from: Schema.DATETIME.required(),
           to: Schema.DATETIME.min(Joi.ref("from")).max("now").required(),
           precision: Schema.STRING.valid("day", "hour").required(),
+          unique: Schema.BOOLEAN.default(false).optional(),
         }),
       },
       response: {
@@ -112,13 +113,13 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const { from, to, precision } = request.query;
+      const { from, to, precision, unique } = request.query;
 
       const result = await Database.pool.query(
         `
         select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
         from
-          "article_views" as "avw"
+          ${unique ? `(select distinct on ("user") "article", "timestamp" from "article_views") as "avw"` :  `"article_views" as "avw"`}
           inner join
           "articles" as "art"
           on "avw"."article" = "art"."id"
