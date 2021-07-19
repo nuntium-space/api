@@ -303,8 +303,7 @@ export class ArticleDraft
             content: Utilities.extractTextFromEditorJson(this.content),
           },
         },
-      }).catch(async (e) => {
-        console.log(e);
+      }).catch(async () => {
         await client.query("rollback");
 
         throw Boom.badImplementation();
