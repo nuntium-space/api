@@ -105,7 +105,7 @@ const init = async () => {
   server.auth.strategy("cookie", "cookie", {
     cookie: {
       name: "session_id",
-      password: "password-should-be-32-characters",
+      password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
       ttl: Config.SESSION_DURATION_IN_SECONDS * 1000,
       domain: new URL(Config.CLIENT_URL).hostname,
       path: "/",
