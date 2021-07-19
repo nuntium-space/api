@@ -27,7 +27,9 @@ export default <ServerRoute[]>[
 
       request.cookieAuth.clear();
 
-      return h.response();
+      return h
+        .response()
+        .unstate("is_signed_in");
     },
   },
 ];
