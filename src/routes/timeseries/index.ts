@@ -60,7 +60,11 @@ export default <ServerRoute[]>[
       const result = await Database.pool.query(
         `
         select date_trunc($4, "timestamp") as "segment", count(*) as "count"
-        from ${unique ? `(select distinct on ("user") "article", "timestamp" from "article_views") as "_"` : `"article_views"`}
+        from ${
+          unique
+            ? `(select distinct on ("user") "article", "timestamp" from "article_views") as "_"`
+            : `"article_views"`
+        }
         where
           "article" = $1
           and
@@ -120,7 +124,11 @@ export default <ServerRoute[]>[
         `
         select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
         from
-          ${unique ? `(select distinct on ("user") "article", "timestamp" from "article_views") as "avw"` : `"article_views" as "avw"`}
+          ${
+            unique
+              ? `(select distinct on ("user") "article", "timestamp" from "article_views") as "avw"`
+              : `"article_views" as "avw"`
+          }
           inner join
           "articles" as "art"
           on "avw"."article" = "art"."id"
