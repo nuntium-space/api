@@ -158,7 +158,7 @@ export class Config {
     isSameSite: "Strict",
     isSecure: Config.IS_PRODUCTION,
     isHttpOnly: true,
-  }
+  };
 
   public static readonly ELASTICSEARCH = new ElasticSearchClient({
     ...createAwsElasticsearchConnector(config),

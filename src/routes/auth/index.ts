@@ -95,9 +95,7 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(
         const redirectUrl = new URL(Config.CLIENT_URL);
         redirectUrl.pathname = query?.redirectTo ?? "";
 
-        return h
-          .redirect(redirectUrl.toString())
-          .state("is_signed_in", "true");
+        return h.redirect(redirectUrl.toString()).state("is_signed_in", "true");
       },
     };
   }
