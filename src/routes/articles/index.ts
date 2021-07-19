@@ -98,15 +98,16 @@ export default <ServerRoute[]>[
         throw Boom.paymentRequired();
       }
 
-      const { rows: [ { content } ] } = await Database.pool
-        .query(
-          `
+      const {
+        rows: [{ content }],
+      } = await Database.pool.query(
+        `
           select "content"
           from "articles"
           where "id" = $1
           `,
-          [article.id],
-        );
+        [article.id]
+      );
 
       // An author can read its own articles, but it does not count as a view
       if (author.user.id === authenticatedUser.id) {
