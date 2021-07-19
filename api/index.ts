@@ -192,13 +192,6 @@ const init = async () => {
 
   server.route(routes);
 
-  /**
-   * IMPORTANT:
-   *
-   * RESULTS ARE NOT LIMITED TO WHAT USERS HAVE ACCESS TO.
-   *
-   * ONLY A SHORT SNIPPET IS SENT TO THE USER.
-   */
   server.route({
     method: "GET",
     path: "/search",
