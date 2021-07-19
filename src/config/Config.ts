@@ -2,6 +2,7 @@ import { config } from "aws-sdk";
 import { Client as ElasticSearchClient } from "@elastic/elasticsearch";
 import { CredentialsOptions } from "aws-sdk/lib/credentials";
 import Stripe from "stripe";
+import { ServerStateCookieOptions } from "@hapi/hapi";
 
 /* eslint @typescript-eslint/no-var-requires: "off" */
 const createAwsElasticsearchConnector = require("aws-elasticsearch-connector");
@@ -147,6 +148,17 @@ export class Config {
 
   public static readonly API_URL = process.env.API_URL as string;
   public static readonly CLIENT_URL = process.env.CLIENT_URL as string;
+
+  public static readonly COOKIE_OPTIONS: ServerStateCookieOptions = {
+    password: process.env.AUTH_COOKIE_ENCRYPTION_PASSWORD,
+    ttl: Config.SESSION_DURATION_IN_SECONDS * 1000,
+    domain: new URL(Config.CLIENT_URL).hostname,
+    path: "/",
+    clearInvalid: true,
+    isSameSite: "Strict",
+    isSecure: Config.IS_PRODUCTION,
+    isHttpOnly: true,
+  }
 
   public static readonly ELASTICSEARCH = new ElasticSearchClient({
     ...createAwsElasticsearchConnector(config),

@@ -95,7 +95,9 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(
         const redirectUrl = new URL(Config.CLIENT_URL);
         redirectUrl.pathname = query?.redirectTo ?? "";
 
-        return h.redirect(redirectUrl.toString());
+        return h
+          .redirect(redirectUrl.toString())
+          .state("is_signed_in", "true");
       },
     };
   }
@@ -183,7 +185,9 @@ export default <ServerRoute[]>[
 
       request.cookieAuth.set({ id: session.id });
 
-      return { session: session.serialize({ for: user }) };
+      return h
+        .response({ session: session.serialize({ for: user }) })
+        .state("is_signed_in", "true");
     },
   },
   {
