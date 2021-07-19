@@ -1,13 +1,5 @@
 import Boom from "@hapi/boom";
 import { ServerRoute } from "@hapi/hapi";
-import {
-  addDays,
-  addHours,
-  differenceInDays,
-  differenceInHours,
-  isSameDay,
-  isSameHour,
-} from "date-fns";
 import Joi from "joi";
 import { Schema } from "../../config/Schema";
 import { Article } from "../../models/Article";
@@ -62,9 +54,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const from = request.query.from as Date;
-      const to = request.query.to as Date;
-      const precision = request.query.precision as "day" | "hour";
+      const { from, to, precision } = request.query;
 
       const result = await Database.pool.query(
         `
@@ -79,59 +69,10 @@ export default <ServerRoute[]>[
         [article.id, from.toISOString(), to.toISOString(), precision]
       );
 
-      const dataPointsWithValues = result.rows.map((_) => ({
+      return Utilities.fillTimeseriesDataGapsWithZeroCountValues(result.rows.map((_) => ({
         segment: _.segment.toISOString(),
         count: parseInt(_.count),
-      }));
-
-      if (precision === "day") {
-        let date: Date;
-
-        for (let i = 0; i <= differenceInDays(to, from); i++) {
-          date = addDays(from, i);
-
-          if (
-            !dataPointsWithValues.find((_) =>
-              isSameDay(date, new Date(_.segment))
-            )
-          ) {
-            date.setUTCHours(0);
-            date.setUTCMinutes(0);
-            date.setUTCSeconds(0);
-            date.setUTCMilliseconds(0);
-
-            dataPointsWithValues.push({
-              segment: date.toISOString(),
-              count: 0,
-            });
-          }
-        }
-      } else if (precision === "hour") {
-        let date: Date;
-
-        for (let i = 0; i <= differenceInHours(to, from); i++) {
-          date = addHours(from, i);
-
-          if (
-            !dataPointsWithValues.find((_) =>
-              isSameHour(date, new Date(_.segment))
-            )
-          ) {
-            date.setUTCMinutes(0);
-            date.setUTCSeconds(0);
-            date.setUTCMilliseconds(0);
-
-            dataPointsWithValues.push({
-              segment: date.toISOString(),
-              count: 0,
-            });
-          }
-        }
-      }
-
-      return dataPointsWithValues.sort(
-        (a, b) => new Date(a.segment).getTime() - new Date(b.segment).getTime()
-      );
+      })), from, to, precision);
     },
   },
   {
@@ -166,6 +107,8 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
+      const { from, to, precision } = request.query;
+
       const result = await Database.pool.query(
         `
         select date_trunc($4, "avw"."timestamp") as "segment", count(*) as "count"
@@ -184,17 +127,17 @@ export default <ServerRoute[]>[
         group by date_trunc($4, "avw"."timestamp")
         `,
         [
-          request.query.from.toISOString(),
-          request.query.to.toISOString(),
+          from.toISOString(),
+          to.toISOString(),
           publisher.id,
-          request.query.precision,
+          precision,
         ]
       );
 
-      return result.rows.map((_) => ({
+      return Utilities.fillTimeseriesDataGapsWithZeroCountValues(result.rows.map((_) => ({
         segment: _.segment.toISOString(),
         count: parseInt(_.count),
-      }));
+      })), from, to, precision);
     },
   },
 ];
