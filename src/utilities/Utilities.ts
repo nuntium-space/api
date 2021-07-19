@@ -1,7 +1,14 @@
 import Boom from "@hapi/boom";
 import { Request } from "@hapi/hapi";
 import { randomBytes, createHmac, timingSafeEqual } from "crypto";
-import { differenceInDays, addDays, isSameDay, differenceInHours, addHours, isSameHour } from "date-fns";
+import {
+  differenceInDays,
+  addDays,
+  isSameDay,
+  differenceInHours,
+  addHours,
+  isSameHour,
+} from "date-fns";
 import readingTime from "reading-time";
 import { Config } from "../config/Config";
 import { Session } from "../models/Session";
@@ -87,19 +94,19 @@ export default class Utilities {
     );
   }
 
-  public static fillTimeseriesDataGapsWithZeroCountValues(data: { segment: string, count: number }[], from: Date, to: Date, precision: "day" | "hour"): { segment: string, count: number }[]
-  {
+  public static fillTimeseriesDataGapsWithZeroCountValues(
+    data: { segment: string; count: number }[],
+    from: Date,
+    to: Date,
+    precision: "day" | "hour"
+  ): { segment: string; count: number }[] {
     if (precision === "day") {
       let date: Date;
 
       for (let i = 0; i <= differenceInDays(to, from); i++) {
         date = addDays(from, i);
 
-        if (
-          !data.find((_) =>
-            isSameDay(date, new Date(_.segment))
-          )
-        ) {
+        if (!data.find((_) => isSameDay(date, new Date(_.segment)))) {
           date.setUTCHours(0);
           date.setUTCMinutes(0);
           date.setUTCSeconds(0);
@@ -117,11 +124,7 @@ export default class Utilities {
       for (let i = 0; i <= differenceInHours(to, from); i++) {
         date = addHours(from, i);
 
-        if (
-          !data.find((_) =>
-            isSameHour(date, new Date(_.segment))
-          )
-        ) {
+        if (!data.find((_) => isSameHour(date, new Date(_.segment)))) {
           date.setUTCMinutes(0);
           date.setUTCSeconds(0);
           date.setUTCMilliseconds(0);

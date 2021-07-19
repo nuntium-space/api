@@ -69,10 +69,15 @@ export default <ServerRoute[]>[
         [article.id, from.toISOString(), to.toISOString(), precision]
       );
 
-      return Utilities.fillTimeseriesDataGapsWithZeroCountValues(result.rows.map((_) => ({
-        segment: _.segment.toISOString(),
-        count: parseInt(_.count),
-      })), from, to, precision);
+      return Utilities.fillTimeseriesDataGapsWithZeroCountValues(
+        result.rows.map((_) => ({
+          segment: _.segment.toISOString(),
+          count: parseInt(_.count),
+        })),
+        from,
+        to,
+        precision
+      );
     },
   },
   {
@@ -126,18 +131,18 @@ export default <ServerRoute[]>[
           "aut"."publisher" = $3
         group by date_trunc($4, "avw"."timestamp")
         `,
-        [
-          from.toISOString(),
-          to.toISOString(),
-          publisher.id,
-          precision,
-        ]
+        [from.toISOString(), to.toISOString(), publisher.id, precision]
       );
 
-      return Utilities.fillTimeseriesDataGapsWithZeroCountValues(result.rows.map((_) => ({
-        segment: _.segment.toISOString(),
-        count: parseInt(_.count),
-      })), from, to, precision);
+      return Utilities.fillTimeseriesDataGapsWithZeroCountValues(
+        result.rows.map((_) => ({
+          segment: _.segment.toISOString(),
+          count: parseInt(_.count),
+        })),
+        from,
+        to,
+        precision
+      );
     },
   },
 ];
