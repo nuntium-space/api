@@ -14,29 +14,12 @@ import { User } from "./User";
 export class Article implements ISerializable<Promise<ISerializedArticle>> {
   private constructor(
     public readonly id: string,
-    private _title: string,
-    private _content: any,
+    public readonly title: string,
     public readonly author: Author | INotExpandedResource,
-    private _reading_time: number,
+    public readonly reading_time: number,
     public readonly created_at: Date,
-    private _updated_at: Date
+    public readonly updated_at: Date
   ) {}
-
-  public get title(): string {
-    return this._title;
-  }
-
-  public get content(): any {
-    return this._content;
-  }
-
-  public get reading_time(): number {
-    return this._reading_time;
-  }
-
-  public get updated_at(): Date {
-    return this._updated_at;
-  }
 
   //////////
   // CRUD //
@@ -47,7 +30,17 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     expand?: string[]
   ): Promise<Article> {
     const result = await Database.pool.query(
-      `select * from "articles" where "id" = $1`,
+      `
+      select
+        "id",
+        "title",
+        "author",
+        "reading_time",
+        "created_at",
+        "updated_at"
+      from "articles"
+      where "id" = $1
+      `,
       [id]
     );
 
@@ -63,7 +56,18 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     expand?: string[]
   ): Promise<Article[]> {
     const result = await Database.pool.query(
-      `select * from "articles" where "id" = any ($1) order by "created_at" desc`,
+      `
+      select
+        "id",
+        "title",
+        "author",
+        "reading_time",
+        "created_at",
+        "updated_at"
+      from "articles"
+      where "id" = any ($1)
+      order by "created_at" desc
+      `,
       [ids]
     );
 
@@ -76,7 +80,12 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     const result = await Database.pool.query(
       `
       select
-        "a".*,
+        "a"."id",
+        "a"."title",
+        "a"."author",
+        "a"."reading_time",
+        "a"."created_at",
+        "a"."updated_at",
         (
           ("like_count" * 0.2)
           + ("view_count" * 0.1)
@@ -138,7 +147,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
         distinct on ("art"."created_at", "art"."id")
         "art"."id",
         "art"."title",
-        "art"."content",
         "art"."author",
         "art"."reading_time",
         "art"."created_at",
@@ -177,7 +185,13 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   ): Promise<Article[]> {
     const result = await Database.pool.query(
       `
-      select *
+      select
+        "id",
+        "title",
+        "author",
+        "reading_time",
+        "created_at",
+        "updated_at"
       from "articles"
       where "author" = $1
       order by "created_at" desc
@@ -196,7 +210,13 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   ): Promise<Article[]> {
     const result = await Database.pool.query(
       `
-      select art.*
+      select
+        "art"."id",
+        "art"."title",
+        "art"."author",
+        "art"."reading_time",
+        "art"."created_at",
+        "art"."updated_at"
       from
         articles as art
         inner join
@@ -224,14 +244,9 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     /**
      * @default false
      */
-    includeContent?: boolean;
-    /**
-     * @default false
-     */
     includeMetadata?: boolean;
   }): Promise<ISerializedArticle> {
     options ??= {};
-    options.includeContent ??= false;
     options.includeMetadata ??= false;
 
     if (options.includeMetadata && !options.for) {
@@ -241,7 +256,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     const obj: ISerializedArticle = {
       id: this.id,
       title: this.title,
-      content: options.includeContent ? this.content : null,
       author:
         this.author instanceof Author
           ? this.author.serialize({ for: options.for })
@@ -281,7 +295,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     return new Article(
       data.id,
       data.title,
-      data.content,
       author,
       parseInt(data.reading_time.toString()),
       data.created_at,

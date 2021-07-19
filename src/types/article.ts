@@ -16,7 +16,6 @@ export interface IDatabaseArticle {
 export interface ISerializedArticle {
   id: string;
   title: string;
-  content: any;
   author: ISerializedAuthor | INotExpandedResource;
   reading_time: number;
   created_at: string;
@@ -31,7 +30,6 @@ export const ARTICLE_SCHEMA = {
   OBJ: Joi.object({
     id: Schema.ID.ARTICLE.required(),
     title: Schema.STRING.max(50).required(),
-    content: Schema.NULLABLE(Schema.ARTICLE_CONTENT).required(),
     author: Joi.alternatives()
       .try(AUTHOR_SCHEMA.OBJ, Schema.NOT_EXPANDED_RESOURCE(Schema.ID.AUTHOR))
       .required(),
