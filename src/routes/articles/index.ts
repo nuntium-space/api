@@ -47,6 +47,7 @@ export default <ServerRoute[]>[
           id: Schema.ID.ARTICLE.required(),
         }),
         query: Joi.object({
+          only_meta: Schema.BOOLEAN,
           expand: Schema.EXPAND_QUERY,
         }),
       },
@@ -74,6 +75,12 @@ export default <ServerRoute[]>[
           for: authenticatedUser,
           includeContent: true,
         });
+      }
+
+      // Do not send content and do not count as a view
+      if (request.query.only_meta)
+      {
+        return article.serialize({ for: authenticatedUser });
       }
 
       if (
