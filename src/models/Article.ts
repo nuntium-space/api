@@ -127,8 +127,7 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   // UTILITIES //
   ///////////////
 
-  public async retrieveContent()
-  {
+  public async retrieveContent() {
     const {
       rows: [{ content }],
     } = await Database.pool.query(
