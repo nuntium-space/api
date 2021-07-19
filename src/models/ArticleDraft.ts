@@ -95,6 +95,8 @@ export class ArticleDraft
   ): Promise<INotExpandedResource> {
     const id = Utilities.id(Config.ID_PREFIXES.ARTICLE_DRAFT);
 
+    const content = await article.retrieveContent();
+
     const client = await Database.pool.connect();
     await client.query("begin");
 
@@ -106,7 +108,7 @@ export class ArticleDraft
         values
           ($1, $2, $3, $4, $5)
         `,
-        [id, article.title, article.content, article.author.id, article.id]
+        [id, article.title, content, article.author.id, article.id]
       )
       .catch(async () => {
         await client.query("rollback");

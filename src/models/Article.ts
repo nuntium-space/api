@@ -133,6 +133,22 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   // UTILITIES //
   ///////////////
 
+  public async retrieveContent()
+  {
+    const {
+      rows: [{ content }],
+    } = await Database.pool.query(
+      `
+        select "content"
+        from "articles"
+        where "id" = $1
+        `,
+      [this.id]
+    );
+
+    return content;
+  }
+
   public static async forFeed(
     user: User,
     options: {
