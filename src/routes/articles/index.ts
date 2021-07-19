@@ -111,11 +111,11 @@ export default <ServerRoute[]>[
       await client.query(
         `
         insert into "article_views"
-          ("id", "article")
+          ("id", "user", "article")
         values
-          ($1, $2)
+          ($1, $2, $3)
         `,
-        [Utilities.id(Config.ID_PREFIXES.ARTICLE_VIEW), article.id]
+        [Utilities.id(Config.ID_PREFIXES.ARTICLE_VIEW), authenticatedUser.id, article.id]
       );
 
       await client.query(

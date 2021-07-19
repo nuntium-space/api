@@ -85,19 +85,13 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
         "a"."author",
         "a"."reading_time",
         "a"."created_at",
-        "a"."updated_at",
-        (
-          ("like_count" * 0.2)
-          + ("view_count" * 0.1)
-        )
-        / (extract(day from current_timestamp - "created_at") * 0.5 + 1)
-          as "score"
+        "a"."updated_at"
       from
         "article_stats" as "s"
         inner join
         "articles" as "a"
         using ("id")
-      order by "score" desc
+      order by ("s"."score" / (extract(day from current_timestamp - "created_at") * 0.5 + 1)) desc
       limit $1
       `,
       [Config.TRENDING_ARTICLES_MAX_LENGTH]
