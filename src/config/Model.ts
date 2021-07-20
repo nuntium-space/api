@@ -15,6 +15,7 @@ export interface ModelKind {
    * Foreign Keys
    */
   expand: string[];
+  fields: string[];
   getInstance(data: any): Model;
 }
 
@@ -51,7 +52,8 @@ export class Model {
   public static async _retrieve<T>(
     kind: ModelKind,
     filter: { [key: string]: any },
-    expand?: ExpandQuery
+    expand?: ExpandQuery,
+    select?: string[],
   ): Promise<T> {
     if (!kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
@@ -59,12 +61,18 @@ export class Model {
       );
     }
 
+    select ??= kind.fields;
+
+    if (select.some(_ => !kind.fields.includes(_))) {
+      throw Boom.badImplementation(`"${select.find(_ => !kind.fields.includes(_))}" is not a field of "${kind.table}"`);
+    }
+
     const {
       rows: [first],
     } = await Database.pool
       .query(
         `
-        select *
+        select ${select.map(_ => `"${_}"`).join(", ")}
         from "${kind.table}"
         where
           ${Object.keys(filter)

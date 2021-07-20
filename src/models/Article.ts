@@ -2,7 +2,8 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedArticle, IDatabaseArticle } from "../types/article";
+import { Model } from "../config/Model";
+import { ISerializedArticle, IDatabaseArticle, IArticle, ARTICLE_MODEL } from "../types/article";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
@@ -11,15 +12,38 @@ import { Like } from "./Like";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
-export class Article implements ISerializable<Promise<ISerializedArticle>> {
-  private constructor(
-    public readonly id: string,
-    public readonly title: string,
-    public readonly author: Author | INotExpandedResource,
-    public readonly reading_time: number,
-    public readonly created_at: Date,
-    public readonly updated_at: Date
-  ) {}
+export class Article extends Model implements ISerializable<Promise<ISerializedArticle>> {
+  public constructor(protected readonly data: IArticle) {
+    super(ARTICLE_MODEL, data);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.data.id;
+  }
+
+  public get title(): string {
+    return this.data.title;
+  }
+
+  public get author(): Author | INotExpandedResource {
+    return this.data.author;
+  }
+
+  public get reading_time(): number {
+    return this.data.reading_time;
+  }
+
+  public get created_at(): Date {
+    return this.data.created_at;
+  }
+
+  public get updated_at(): Date {
+    return this.data.updated_at;
+  }
 
   //////////
   // CRUD //

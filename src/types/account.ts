@@ -36,6 +36,7 @@ export const ACCOUNT_MODEL: ModelKind = {
   table: "accounts",
   keys: [["id"], ["user", "type"], ["type", "external_id"]],
   expand: ["user"],
+  fields: ["id", "user", "type", "external_id"],
   getInstance: (data) => new Account(data),
 };
 
