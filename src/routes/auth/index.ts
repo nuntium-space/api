@@ -43,7 +43,7 @@ const authProvidersEndpoints: ServerRoute[] = Config.AUTH_PROVIDERS.map(
 
           user = userId;
 
-          if (await Account.exists(user, provider.id)) {
+          if (await Account.existsWithUserAndType(user, provider.id)) {
             throw Boom.conflict();
           }
 

@@ -124,7 +124,7 @@ export class Model
       throw Boom.badImplementation(`"${Object.keys(filter).join(", ")}" is not a key of "${kind.table}"`);
     }
 
-    const result = await pool
+    const { rows: [ first ] } = await pool
       .query(
         sql`
         select *
@@ -147,18 +147,51 @@ export class Model
         throw Boom.badImplementation();
       });
 
-    if (result.rowCount === 0) {
+    if (!first) {
       throw Boom.notFound();
     }
 
-    return Model.deserialize<T>(kind, result.rows[0], expand);
+    return Model.deserialize<T>(kind, first, expand);
   }
 
   ///////////////
   // UTILITIES //
   ///////////////
 
-  public static async for<T>(kind: ModelKind, filter: { key: string, value: string }, expand?: ExpandQuery): Promise<T[]>
+  public static async _exists(kind: ModelKind, filter: { [ key: string ]: any }): Promise<boolean>
+  {
+    if (!kind.keys.some(_ => isEqual(_ , Object.keys(filter)))) {
+      throw Boom.badImplementation(`"${Object.keys(filter).join(", ")}" is not a key of "${kind.table}"`);
+    }
+
+    const { rowCount } = await pool
+      .query(
+        sql`
+        select 1
+        from "${kind.table}"
+        where
+          ${
+            Object
+              .keys(filter)
+              .map((key, index) =>
+              {
+                return `"${key}" = $${index + 1}`;
+              })
+              .join(" and ")
+          }
+          limit 1
+        `,
+        Object.values(filter),
+      )
+      .catch(() =>
+      {
+        throw Boom.badImplementation();
+      });
+
+    return rowCount > 0;
+  }
+
+  public static async _for<T>(kind: ModelKind, filter: { key: string, value: string }, expand?: ExpandQuery): Promise<T[]>
   {
     if (!kind.expand.includes(filter.key)) {
       throw Boom.badImplementation(`"${filter.key}" is not a foreign key of "${kind.table}"`);

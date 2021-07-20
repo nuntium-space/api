@@ -100,51 +100,30 @@ export class Account extends Model {
   // UTILITIES //
   ///////////////
 
-  public static async exists(
+  public static async existsWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "accounts"
-      where
-        "user" = $1
-        and
-        "type" = $2
-      limit 1
-      `,
-      [typeof user === "string" ? user : user.id, type]
-    );
-
-    return result.rows.length > 0;
+    return super._exists(MODELS.ACCOUNT, {
+      user: typeof user === "string" ? user : user.id,
+      type,
+    });
   }
 
   public static async existsWithTypeAndExternalId(
     type: string,
-    externalId: string
+    external_id: string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "accounts"
-      where
-        "type" = $1
-        and
-        "external_id" = $2
-      limit 1
-      `,
-      [type, externalId]
-    );
-
-    return result.rows.length > 0;
+    return super._exists(MODELS.ACCOUNT, {
+      type, external_id,
+    });
   }
 
   public static async forUser(
     user: User | INotExpandedResource | string,
     expand?: ExpandQuery
   ): Promise<Account[]> {
-    return super.for<Account>(MODELS.ACCOUNT, {
+    return super._for<Account>(MODELS.ACCOUNT, {
       key: "user",
       value: typeof user === "string" ? user : user.id
     }, expand);
