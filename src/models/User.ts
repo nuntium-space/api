@@ -6,6 +6,7 @@ import jdenticon from "jdenticon";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Model, MODELS } from "../config/Model";
 import {
   ISerializedUser,
   ICreateUser,
@@ -20,14 +21,18 @@ import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
-export class User implements ISerializable<ISerializedUser> {
+export class User extends Model implements ISerializable<ISerializedUser> {
   private constructor(
     public readonly id: string,
     public readonly type: UserType,
     private _full_name: string | null,
     private _email: string,
     public readonly stripe_customer_id: string | null
-  ) {}
+  ) {
+    super(MODELS.USER, {
+      id, type, full_name: _full_name, email: _email, stripe_customer_id,
+    });
+  }
 
   public get full_name(): string | null {
     return this._full_name;
@@ -85,16 +90,9 @@ export class User implements ISerializable<ISerializedUser> {
   }
 
   public static async retrieve(id: string): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "id" = $1`,
-      [id]
-    );
+    const model = await super.retrieve(MODELS.USER, { id })
 
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return User.deserialize(model.data);
   }
 
   public static async retrieveWithEmail(email: string): Promise<User> {
