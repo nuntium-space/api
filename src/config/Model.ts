@@ -98,12 +98,12 @@ const pool = createPool(process.env.DATABASE_URL as string);
 
 export class Model {
   constructor(
-    protected readonly KIND: ModelKind,
+    protected readonly kind: ModelKind,
     protected readonly data: DatabaseRecord
   ) {}
 
   public instance<T>(): T {
-    return this.KIND.getInstance(this.data) as unknown as T;
+    return this.kind.getInstance(this.data) as unknown as T;
   }
 
   //////////
@@ -146,6 +146,32 @@ export class Model {
     }
 
     return Model.deserialize<T>(kind, first, expand);
+  }
+
+  public async _delete(filter: { [key: string]: any }): Promise<void> {
+    if (!this.kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
+      throw Boom.badImplementation(
+        `"${Object.keys(filter).join(", ")}" is not a key of "${this.kind.table}"`
+      );
+    }
+
+    await pool
+      .query(
+        sql`
+        delete
+        from "${this.kind.table}"
+        where
+          ${Object.keys(filter)
+            .map((key, index) => {
+              return `"${key}" = $${index + 1}`;
+            })
+            .join(" and ")}
+        `,
+        Object.values(filter)
+      )
+      .catch(() => {
+        throw Boom.badImplementation();
+      });
   }
 
   ///////////////

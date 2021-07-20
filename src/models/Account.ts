@@ -88,9 +88,7 @@ export class Account extends Model {
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(`delete from "accounts" where "id" = $1`, [
-      this.id,
-    ]);
+    return super._delete({ id: this.id });
   }
 
   ///////////////
