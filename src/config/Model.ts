@@ -1,6 +1,6 @@
 import Boom from "@hapi/boom";
 import { isEqual } from "lodash";
-import { createPool, sql } from "slonik";
+import { createPool, DatabaseTransactionConnectionType, sql } from "slonik";
 import { Account } from "../models/Account";
 
 export type DatabaseRecord = { [key: string]: any };
@@ -148,14 +148,14 @@ export class Model {
     return Model.deserialize<T>(kind, first, expand);
   }
 
-  public async _delete(filter: { [key: string]: any }): Promise<void> {
+  public async _delete(filter: { [key: string]: any }, client?: DatabaseTransactionConnectionType): Promise<void> {
     if (!this.kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
         `"${Object.keys(filter).join(", ")}" is not a key of "${this.kind.table}"`
       );
     }
 
-    await pool
+    await (client ?? pool)
       .query(
         sql`
         delete
