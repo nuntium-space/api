@@ -4,6 +4,7 @@ import { createPool, sql } from "slonik";
 import { Account } from "../models/Account";
 
 export type DatabaseRecord = { [ key: string ]: any };
+export type ExpandQuery = string[];
 
 export interface ModelKind
 {
@@ -105,7 +106,7 @@ export class Model
     return this.KIND.getInstance(this.data) as unknown as T;
   }
 
-  public static async retrieve(kind: ModelKind, filter: { [ key: string ]: any }): Promise<Model>
+  public static async retrieve(kind: ModelKind, filter: { [ key: string ]: any }, expand?: ExpandQuery): Promise<Model>
   {
     if (!kind.keys.some(_ => isEqual(_ , Object.keys(filter)))) {
       throw Boom.badImplementation(`"${Object.keys(filter).join(", ")}" is not a key of "${kind.table}"`);
@@ -138,11 +139,11 @@ export class Model
       throw Boom.notFound();
     }
 
-    return Model.deserialize(kind, result.rows[0]);
+    return Model.deserialize(kind, result.rows[0], expand);
   }
 
-  protected static deserialize(kind: ModelKind, data: DatabaseRecord): Model
+  protected static deserialize<T>(kind: ModelKind, data: DatabaseRecord, expand?: ExpandQuery): T
   {
-    return new Model(kind, data);
+    return new Model(kind, data).instance<T>();
   }
 }

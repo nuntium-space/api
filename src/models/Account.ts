@@ -153,6 +153,6 @@ export class Account extends Model {
       [typeof user === "string" ? user : user.id]
     );
 
-    return Promise.all(result.rows.map((_) => Account.deserialize(_, expand)));
+    return Promise.all(result.rows.map((_) => super.deserialize<Account>(MODELS.ACCOUNT, _, expand)));
   }
 }
