@@ -6,14 +6,13 @@ import { Article } from "../models/Article";
 import { Author } from "../models/Author";
 import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
 
-export interface IArticle
-{
-  id: string,
-  title: string,
-  author: Author | INotExpandedResource,
-  reading_time: number,
-  created_at: Date,
-  updated_at: Date
+export interface IArticle {
+  id: string;
+  title: string;
+  author: Author | INotExpandedResource;
+  reading_time: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface IDatabaseArticle {
@@ -43,7 +42,15 @@ export const ARTICLE_MODEL: ModelKind = {
   table: "articles",
   keys: [["id"]],
   expand: ["author"],
-  fields: ["id", "title", "content", "author", "reading_time", "created_at", "updated_at"],
+  fields: [
+    "id",
+    "title",
+    "content",
+    "author",
+    "reading_time",
+    "created_at",
+    "updated_at",
+  ],
   getInstance: (data) => new Article(data),
 };
 

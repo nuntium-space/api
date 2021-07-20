@@ -35,7 +35,11 @@ export class Account extends Model {
   // CRUD //
   //////////
 
-  public static async create({ user, type, external_id }: ICreateAccount): Promise<INotExpandedResource> {
+  public static async create({
+    user,
+    type,
+    external_id,
+  }: ICreateAccount): Promise<INotExpandedResource> {
     const id = Utilities.id(Config.ID_PREFIXES.ACCOUNT);
 
     await super._create(ACCOUNT_MODEL, {

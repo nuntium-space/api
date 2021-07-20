@@ -33,14 +33,22 @@ export class Model {
   // CRUD //
   //////////
 
-  public static async _create(kind: ModelKind, data: { [key: string]: any }, client?: PoolClient): Promise<void> {
+  public static async _create(
+    kind: ModelKind,
+    data: { [key: string]: any },
+    client?: PoolClient
+  ): Promise<void> {
     await (client ?? Database.pool)
       .query(
         `
         inser into "${kind.table}"
-          (${Object.keys(data).map(_ => `"${_}"`).join(", ")})
+          (${Object.keys(data)
+            .map((_) => `"${_}"`)
+            .join(", ")})
         values
-          (${Object.keys(data).map((_, index) => `$${index + 1}`).join(", ")})
+          (${Object.keys(data)
+            .map((_, index) => `$${index + 1}`)
+            .join(", ")})
         `,
         Object.values(data)
       )
@@ -53,7 +61,7 @@ export class Model {
     kind: ModelKind,
     filter: { [key: string]: any },
     expand?: ExpandQuery,
-    select?: string[],
+    select?: string[]
   ): Promise<T> {
     if (!kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
@@ -63,8 +71,12 @@ export class Model {
 
     select ??= kind.fields;
 
-    if (select.some(_ => !kind.fields.includes(_))) {
-      throw Boom.badImplementation(`"${select.find(_ => !kind.fields.includes(_))}" is not a field of "${kind.table}"`);
+    if (select.some((_) => !kind.fields.includes(_))) {
+      throw Boom.badImplementation(
+        `"${select.find((_) => !kind.fields.includes(_))}" is not a field of "${
+          kind.table
+        }"`
+      );
     }
 
     const {
@@ -72,7 +84,7 @@ export class Model {
     } = await Database.pool
       .query(
         `
-        select ${select.map(_ => `"${_}"`).join(", ")}
+        select ${select.map((_) => `"${_}"`).join(", ")}
         from "${kind.table}"
         where
           ${Object.keys(filter)
@@ -94,10 +106,15 @@ export class Model {
     return Model.deserialize<T>(kind, first, expand);
   }
 
-  public async _delete(filter: { [key: string]: any }, client?: PoolClient): Promise<void> {
+  public async _delete(
+    filter: { [key: string]: any },
+    client?: PoolClient
+  ): Promise<void> {
     if (!this.kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
-        `"${Object.keys(filter).join(", ")}" is not a key of "${this.kind.table}"`
+        `"${Object.keys(filter).join(", ")}" is not a key of "${
+          this.kind.table
+        }"`
       );
     }
 

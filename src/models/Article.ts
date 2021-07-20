@@ -4,7 +4,12 @@ import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Model } from "../config/Model";
-import { ISerializedArticle, IDatabaseArticle, IArticle, ARTICLE_MODEL } from "../types/article";
+import {
+  ISerializedArticle,
+  IDatabaseArticle,
+  IArticle,
+  ARTICLE_MODEL,
+} from "../types/article";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
@@ -13,7 +18,10 @@ import { Like } from "./Like";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
-export class Article extends Model implements ISerializable<Promise<ISerializedArticle>> {
+export class Article
+  extends Model
+  implements ISerializable<Promise<ISerializedArticle>>
+{
   public constructor(protected readonly data: IArticle) {
     super(ARTICLE_MODEL, data);
   }
