@@ -1,7 +1,9 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
+import { Account } from "../models/Account";
 import { User } from "../models/User";
 
 export interface IAccount {
@@ -29,6 +31,13 @@ export interface ISerializedAccount {
   display_name: string;
   is_linked: boolean;
 }
+
+export const ACCOUNT_MODEL: ModelKind = {
+  table: "accounts",
+  keys: [["id"], ["user", "type"], ["type", "external_id"]],
+  expand: ["user"],
+  getInstance: (data) => new Account(data),
+};
 
 export const ACCOUNT_SCHEMA = {
   OBJ: Joi.object({

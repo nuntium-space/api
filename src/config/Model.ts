@@ -3,7 +3,6 @@ import { isEqual } from "lodash";
 import { PoolClient } from "pg";
 import { DatabaseRecord } from "../common/DatabaseRecord";
 import { ExpandQuery } from "../common/ExpandQuery";
-import { Account } from "../models/Account";
 import Database from "../utilities/Database";
 
 export interface ModelKind {
@@ -18,81 +17,6 @@ export interface ModelKind {
   expand: string[];
   getInstance(data: any): Model;
 }
-
-export const MODELS: { [key: string]: ModelKind } /*IdPrefixes<ModelKind>*/ = {
-  ACCOUNT: {
-    table: "accounts",
-    keys: [["id"], ["user", "type"], ["type", "external_id"]],
-    expand: ["user"],
-    getInstance: (data) => new Account(data),
-  },
-  /*
-  ARTICLE: {
-    table: "articles",
-    keys: [ "id" ],
-  },
-  ARTICLE_DRAFT: {
-    table: "article_drafts",
-    keys: [ "id" ],
-  },
-  ARTICLE_REPORT: {
-    table: "article_reports",
-    keys: [ "id" ],
-  },
-  AUTHOR: {
-    table: "authors",
-    keys: [ "id" ],
-  },
-  AUTHOR_INVITE: {
-    table: "author_invites",
-    keys: [ "id" ],
-  },
-  BUNDLE: {
-    table: "bundles",
-    keys: [ "id" ],
-  },
-  DRAFT_SOURCE: {
-    table: "draft_sources",
-    keys: [ "id" ],
-  },
-  ORGANIZATION: {
-    table: "organizations",
-    keys: [ "id" ],
-  },
-  PAYMENT_METHOD: {
-    table: "payment_methods",
-    keys: [ "id" ],
-  },
-  PRICE: {
-    table: "prices",
-    keys: [ "id" ],
-  },
-  PUBLISHER: {
-    table: "publishers",
-    keys: [ "id" ],
-  },
-  SESSION: {
-    table: "sessions",
-    keys: [ "id" ],
-  },
-  SIGN_IN_REQUEST: {
-    table: "sign_in_requests",
-    keys: [ "id" ],
-  },
-  SOURCE: {
-    table: "sources",
-    keys: [ "id" ],
-  },
-  SUBSCRIPTION: {
-    table: "subscriptions",
-    keys: [ "id" ],
-  },
-  USER: {
-    table: "users",
-    keys: [ "id" ],
-  },
-  */
-};
 
 export class Model {
   constructor(

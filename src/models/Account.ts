@@ -1,14 +1,14 @@
 import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
-import { Model, MODELS } from "../config/Model";
-import { IAccount, ICreateAccount } from "../types/account";
+import { Model } from "../config/Model";
+import { ACCOUNT_MODEL, IAccount, ICreateAccount } from "../types/account";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
 export class Account extends Model {
   public constructor(protected readonly data: IAccount) {
-    super(MODELS.ACCOUNT, data);
+    super(ACCOUNT_MODEL, data);
   }
 
   ////////////////
@@ -38,7 +38,7 @@ export class Account extends Model {
   public static async create({ user, type, external_id }: ICreateAccount): Promise<INotExpandedResource> {
     const id = Utilities.id(Config.ID_PREFIXES.ACCOUNT);
 
-    await super._create(MODELS.ACCOUNT, {
+    await super._create(ACCOUNT_MODEL, {
       id,
       user: typeof user === "string" ? user : user.id,
       type,
@@ -49,14 +49,14 @@ export class Account extends Model {
   }
 
   public static async retrieve(id: string): Promise<Account> {
-    return super._retrieve<Account>(MODELS.ACCOUNT, { id });
+    return super._retrieve<Account>(ACCOUNT_MODEL, { id });
   }
 
   public static async retrieveWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<Account> {
-    return super._retrieve<Account>(MODELS.ACCOUNT, {
+    return super._retrieve<Account>(ACCOUNT_MODEL, {
       user: typeof user === "string" ? user : user.id,
       type,
     });
@@ -66,7 +66,7 @@ export class Account extends Model {
     type: string,
     external_id: string
   ): Promise<Account> {
-    return super._retrieve<Account>(MODELS.ACCOUNT, {
+    return super._retrieve<Account>(ACCOUNT_MODEL, {
       type,
       external_id,
     });
@@ -84,7 +84,7 @@ export class Account extends Model {
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<boolean> {
-    return super._exists(MODELS.ACCOUNT, {
+    return super._exists(ACCOUNT_MODEL, {
       user: typeof user === "string" ? user : user.id,
       type,
     });
@@ -94,7 +94,7 @@ export class Account extends Model {
     type: string,
     external_id: string
   ): Promise<boolean> {
-    return super._exists(MODELS.ACCOUNT, {
+    return super._exists(ACCOUNT_MODEL, {
       type,
       external_id,
     });
@@ -105,7 +105,7 @@ export class Account extends Model {
     expand?: ExpandQuery
   ): Promise<Account[]> {
     return super._for<Account>(
-      MODELS.ACCOUNT,
+      ACCOUNT_MODEL,
       {
         key: "user",
         value: typeof user === "string" ? user : user.id,
