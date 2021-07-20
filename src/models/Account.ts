@@ -16,23 +16,19 @@ export class Account extends Model {
   // PROPERTIES //
   ////////////////
 
-  public get id(): string
-  {
+  public get id(): string {
     return this.data.id;
   }
 
-  public get user(): User | INotExpandedResource
-  {
+  public get user(): User | INotExpandedResource {
     return this.data.user;
   }
 
-  public get type(): string
-  {
+  public get type(): string {
     return this.data.type;
   }
 
-  public get external_id(): string
-  {
+  public get external_id(): string {
     return this.data.external_id;
   }
 
@@ -86,7 +82,8 @@ export class Account extends Model {
     external_id: string
   ): Promise<Account> {
     return super._retrieve<Account>(MODELS.ACCOUNT, {
-      type, external_id,
+      type,
+      external_id,
     });
   }
 
@@ -115,7 +112,8 @@ export class Account extends Model {
     external_id: string
   ): Promise<boolean> {
     return super._exists(MODELS.ACCOUNT, {
-      type, external_id,
+      type,
+      external_id,
     });
   }
 
@@ -123,9 +121,13 @@ export class Account extends Model {
     user: User | INotExpandedResource | string,
     expand?: ExpandQuery
   ): Promise<Account[]> {
-    return super._for<Account>(MODELS.ACCOUNT, {
-      key: "user",
-      value: typeof user === "string" ? user : user.id
-    }, expand);
+    return super._for<Account>(
+      MODELS.ACCOUNT,
+      {
+        key: "user",
+        value: typeof user === "string" ? user : user.id,
+      },
+      expand
+    );
   }
 }
