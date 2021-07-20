@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -51,28 +52,16 @@ export class Article extends Model implements ISerializable<Promise<ISerializedA
 
   public static async retrieve(
     id: string,
-    expand?: string[]
+    expand?: ExpandQuery
   ): Promise<Article> {
-    const result = await Database.pool.query(
-      `
-      select
-        "id",
-        "title",
-        "author",
-        "reading_time",
-        "created_at",
-        "updated_at"
-      from "articles"
-      where "id" = $1
-      `,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Article.deserialize(result.rows[0], expand);
+    return super._retrieve<Article>(ARTICLE_MODEL, { id }, expand, [
+      "id",
+      "title",
+      "author",
+      "reading_time",
+      "created_at",
+      "updated_at",
+    ]);
   }
 
   public static async retrieveMultiple(
