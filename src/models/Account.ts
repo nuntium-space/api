@@ -1,7 +1,7 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
-import { Model, MODELS } from "../config/Model";
+import { ExpandQuery, Model, MODELS } from "../config/Model";
 import { IAccount, ICreateAccount } from "../types/account";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -67,27 +67,27 @@ export class Account extends Model {
     return { id };
   }
 
+  public static async retrieve(id: string): Promise<Account> {
+    return super._retrieve<Account>(MODELS.ACCOUNT, { id });
+  }
+
   public static async retrieveWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<Account> {
-    const model = await super.retrieve(MODELS.ACCOUNT, {
+    return super._retrieve<Account>(MODELS.ACCOUNT, {
       user: typeof user === "string" ? user : user.id,
       type,
     });
-
-    return model.instance<Account>();
   }
 
   public static async retrieveWithTypeAndExternalId(
     type: string,
     external_id: string
   ): Promise<Account> {
-    const model = await super.retrieve(MODELS.ACCOUNT, {
+    return super._retrieve<Account>(MODELS.ACCOUNT, {
       type, external_id,
     });
-
-    return model.instance<Account>();
   }
 
   public async delete(): Promise<void> {
@@ -142,17 +142,11 @@ export class Account extends Model {
 
   public static async forUser(
     user: User | INotExpandedResource | string,
-    expand?: string[]
+    expand?: ExpandQuery
   ): Promise<Account[]> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "accounts"
-      where "user" = $1
-      `,
-      [typeof user === "string" ? user : user.id]
-    );
-
-    return Promise.all(result.rows.map((_) => super.deserialize<Account>(MODELS.ACCOUNT, _, expand)));
+    return super.for<Account>(MODELS.ACCOUNT, {
+      key: "user",
+      value: typeof user === "string" ? user : user.id
+    }, expand);
   }
 }
