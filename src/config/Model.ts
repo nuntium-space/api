@@ -215,7 +215,7 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  protected static deserialize<T>(
+  private static deserialize<T>(
     kind: ModelKind,
     data: DatabaseRecord,
     expand?: ExpandQuery
