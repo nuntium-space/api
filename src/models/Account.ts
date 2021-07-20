@@ -1,9 +1,7 @@
-import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
 import { ExpandQuery, Model, MODELS } from "../config/Model";
 import { IAccount, ICreateAccount } from "../types/account";
-import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
@@ -36,29 +34,15 @@ export class Account extends Model {
   // CRUD //
   //////////
 
-  public static async create(
-    data: ICreateAccount
-  ): Promise<INotExpandedResource> {
+  public static async create({ user, type, external_id }: ICreateAccount): Promise<INotExpandedResource> {
     const id = Utilities.id(Config.ID_PREFIXES.ACCOUNT);
 
-    await Database.pool
-      .query(
-        `
-        insert into "accounts"
-          ("id", "user", "type", "external_id")
-        values
-          ($1, $2, $3, $4)
-        `,
-        [
-          id,
-          typeof data.user === "string" ? data.user : data.user.id,
-          data.type,
-          data.external_id,
-        ]
-      )
-      .catch(() => {
-        throw Boom.badRequest();
-      });
+    await super._create(MODELS.ACCOUNT, {
+      id,
+      user: typeof user === "string" ? user : user.id,
+      type,
+      external_id,
+    });
 
     return { id };
   }

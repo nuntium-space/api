@@ -109,6 +109,22 @@ export class Model {
   // CRUD //
   //////////
 
+  public static async _create(kind: ModelKind, data: { [key: string]: any }, client?: PoolClient): Promise<void> {
+    await (client ?? Database.pool)
+      .query(
+        `
+        inser into "${kind.table}"
+          (${Object.keys(data).map(_ => `"${_}"`).join(", ")})
+        values
+          (${Object.keys(data).map((_, index) => `$${index + 1}`).join(", ")})
+        `,
+        Object.values(data)
+      )
+      .catch(() => {
+        throw Boom.badRequest();
+      });
+  }
+
   public static async _retrieve<T>(
     kind: ModelKind,
     filter: { [key: string]: any },
