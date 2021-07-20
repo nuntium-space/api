@@ -1,11 +1,10 @@
 import Boom from "@hapi/boom";
 import { isEqual } from "lodash";
 import { PoolClient } from "pg";
+import { DatabaseRecord } from "../common/DatabaseRecord";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { Account } from "../models/Account";
 import Database from "../utilities/Database";
-
-export type DatabaseRecord = { [key: string]: any };
-export type ExpandQuery = string[];
 
 export interface ModelKind {
   table: string;

@@ -1,6 +1,7 @@
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
-import { ExpandQuery, Model, MODELS } from "../config/Model";
+import { Model, MODELS } from "../config/Model";
 import { IAccount, ICreateAccount } from "../types/account";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
