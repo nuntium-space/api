@@ -1,7 +1,8 @@
 import Boom from "@hapi/boom";
 import { isEqual } from "lodash";
-import { createPool, DatabaseTransactionConnectionType, sql } from "slonik";
+import { PoolClient } from "pg";
 import { Account } from "../models/Account";
+import Database from "../utilities/Database";
 
 export type DatabaseRecord = { [key: string]: any };
 export type ExpandQuery = string[];
@@ -94,8 +95,6 @@ export const MODELS: { [key: string]: ModelKind } /*IdPrefixes<ModelKind>*/ = {
   */
 };
 
-const pool = createPool(process.env.DATABASE_URL as string);
-
 export class Model {
   constructor(
     protected readonly kind: ModelKind,
@@ -123,9 +122,9 @@ export class Model {
 
     const {
       rows: [first],
-    } = await pool
+    } = await Database.pool
       .query(
-        sql`
+        `
         select *
         from "${kind.table}"
         where
@@ -148,16 +147,16 @@ export class Model {
     return Model.deserialize<T>(kind, first, expand);
   }
 
-  public async _delete(filter: { [key: string]: any }, client?: DatabaseTransactionConnectionType): Promise<void> {
+  public async _delete(filter: { [key: string]: any }, client?: PoolClient): Promise<void> {
     if (!this.kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
         `"${Object.keys(filter).join(", ")}" is not a key of "${this.kind.table}"`
       );
     }
 
-    await (client ?? pool)
+    await (client ?? Database.pool)
       .query(
-        sql`
+        `
         delete
         from "${this.kind.table}"
         where
@@ -188,9 +187,9 @@ export class Model {
       );
     }
 
-    const { rowCount } = await pool
+    const { rowCount } = await Database.pool
       .query(
-        sql`
+        `
         select 1
         from "${kind.table}"
         where
@@ -221,12 +220,12 @@ export class Model {
       );
     }
 
-    const { rows } = await pool
+    const { rows } = await Database.pool
       .query(
-        sql`
+        `
         select *
         from "${kind.table}"
-        where ${filter.key} = $1
+        where "${filter.key}" = $1
         `,
         [filter.value]
       )
