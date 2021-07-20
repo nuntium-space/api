@@ -4,6 +4,14 @@ import { Config } from "../config/Config";
 import { Schema } from "../config/Schema";
 import { User } from "../models/User";
 
+export interface IAccount
+{
+  id: string;
+  user: User | INotExpandedResource;
+  type: string;
+  external_id: string;
+}
+
 export interface IDatabaseAccount {
   id: string;
   user: string;

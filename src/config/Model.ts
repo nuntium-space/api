@@ -1,23 +1,28 @@
 import Boom from "@hapi/boom";
+import { isEqual } from "lodash";
 import { createPool, sql } from "slonik";
 import { Account } from "../models/Account";
-import { IdPrefixes } from "./Config";
 
 export type DatabaseRecord = { [ key: string ]: any };
 
 export interface ModelKind
 {
   table: string,
-  keys: string[],
-  getInstance(data: DatabaseRecord): Model,
+  keys: string[][],
+  getInstance(data: any): Model,
 };
 
-export const MODELS: IdPrefixes<ModelKind> = {
+export const MODELS: { [ key: string ]: ModelKind } /*IdPrefixes<ModelKind>*/ = {
   ACCOUNT: {
     table: "accounts",
-    keys: [ "id" ],
-    getInstance: (data) => new Account(TODO), make constructor public
+    keys: [
+      ["id"],
+      ["user", "type"],
+      ["type", "external_id"],
+    ],
+    getInstance: data => new Account(data),
   },
+  /*
   ARTICLE: {
     table: "articles",
     keys: [ "id" ],
@@ -82,6 +87,7 @@ export const MODELS: IdPrefixes<ModelKind> = {
     table: "users",
     keys: [ "id" ],
   },
+  */
 };
 
 const pool = createPool(process.env.DATABASE_URL as string);
@@ -90,16 +96,19 @@ export class Model
 {
   constructor(
     protected readonly KIND: ModelKind,
-    public data: { [ key: string ]: any },
+    protected readonly data: DatabaseRecord,
   )
   {}
 
+  public instance<T>(): T
+  {
+    return this.KIND.getInstance(this.data) as unknown as T;
+  }
+
   public static async retrieve(kind: ModelKind, filter: { [ key: string ]: any }): Promise<Model>
   {
-    if (!Object.keys(filter).every(_ => kind.keys.includes(_))) {
-      throw Boom.badImplementation(`${
-        Object.keys(filter).find(_ => !kind.keys.includes(_))
-      } is not a key of ${kind.table}`);
+    if (!kind.keys.some(_ => isEqual(_ , Object.keys(filter)))) {
+      throw Boom.badImplementation(`"${Object.keys(filter).join(", ")}" is not a key of "${kind.table}"`);
     }
 
     const result = await pool
@@ -110,15 +119,15 @@ export class Model
         where
           ${
             Object
-              .entries(filter)
-              .map(([ key, value ], index) =>
+              .keys(filter)
+              .map((key, index) =>
               {
                 return `"${key}" = $${index + 1}`;
               })
               .join(" and ")
           }
         `,
-        ["id"]
+        Object.values(filter),
       )
       .catch(() =>
       {
@@ -132,7 +141,7 @@ export class Model
     return Model.deserialize(kind, result.rows[0]);
   }
 
-  private static deserialize(kind: ModelKind, data: any): Model
+  protected static deserialize(kind: ModelKind, data: DatabaseRecord): Model
   {
     return new Model(kind, data);
   }

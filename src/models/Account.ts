@@ -1,18 +1,40 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
-import { ICreateAccount, IDatabaseAccount } from "../types/account";
+import { Model, MODELS } from "../config/Model";
+import { IAccount, ICreateAccount } from "../types/account";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Account {
-  private constructor(
-    public readonly id: string,
-    public readonly user: User | INotExpandedResource,
-    public readonly type: string,
-    public readonly external_id: string
-  ) {}
+export class Account extends Model {
+  public constructor(protected readonly data: IAccount) {
+    super(MODELS.ACCOUNT, data);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string
+  {
+    return this.data.id;
+  }
+
+  public get user(): User | INotExpandedResource
+  {
+    return this.data.user;
+  }
+
+  public get type(): string
+  {
+    return this.data.type;
+  }
+
+  public get external_id(): string
+  {
+    return this.data.external_id;
+  }
 
   //////////
   // CRUD //
@@ -45,63 +67,27 @@ export class Account {
     return { id };
   }
 
-  public static async retrieve(id: string): Promise<Account> {
-    const result = await Database.pool.query(
-      `select * from "accounts" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Account.deserialize(result.rows[0]);
-  }
-
   public static async retrieveWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<Account> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "accounts"
-      where
-        "user" = $1
-        and
-        "type" = $2
-      `,
-      [typeof user === "string" ? user : user.id, type]
-    );
+    const model = await super.retrieve(MODELS.ACCOUNT, {
+      user: typeof user === "string" ? user : user.id,
+      type,
+    });
 
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Account.deserialize(result.rows[0]);
+    return model.instance<Account>();
   }
 
   public static async retrieveWithTypeAndExternalId(
     type: string,
-    externalId: string
+    external_id: string
   ): Promise<Account> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "accounts"
-      where
-        "type" = $1
-        and
-        "external_id" = $2
-      `,
-      [type, externalId]
-    );
+    const model = await super.retrieve(MODELS.ACCOUNT, {
+      type, external_id,
+    });
 
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Account.deserialize(result.rows[0]);
+    return model.instance<Account>();
   }
 
   public async delete(): Promise<void> {
@@ -168,20 +154,5 @@ export class Account {
     );
 
     return Promise.all(result.rows.map((_) => Account.deserialize(_, expand)));
-  }
-
-  ///////////////////
-  // SERIALIZATION //
-  ///////////////////
-
-  private static async deserialize(
-    data: IDatabaseAccount,
-    expand?: string[]
-  ): Promise<Account> {
-    const user = expand?.includes("user")
-      ? await User.retrieve(data.user)
-      : { id: data.user };
-
-    return new Account(data.id, user, data.type, data.external_id);
   }
 }
