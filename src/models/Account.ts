@@ -117,13 +117,13 @@ export class Account extends Model {
     user: User | INotExpandedResource | string,
     expand?: ExpandQuery
   ): Promise<Account[]> {
-    return super._for<Account>(
-      ACCOUNT_MODEL,
-      {
+    return super._for<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: {
         key: "user",
         value: typeof user === "string" ? user : user.id,
       },
-      expand
-    );
+      expand,
+    });
   }
 }

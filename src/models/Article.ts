@@ -213,27 +213,14 @@ export class Article
     author: Author | INotExpandedResource | string,
     expand?: string[]
   ): Promise<Article[]> {
-    const result = await Database.pool.query(
-      `
-      select
-        "id",
-        "title",
-        "author",
-        "reading_time",
-        "created_at",
-        "updated_at"
-      from "articles"
-      where "author" = $1
-      order by "created_at" desc
-      `,
-      [typeof author === "string" ? author : author.id]
-    );
-
-    return Promise.all(
-      result.rows.map((row) =>
-        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
-      )
-    );
+    return super._for({ kind: ARTICLE_MODEL, filter: { key: "author", value: typeof author === "string" ? author : author.id }, expand, select: [
+      "id",
+      "title",
+      "author",
+      "reading_time",
+      "created_at",
+      "updated_at",
+    ], order: {field: "created_at", direction: "desc"}});
   }
 
   public static async forPublisher(

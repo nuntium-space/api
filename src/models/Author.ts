@@ -61,18 +61,18 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
     publisher: Publisher,
     expand?: string[]
   ): Promise<Author[]> {
-    return super._for(
-      AUTHOR_MODEL,
-      { key: "publisher", value: publisher.id },
-      expand
-    );
+    return super._for({
+      kind: AUTHOR_MODEL,
+      filter: { key: "publisher", value: publisher.id },
+      expand,
+    });
   }
 
   public static async forUser(
     user: User,
     expand?: string[]
   ): Promise<Author[]> {
-    return super._for(AUTHOR_MODEL, { key: "user", value: user.id }, expand);
+    return super._for({ kind: AUTHOR_MODEL, filter: { key: "user", value: user.id }, expand });
   }
 
   ///////////////////

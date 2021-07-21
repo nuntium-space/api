@@ -184,17 +184,35 @@ export class Model {
     return rowCount > 0;
   }
 
-  public static async _for<T>(
-    kind: ModelKind,
-    filter: { key: string; value: string },
-    expand?: ExpandQuery
-  ): Promise<T[]> {
+  public static async _for<T>({ kind, filter, expand, select, order }: {
+    kind: ModelKind;
+    filter: { key: string, value: any };
+    expand?: ExpandQuery;
+    select?: SelectQuery;
+    order?: { field: string, direction?: "asc" | "desc" },
+  }): Promise<T[]> {
+    select ??= kind.fields;
+
+    if (select.some((_) => !kind.fields.includes(_)) || (order && !kind.fields.includes(order.field))) {
+      throw Boom.badImplementation(
+        `"${select.find((_) => !kind.fields.includes(_))}" is not a field of "${
+          kind.table
+        }"`
+      );
+    }
+
+    if (order)
+    {
+      order.direction ??= "asc";
+    }
+
     const { rows } = await Database.pool
       .query(
         `
         select *
         from "${kind.table}"
         where "${filter.key}" = $1
+        ${order !== undefined ? `order by ${order.field} ${order.direction}` : ""}
         `,
         [filter.value]
       )

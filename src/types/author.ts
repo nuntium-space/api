@@ -27,7 +27,7 @@ export interface ISerializedAuthor {
 }
 
 export const AUTHOR_MODEL: ModelKind = {
-  table: "accounts",
+  table: "authors",
   keys: [["id"], ["user", "publisher"]],
   expand: [
     {
