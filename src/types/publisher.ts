@@ -3,7 +3,11 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Organization } from "../models/Organization";
 import { Publisher } from "../models/Publisher";
-import { ISerializedOrganization, ORGANIZATION_MODEL, ORGANIZATION_SCHEMA } from "./organization";
+import {
+  ISerializedOrganization,
+  ORGANIZATION_MODEL,
+  ORGANIZATION_SCHEMA,
+} from "./organization";
 
 export interface IPublisher {
   id: string;

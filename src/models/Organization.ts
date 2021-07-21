@@ -14,7 +14,10 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Organization extends Model implements ISerializable<ISerializedOrganization> {
+export class Organization
+  extends Model
+  implements ISerializable<ISerializedOrganization>
+{
   public constructor(protected readonly data: IOrganization) {
     super(ORGANIZATION_MODEL, data);
   }
@@ -77,11 +80,11 @@ export class Organization extends Model implements ISerializable<ISerializedOrga
   }
 
   public static async retrieve(id: string): Promise<Organization> {
-    return super._retrieve({ kind: ORGANIZATION_MODEL, filter: {id} });
+    return super._retrieve({ kind: ORGANIZATION_MODEL, filter: { id } });
   }
 
   public static async existsWithName(name: string): Promise<boolean> {
-    return super._exists({ kind: ORGANIZATION_MODEL, filter: {name} });
+    return super._exists({ kind: ORGANIZATION_MODEL, filter: { name } });
   }
 
   public async update(data: IUpdateOrganization): Promise<void> {
@@ -111,7 +114,10 @@ export class Organization extends Model implements ISerializable<ISerializedOrga
   }
 
   public static async forUser(user: User): Promise<Organization[]> {
-    return super._for({ kind: ORGANIZATION_MODEL, filter: {key: "user", value: user.id} });
+    return super._for({
+      kind: ORGANIZATION_MODEL,
+      filter: { key: "user", value: user.id },
+    });
   }
 
   public serialize(options?: {
