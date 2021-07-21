@@ -152,9 +152,12 @@ export class Model {
   // UTILITIES //
   ///////////////
 
-  public static async _exists({ kind, filter }: {
-    kind: ModelKind,
-    filter: { [key: string]: any }
+  public static async _exists({
+    kind,
+    filter,
+  }: {
+    kind: ModelKind;
+    filter: { [key: string]: any };
   }): Promise<boolean> {
     if (!kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
@@ -184,16 +187,25 @@ export class Model {
     return rowCount > 0;
   }
 
-  public static async _for<T>({ kind, filter, expand, select, order }: {
+  public static async _for<T>({
+    kind,
+    filter,
+    expand,
+    select,
+    order,
+  }: {
     kind: ModelKind;
-    filter: { key: string, value: any };
+    filter: { key: string; value: any };
     expand?: ExpandQuery;
     select?: SelectQuery;
-    order?: { field: string, direction?: "asc" | "desc" },
+    order?: { field: string; direction?: "asc" | "desc" };
   }): Promise<T[]> {
     select ??= kind.fields;
 
-    if (select.some((_) => !kind.fields.includes(_)) || (order && !kind.fields.includes(order.field))) {
+    if (
+      select.some((_) => !kind.fields.includes(_)) ||
+      (order && !kind.fields.includes(order.field))
+    ) {
       throw Boom.badImplementation(
         `"${select.find((_) => !kind.fields.includes(_))}" is not a field of "${
           kind.table
@@ -201,8 +213,7 @@ export class Model {
       );
     }
 
-    if (order)
-    {
+    if (order) {
       order.direction ??= "asc";
     }
 
@@ -212,7 +223,11 @@ export class Model {
         select *
         from "${kind.table}"
         where "${filter.key}" = $1
-        ${order !== undefined ? `order by ${order.field} ${order.direction}` : ""}
+        ${
+          order !== undefined
+            ? `order by ${order.field} ${order.direction}`
+            : ""
+        }
         `,
         [filter.value]
       )

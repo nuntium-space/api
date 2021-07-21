@@ -104,7 +104,10 @@ export class User extends Model implements ISerializable<ISerializedUser> {
   public static async retrieveWithCustomerId(
     stripe_customer_id: string
   ): Promise<User> {
-    return super._retrieve({ kind: USER_MODEL, filter: { stripe_customer_id } });
+    return super._retrieve({
+      kind: USER_MODEL,
+      filter: { stripe_customer_id },
+    });
   }
 
   public static async existsWithEmail(email: string): Promise<boolean> {

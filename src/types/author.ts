@@ -5,7 +5,11 @@ import { Schema } from "../config/Schema";
 import { Author } from "../models/Author";
 import { Publisher } from "../models/Publisher";
 import { User } from "../models/User";
-import { ISerializedPublisher, PUBLISHER_MODEL, PUBLISHER_SCHEMA } from "./publisher";
+import {
+  ISerializedPublisher,
+  PUBLISHER_MODEL,
+  PUBLISHER_SCHEMA,
+} from "./publisher";
 import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
 
 export interface IAuthor {

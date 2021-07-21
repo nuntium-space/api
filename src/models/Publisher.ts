@@ -21,7 +21,10 @@ import imageSize from "image-size";
 import jdenticon from "jdenticon";
 import { Model } from "../config/Model";
 
-export class Publisher extends Model implements ISerializable<ISerializedPublisher> {
+export class Publisher
+  extends Model
+  implements ISerializable<ISerializedPublisher>
+{
   public constructor(protected readonly data: IPublisher) {
     super(PUBLISHER_MODEL, data);
   }
@@ -98,7 +101,10 @@ export class Publisher extends Model implements ISerializable<ISerializedPublish
     await client.query("commit");
     client.release();
 
-    const publisher = await super.deserialize<Publisher>(PUBLISHER_MODEL, result.rows[0]);
+    const publisher = await super.deserialize<Publisher>(
+      PUBLISHER_MODEL,
+      result.rows[0]
+    );
 
     const png = jdenticon.toPng(publisher.id, 500, { backColor: "#ffffff" });
     await publisher.setImage(png);
@@ -107,11 +113,11 @@ export class Publisher extends Model implements ISerializable<ISerializedPublish
   }
 
   public static async retrieve(id: string): Promise<Publisher> {
-    return super._retrieve({ kind: PUBLISHER_MODEL, filter: {id} });
+    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { id } });
   }
 
   public static async retrieveWithName(name: string): Promise<Publisher> {
-    return super._retrieve({ kind: PUBLISHER_MODEL, filter: {name} });
+    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { name } });
   }
 
   public static async retrieveMultiple(ids: string[]): Promise<Publisher[]> {
@@ -120,7 +126,9 @@ export class Publisher extends Model implements ISerializable<ISerializedPublish
       [ids]
     );
 
-    return Promise.all(result.rows.map(_ => super.deserialize<Publisher>(PUBLISHER_MODEL, _)));
+    return Promise.all(
+      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _))
+    );
   }
 
   public async update(data: IUpdatePublisher): Promise<void> {
@@ -209,7 +217,10 @@ export class Publisher extends Model implements ISerializable<ISerializedPublish
   }
 
   public static async forBundle(bundle: Bundle): Promise<Publisher[]> {
-    return super._for({ kind: PUBLISHER_MODEL, filter: {key: "bundle", value: bundle.id} });
+    return super._for({
+      kind: PUBLISHER_MODEL,
+      filter: { key: "bundle", value: bundle.id },
+    });
   }
 
   public static async forOrganization(
@@ -241,7 +252,9 @@ export class Publisher extends Model implements ISerializable<ISerializedPublish
 
     const result = await Database.pool.query(query, params);
 
-    return Promise.all(result.rows.map(_ => super.deserialize<Publisher>(PUBLISHER_MODEL, _)));
+    return Promise.all(
+      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _))
+    );
   }
 
   public isOwnedByUser(user: User): boolean {

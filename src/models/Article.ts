@@ -213,14 +213,23 @@ export class Article
     author: Author | INotExpandedResource | string,
     expand?: string[]
   ): Promise<Article[]> {
-    return super._for({ kind: ARTICLE_MODEL, filter: { key: "author", value: typeof author === "string" ? author : author.id }, expand, select: [
-      "id",
-      "title",
-      "author",
-      "reading_time",
-      "created_at",
-      "updated_at",
-    ], order: {field: "created_at", direction: "desc"}});
+    return super._for({
+      kind: ARTICLE_MODEL,
+      filter: {
+        key: "author",
+        value: typeof author === "string" ? author : author.id,
+      },
+      expand,
+      select: [
+        "id",
+        "title",
+        "author",
+        "reading_time",
+        "created_at",
+        "updated_at",
+      ],
+      order: { field: "created_at", direction: "desc" },
+    });
   }
 
   public static async forPublisher(

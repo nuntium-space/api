@@ -35,7 +35,7 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
   }
 
   public async delete(): Promise<void> {
-    return super._delete({ id : this.id });
+    return super._delete({ id: this.id });
   }
 
   ///////////////
@@ -72,7 +72,11 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
     user: User,
     expand?: string[]
   ): Promise<Author[]> {
-    return super._for({ kind: AUTHOR_MODEL, filter: { key: "user", value: user.id }, expand });
+    return super._for({
+      kind: AUTHOR_MODEL,
+      filter: { key: "user", value: user.id },
+      expand,
+    });
   }
 
   ///////////////////

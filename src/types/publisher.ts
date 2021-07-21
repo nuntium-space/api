@@ -50,14 +50,9 @@ export const PUBLISHER_MODEL: ModelKind = {
     {
       field: "organization",
       model: USER_MODEL, // TODO: Replace with actual one
-    }
+    },
   ],
-  fields: ["id",
-  "name",
-  "url",
-  "organization",
-  "verified",
-  "dns_txt_value",],
+  fields: ["id", "name", "url", "organization", "verified", "dns_txt_value"],
   getModel: () => Publisher,
   getInstance: (data) => new Publisher(data),
 };
