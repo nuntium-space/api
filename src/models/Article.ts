@@ -7,12 +7,10 @@ import { Config } from "../config/Config";
 import { Model } from "../config/Model";
 import {
   ISerializedArticle,
-  IDatabaseArticle,
   IArticle,
   ARTICLE_MODEL,
 } from "../types/article";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
 import { Bookmark } from "./Bookmark";
 import { Like } from "./Like";
@@ -104,7 +102,7 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
     );
   }
 
@@ -130,7 +128,7 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
     );
   }
 
@@ -205,7 +203,7 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, options.expand))
+      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, options.expand))
     );
   }
 
@@ -230,7 +228,7 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
     );
   }
 
@@ -261,7 +259,7 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
     );
   }
 
@@ -309,26 +307,5 @@ export class Article
     }
 
     return obj;
-  }
-
-  private static async deserialize(
-    data: IDatabaseArticle,
-    expand?: string[]
-  ): Promise<Article> {
-    const author = expand?.includes("author")
-      ? await Author.retrieve(
-          data.author,
-          Utilities.getNestedExpandQuery(expand, "author")
-        )
-      : { id: data.author };
-
-    return new Article(
-      data.id,
-      data.title,
-      author,
-      parseInt(data.reading_time.toString()),
-      data.created_at,
-      data.updated_at
-    );
   }
 }

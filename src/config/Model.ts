@@ -5,6 +5,7 @@ import { DatabaseRecord } from "../common/DatabaseRecord";
 import { ExpandQuery } from "../common/ExpandQuery";
 import { SelectQuery } from "../common/SelectQuery";
 import Database from "../utilities/Database";
+import Utilities from "../utilities/Utilities";
 
 export interface ModelKind {
   table: string;
@@ -15,8 +16,12 @@ export interface ModelKind {
   /**
    * Foreign Keys
    */
-  expand: string[];
+  expand: {
+    field: string,
+    model: ModelKind,
+  }[];
   fields: string[];
+  getModel(): any;
   getInstance(data: any): Model;
 }
 
@@ -179,12 +184,6 @@ export class Model {
     filter: { key: string; value: string },
     expand?: ExpandQuery
   ): Promise<T[]> {
-    if (!kind.expand.includes(filter.key)) {
-      throw Boom.badImplementation(
-        `"${filter.key}" is not a foreign key of "${kind.table}"`
-      );
-    }
-
     const { rows } = await Database.pool
       .query(
         `
@@ -205,11 +204,43 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  private static deserialize<T>(
+  protected static async deserialize<T>(
     kind: ModelKind,
     data: DatabaseRecord,
     expand?: ExpandQuery
-  ): T {
+  ): Promise<T> {
+    expand ??= [];
+
+    if (!expand.every(_ => kind.expand.some(__ => __.field === _))) {
+      throw Boom.badImplementation(
+        `"${expand.find(_ => !kind.expand.find(__ => __.field === _))}" is not a foreign key of "${kind.table}"`
+      );
+    }
+
+    if (!expand.every(_ => Object.keys(data).includes(_))) {
+      throw Boom.badImplementation(
+        `"${expand.find(_ => !Object.keys(data).includes(_))}" must be included in order to be expanded`
+      );
+    }
+
+    await Promise.all(
+      Object.entries(data)
+        .filter(([ key ]) => kind.expand.find(_ => _.field === key)) // Can be expanded
+        .map(async ([ key, value ]) =>
+        {
+          if (!expand?.includes(key))
+          {
+            return { id: value };
+          }
+
+          return kind.expand
+            .find(_ => _.field === key)!
+            .model
+            .getModel()
+            .retrieve(value, Utilities.getNestedExpandQuery(expand, key));
+        }),
+    );
+
     return new Model(kind, data).instance<T>();
   }
 }

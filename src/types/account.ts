@@ -5,6 +5,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Account } from "../models/Account";
 import { User } from "../models/User";
+import { USER_MODEL } from "./user";
 
 export interface IAccount {
   id: string;
@@ -35,8 +36,14 @@ export interface ISerializedAccount {
 export const ACCOUNT_MODEL: ModelKind = {
   table: "accounts",
   keys: [["id"], ["user", "type"], ["type", "external_id"]],
-  expand: ["user"],
+  expand: [
+    {
+      field: "user",
+      model: USER_MODEL,
+    },
+  ],
   fields: ["id", "user", "type", "external_id"],
+  getModel: () => Account,
   getInstance: (data) => new Account(data),
 };
 

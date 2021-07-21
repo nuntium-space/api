@@ -1,5 +1,7 @@
 import Joi from "joi";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
+import { User } from "../models/User";
 
 export type UserType = "admin" | "user";
 
@@ -36,6 +38,15 @@ export interface ISerializedUser {
   email: string;
   imageUrl: string;
 }
+
+export const USER_MODEL: ModelKind = {
+  table: "accounts",
+  keys: [["id"], ["email"], ["stripe_customer_id"]],
+  expand: [],
+  fields: ["id", "type", "full_name", "email", "stripe_customer_id"],
+  getModel: () => User,
+  getInstance: (data) => new User(data),
+};
 
 export const USER_SCHEMA = {
   OBJ: Joi.object({

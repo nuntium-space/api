@@ -4,7 +4,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Article } from "../models/Article";
 import { Author } from "../models/Author";
-import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
+import { AUTHOR_MODEL, AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
 
 export interface IArticle {
   id: string;
@@ -42,7 +42,12 @@ export interface ISerializedArticle {
 export const ARTICLE_MODEL: ModelKind = {
   table: "articles",
   keys: [["id"]],
-  expand: ["author"],
+  expand: [
+    {
+      field: "author",
+      model: AUTHOR_MODEL,
+    },
+  ],
   fields: [
     "id",
     "title",
@@ -52,8 +57,11 @@ export const ARTICLE_MODEL: ModelKind = {
     "created_at",
     "updated_at",
   ],
+  getModel: () => Article,
   getInstance: (data) => new Article(data),
 };
+
+ARTICLE_MODEL.getModel().retrieve("sasas").then(console.log);
 
 export const ARTICLE_SCHEMA = {
   OBJ: Joi.object({
