@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { Model, ModelKind } from "../config/Model";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { User } from "../models/User";
 
@@ -40,12 +40,12 @@ export interface ISerializedUser {
 }
 
 export const USER_MODEL: ModelKind = {
-  table: "accounts",
+  table: "users",
   keys: [["id"], ["email"], ["stripe_customer_id"]],
   expand: [],
   fields: ["id", "type", "full_name", "email", "stripe_customer_id"],
   getModel: () => User,
-  getInstance: (data) => new User(data) as unknown as Model, // TODO: Remove once User is an actual Model
+  getInstance: (data) => new User(data),
 };
 
 export const USER_SCHEMA = {

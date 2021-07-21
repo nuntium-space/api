@@ -6,22 +6,25 @@ import jdenticon from "jdenticon";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Model } from "../config/Model";
 import {
   ISerializedUser,
   ICreateUser,
   IUpdateUser,
   IUserSettings,
   IUpdateUserSettings,
-  IDatabaseUser,
   UserType,
+  USER_MODEL,
 } from "../types/user";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
-export class User implements ISerializable<ISerializedUser> {
-  public constructor(private readonly data: any) {}
+export class User extends Model implements ISerializable<ISerializedUser> {
+  public constructor(protected readonly data: any) {
+    super(USER_MODEL, data);
+  }
 
   public get id(): string {
     return this.data.id;
@@ -82,7 +85,7 @@ export class User implements ISerializable<ISerializedUser> {
     await client.query("commit");
     client.release();
 
-    const user = await User.deserialize(result.rows[0]);
+    const user = await super.deserialize<User>(USER_MODEL, result.rows[0]);
 
     const png = jdenticon.toPng(user.id, 500, { backColor: "#ffffff" });
     await user.setImage(png);
@@ -91,58 +94,21 @@ export class User implements ISerializable<ISerializedUser> {
   }
 
   public static async retrieve(id: string): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return super._retrieve({ kind: USER_MODEL, filter: { id } });
   }
 
   public static async retrieveWithEmail(email: string): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "email" = $1`,
-      [email]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return super._retrieve({ kind: USER_MODEL, filter: { email } });
   }
 
   public static async retrieveWithCustomerId(
-    customerId: string
+    stripe_customer_id: string
   ): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "stripe_customer_id" = $1`,
-      [customerId]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return super._retrieve({ kind: USER_MODEL, filter: { stripe_customer_id } });
   }
 
   public static async existsWithEmail(email: string): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "users"
-      where "email" = $1
-      limit 1
-      `,
-      [email]
-    );
-
-    return result.rows.length > 0;
+    return super._exists({ kind: USER_MODEL, filter: { email } });
   }
 
   public async update(data: IUpdateUser): Promise<void> {
@@ -150,7 +116,6 @@ export class User implements ISerializable<ISerializedUser> {
     this.data.email = data.email ?? this.email;
 
     const client = await Database.pool.connect();
-
     await client.query("begin");
 
     await client
@@ -185,7 +150,6 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     await client.query("commit");
-
     client.release();
   }
 
@@ -200,10 +164,9 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     const client = await Database.pool.connect();
-
     await client.query("begin");
 
-    await client.query(`delete from "users" where "id" = $1`, [this.id]);
+    await super._delete({ id: this.id });
 
     if (this.stripe_customer_id) {
       await Config.STRIPE.customers
@@ -216,7 +179,6 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     await client.query("commit");
-
     client.release();
   }
 
@@ -526,9 +488,5 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     return response;
-  }
-
-  private static async deserialize(data: IDatabaseUser): Promise<User> {
-    return new User(data);
   }
 }

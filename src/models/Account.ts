@@ -97,20 +97,20 @@ export class Account extends Model {
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<boolean> {
-    return super._exists(ACCOUNT_MODEL, {
+    return super._exists({kind: ACCOUNT_MODEL, filter: {
       user: typeof user === "string" ? user : user.id,
       type,
-    });
+    }});
   }
 
   public static async existsWithTypeAndExternalId(
     type: string,
     external_id: string
   ): Promise<boolean> {
-    return super._exists(ACCOUNT_MODEL, {
+    return super._exists({kind: ACCOUNT_MODEL, filter: {
       type,
       external_id,
-    });
+    }});
   }
 
   public static async forUser(

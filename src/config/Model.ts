@@ -152,10 +152,10 @@ export class Model {
   // UTILITIES //
   ///////////////
 
-  public static async _exists(
+  public static async _exists({ kind, filter }: {
     kind: ModelKind,
     filter: { [key: string]: any }
-  ): Promise<boolean> {
+  }): Promise<boolean> {
     if (!kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
         `"${Object.keys(filter).join(", ")}" is not a key of "${kind.table}"`
