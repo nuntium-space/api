@@ -29,22 +29,15 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
   //////////
 
   public static async retrieve(id: string, expand?: string[]): Promise<Author> {
-    const result = await Database.pool.query(
-      `select * from "authors" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return super.deserialize(AUTHOR_MODEL, result.rows[0], expand);
+    return super._retrieve({
+      kind: AUTHOR_MODEL,
+      filter: { id },
+      expand,
+    });
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(`delete from "authors" where "id" = $1`, [
-      this.id,
-    ]);
+    return super._delete({ id : this.id });
   }
 
   ///////////////
