@@ -1,6 +1,19 @@
 import Joi from "joi";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
+import { Organization } from "../models/Organization";
+import { Publisher } from "../models/Publisher";
 import { ISerializedOrganization, ORGANIZATION_SCHEMA } from "./organization";
+import { USER_MODEL } from "./user";
+
+export interface IPublisher {
+  id: string;
+  name: string;
+  url: string;
+  organization: Organization;
+  verified: boolean;
+  dns_txt_value: string;
+}
 
 export interface IDatabasePublisher {
   id: string;
@@ -29,6 +42,25 @@ export interface ISerializedPublisher {
   verified: boolean;
   imageUrl: string;
 }
+
+export const PUBLISHER_MODEL: ModelKind = {
+  table: "publishers",
+  keys: [["id"], ["name"], ["url"], ["dns_txt_value"]],
+  expand: [
+    {
+      field: "organization",
+      model: USER_MODEL, // TODO: Replace with actual one
+    }
+  ],
+  fields: ["id",
+  "name",
+  "url",
+  "organization",
+  "verified",
+  "dns_txt_value",],
+  getModel: () => Publisher,
+  getInstance: (data) => new Publisher(data),
+};
 
 export const PUBLISHER_SCHEMA = {
   OBJ: Joi.object({

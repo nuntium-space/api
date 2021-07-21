@@ -5,7 +5,7 @@ import { Schema } from "../config/Schema";
 import { Author } from "../models/Author";
 import { Publisher } from "../models/Publisher";
 import { User } from "../models/User";
-import { ISerializedPublisher, PUBLISHER_SCHEMA } from "./publisher";
+import { ISerializedPublisher, PUBLISHER_MODEL, PUBLISHER_SCHEMA } from "./publisher";
 import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
 
 export interface IAuthor {
@@ -36,7 +36,7 @@ export const AUTHOR_MODEL: ModelKind = {
     },
     {
       field: "publisher",
-      model: USER_MODEL, // TODO: Create Publisher Model
+      model: PUBLISHER_MODEL,
     },
   ],
   fields: ["id", "user", "publisher"],
