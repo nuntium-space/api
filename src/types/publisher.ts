@@ -3,8 +3,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Organization } from "../models/Organization";
 import { Publisher } from "../models/Publisher";
-import { ISerializedOrganization, ORGANIZATION_SCHEMA } from "./organization";
-import { USER_MODEL } from "./user";
+import { ISerializedOrganization, ORGANIZATION_MODEL, ORGANIZATION_SCHEMA } from "./organization";
 
 export interface IPublisher {
   id: string;
@@ -49,7 +48,7 @@ export const PUBLISHER_MODEL: ModelKind = {
   expand: [
     {
       field: "organization",
-      model: USER_MODEL, // TODO: Replace with actual one
+      model: ORGANIZATION_MODEL,
     },
   ],
   fields: ["id", "name", "url", "organization", "verified", "dns_txt_value"],

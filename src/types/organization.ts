@@ -1,6 +1,17 @@
 import Joi from "joi";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
+import { Organization } from "../models/Organization";
+import { User } from "../models/User";
 import { ISerializedUser, USER_SCHEMA } from "./user";
+
+export interface IOrganization {
+  id: string;
+  name: string;
+  user: User;
+  stripe_account_id: string;
+  stripe_account_enabled: boolean;
+}
 
 export interface IDatabaseOrganization {
   id: string;
@@ -25,6 +36,15 @@ export interface ISerializedOrganization {
   owner: ISerializedUser;
   stripe_account_enabled: boolean;
 }
+
+export const ORGANIZATION_MODEL: ModelKind = {
+  table: "organizations",
+  keys: [["id"], ["name"], ["stripe_account_id"]],
+  expand: [],
+  fields: ["id", "name", "user", "stripe_account_id", "stripe_account_enabled"],
+  getModel: () => Organization,
+  getInstance: (data) => new Organization(data),
+};
 
 export const ORGANIZATION_SCHEMA = {
   OBJ: Joi.object({
