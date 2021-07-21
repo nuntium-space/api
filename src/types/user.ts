@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ModelKind } from "../config/Model";
+import { Model, ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { User } from "../models/User";
 
@@ -45,7 +45,7 @@ export const USER_MODEL: ModelKind = {
   expand: [],
   fields: ["id", "type", "full_name", "email", "stripe_customer_id"],
   getModel: () => User,
-  getInstance: (data) => new User(data),
+  getInstance: (data) => new User(data) as unknown as Model, // TODO: Remove once User is an actual Model
 };
 
 export const USER_SCHEMA = {

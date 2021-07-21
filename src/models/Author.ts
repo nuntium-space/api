@@ -7,11 +7,19 @@ import { Publisher } from "./Publisher";
 import { User } from "./User";
 
 export class Author implements ISerializable<ISerializedAuthor> {
-  private constructor(
-    public readonly id: string,
-    public readonly user: User | INotExpandedResource,
-    public readonly publisher: Publisher | INotExpandedResource
-  ) {}
+  public constructor(private readonly data: any) {}
+
+  public get id(): string {
+    return this.data.id;
+  }
+
+  public get user(): User | INotExpandedResource {
+    return this.data.user;
+  }
+
+  public get publisher(): Publisher | INotExpandedResource {
+    return this.data.publisher;
+  }
 
   //////////
   // CRUD //
@@ -128,6 +136,10 @@ export class Author implements ISerializable<ISerializedAuthor> {
       ? await Publisher.retrieve(data.publisher)
       : { id: data.publisher };
 
-    return new Author(data.id, user, publisher);
+    return new Author({
+      id: data.id,
+      user,
+      publisher,
+    });
   }
 }

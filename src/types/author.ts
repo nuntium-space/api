@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ModelKind } from "../config/Model";
+import { Model, ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Author } from "../models/Author";
 import { ISerializedPublisher, PUBLISHER_SCHEMA } from "./publisher";
@@ -28,12 +28,12 @@ export const AUTHOR_MODEL: ModelKind = {
     },
     {
       field: "publisher",
-      model: PUBLISHER_MODEL,
+      model: USER_MODEL, // TODO: Create Publisher Model
     },
   ],
   fields: ["id", "user", "publisher"],
   getModel: () => Author,
-  getInstance: (data) => new Author(data),
+  getInstance: (data) => new Author(data) as unknown as Model, // TODO: Remove once Author is an actual Model
 };
 
 export const AUTHOR_SCHEMA = {

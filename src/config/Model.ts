@@ -223,24 +223,37 @@ export class Model {
       );
     }
 
-    await Promise.all(
+    const expandedData = await Promise.all(
       Object.entries(data)
-        .filter(([ key ]) => kind.expand.find(_ => _.field === key)) // Can be expanded
         .map(async ([ key, value ]) =>
         {
-          if (!expand?.includes(key))
+          let newValue: any;
+
+          // Cannot be expanded
+          if (!kind.expand.find(_ => _.field === key))
           {
-            return { id: value };
+            newValue = value;
+          }
+          else if (!expand?.includes(key))
+          {
+            newValue = { id: value };
+          }
+          else
+          {
+            newValue = await kind.expand
+              .find(_ => _.field === key)!
+              .model
+              .getModel()
+              .retrieve(value, Utilities.getNestedExpandQuery(expand, key));
           }
 
-          return kind.expand
-            .find(_ => _.field === key)!
-            .model
-            .getModel()
-            .retrieve(value, Utilities.getNestedExpandQuery(expand, key));
+          return { [key]: newValue };
         }),
     );
 
-    return new Model(kind, data).instance<T>();
+    return new Model(
+      kind,
+      expandedData.reduce((prev, curr) => ({ ...prev, ...curr }), {}) // Reduce the array of objects to a single object
+    ).instance<T>();
   }
 }

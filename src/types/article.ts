@@ -61,8 +61,6 @@ export const ARTICLE_MODEL: ModelKind = {
   getInstance: (data) => new Article(data),
 };
 
-ARTICLE_MODEL.getModel().retrieve("sasas").then(console.log);
-
 export const ARTICLE_SCHEMA = {
   OBJ: Joi.object({
     id: Schema.ID.ARTICLE.required(),

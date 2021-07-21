@@ -21,20 +21,26 @@ import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
 export class User implements ISerializable<ISerializedUser> {
-  private constructor(
-    public readonly id: string,
-    public readonly type: UserType,
-    private _full_name: string | null,
-    private _email: string,
-    public readonly stripe_customer_id: string | null
-  ) {}
+  public constructor(private readonly data: any) {}
+
+  public get id(): string {
+    return this.data.id;
+  }
+
+  public get type(): UserType {
+    return this.data.type;
+  }
 
   public get full_name(): string | null {
-    return this._full_name;
+    return this.data.full_name;
   }
 
   public get email(): string {
-    return this._email;
+    return this.data.email;
+  }
+
+  public get stripe_customer_id(): string | null {
+    return this.data.stripe_customer_id;
   }
 
   public static async create(data: ICreateUser): Promise<INotExpandedResource> {
@@ -140,8 +146,8 @@ export class User implements ISerializable<ISerializedUser> {
   }
 
   public async update(data: IUpdateUser): Promise<void> {
-    this._full_name = data.full_name ?? this.full_name;
-    this._email = data.email ?? this.email;
+    this.data.full_name = data.full_name ?? this.full_name;
+    this.data.email = data.email ?? this.email;
 
     const client = await Database.pool.connect();
 
@@ -523,12 +529,6 @@ export class User implements ISerializable<ISerializedUser> {
   }
 
   private static async deserialize(data: IDatabaseUser): Promise<User> {
-    return new User(
-      data.id,
-      data.type,
-      data.full_name,
-      data.email,
-      data.stripe_customer_id
-    );
+    return new User(data);
   }
 }
