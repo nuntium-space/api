@@ -2,6 +2,7 @@ import Boom from "@hapi/boom";
 import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
+import { SelectQuery } from "../common/SelectQuery";
 import { Config } from "../config/Config";
 import { Model } from "../config/Model";
 import {
@@ -38,6 +39,10 @@ export class Article
     return this.data.title;
   }
 
+  public get content(): string {
+    return this.data.content;
+  }
+
   public get author(): Author | INotExpandedResource {
     return this.data.author;
   }
@@ -60,16 +65,22 @@ export class Article
 
   public static async retrieve(
     id: string,
-    expand?: ExpandQuery
+    expand?: ExpandQuery,
+    select?: SelectQuery,
   ): Promise<Article> {
-    return super._retrieve<Article>(ARTICLE_MODEL, { id }, expand, [
-      "id",
-      "title",
-      "author",
-      "reading_time",
-      "created_at",
-      "updated_at",
-    ]);
+    return super._retrieve<Article>({
+      kind: ARTICLE_MODEL,
+      filter: { id },
+      expand,
+      select: select ?? [
+        "id",
+        "title",
+        "author",
+        "reading_time",
+        "created_at",
+        "updated_at",
+      ],
+    });
   }
 
   public static async retrieveMultiple(
@@ -125,10 +136,9 @@ export class Article
 
   public async delete(): Promise<void> {
     const client = await Database.pool.connect();
-
     await client.query("begin");
 
-    await client.query(`delete from "articles" where "id" = $1`, [this.id]);
+    await super._delete({ id: this.id }, client);
 
     await Config.ELASTICSEARCH.delete({
       index: "articles",
@@ -140,7 +150,6 @@ export class Article
     });
 
     await client.query("commit");
-
     client.release();
   }
 
@@ -148,17 +157,8 @@ export class Article
   // UTILITIES //
   ///////////////
 
-  public async retrieveContent() {
-    const {
-      rows: [{ content }],
-    } = await Database.pool.query(
-      `
-        select "content"
-        from "articles"
-        where "id" = $1
-        `,
-      [this.id]
-    );
+  public async retrieveContent(): Promise<string> {
+    const { content } = await Article.retrieve(this.id, undefined, ["content"]);
 
     return content;
   }

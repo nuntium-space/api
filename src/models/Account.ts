@@ -53,16 +53,22 @@ export class Account extends Model {
   }
 
   public static async retrieve(id: string): Promise<Account> {
-    return super._retrieve<Account>(ACCOUNT_MODEL, { id });
+    return super._retrieve<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: { id },
+    });
   }
 
   public static async retrieveWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<Account> {
-    return super._retrieve<Account>(ACCOUNT_MODEL, {
-      user: typeof user === "string" ? user : user.id,
-      type,
+    return super._retrieve<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        user: typeof user === "string" ? user : user.id,
+        type,
+      },
     });
   }
 
@@ -70,9 +76,12 @@ export class Account extends Model {
     type: string,
     external_id: string
   ): Promise<Account> {
-    return super._retrieve<Account>(ACCOUNT_MODEL, {
-      type,
-      external_id,
+    return super._retrieve<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        type,
+        external_id,
+      },
     });
   }
 

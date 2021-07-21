@@ -3,6 +3,7 @@ import { isEqual } from "lodash";
 import { PoolClient } from "pg";
 import { DatabaseRecord } from "../common/DatabaseRecord";
 import { ExpandQuery } from "../common/ExpandQuery";
+import { SelectQuery } from "../common/SelectQuery";
 import Database from "../utilities/Database";
 
 export interface ModelKind {
@@ -57,12 +58,12 @@ export class Model {
       });
   }
 
-  public static async _retrieve<T>(
+  public static async _retrieve<T>({ kind, filter, expand, select }: {
     kind: ModelKind,
     filter: { [key: string]: any },
     expand?: ExpandQuery,
-    select?: string[]
-  ): Promise<T> {
+    select?: SelectQuery,
+  }): Promise<T> {
     if (!kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
         `"${Object.keys(filter).join(", ")}" is not a key of "${kind.table}"`

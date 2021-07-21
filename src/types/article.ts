@@ -9,6 +9,7 @@ import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
 export interface IArticle {
   id: string;
   title: string;
+  content: string;
   author: Author | INotExpandedResource;
   reading_time: number;
   created_at: Date;
