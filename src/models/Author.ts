@@ -1,9 +1,7 @@
-import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Model } from "../config/Model";
 import { ISerializedAuthor, IAuthor, AUTHOR_MODEL } from "../types/author";
-import Database from "../utilities/Database";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
@@ -49,27 +47,14 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
     publisher: Publisher | string,
     expand?: string[]
   ): Promise<Author> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "authors"
-      where
-        "user" = $1
-        and
-        "publisher" = $2
-      limit 1
-      `,
-      [
-        user instanceof User ? user.id : user,
-        publisher instanceof Publisher ? publisher.id : publisher,
-      ]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return super.deserialize(AUTHOR_MODEL, result.rows[0], expand);
+    return super._retrieve({
+      kind: AUTHOR_MODEL,
+      filter: {
+        user: user instanceof User ? user.id : user,
+        publisher: publisher instanceof Publisher ? publisher.id : publisher,
+      },
+      expand,
+    });
   }
 
   public static async forPublisher(
