@@ -17,8 +17,8 @@ export interface ModelKind {
    * Foreign Keys
    */
   expand: {
-    field: string,
-    model: ModelKind,
+    field: string;
+    model: ModelKind;
   }[];
   fields: string[];
   getModel(): any;
@@ -63,11 +63,16 @@ export class Model {
       });
   }
 
-  public static async _retrieve<T>({ kind, filter, expand, select }: {
-    kind: ModelKind,
-    filter: { [key: string]: any },
-    expand?: ExpandQuery,
-    select?: SelectQuery,
+  public static async _retrieve<T>({
+    kind,
+    filter,
+    expand,
+    select,
+  }: {
+    kind: ModelKind;
+    filter: { [key: string]: any };
+    expand?: ExpandQuery;
+    select?: SelectQuery;
   }): Promise<T> {
     if (!kind.keys.some((_) => isEqual(_, Object.keys(filter)))) {
       throw Boom.badImplementation(
@@ -211,44 +216,40 @@ export class Model {
   ): Promise<T> {
     expand ??= [];
 
-    if (!expand.every(_ => kind.expand.some(__ => __.field === _))) {
+    if (!expand.every((_) => kind.expand.some((__) => __.field === _))) {
       throw Boom.badImplementation(
-        `"${expand.find(_ => !kind.expand.find(__ => __.field === _))}" is not a foreign key of "${kind.table}"`
+        `"${expand.find(
+          (_) => !kind.expand.find((__) => __.field === _)
+        )}" is not a foreign key of "${kind.table}"`
       );
     }
 
-    if (!expand.every(_ => Object.keys(data).includes(_))) {
+    if (!expand.every((_) => Object.keys(data).includes(_))) {
       throw Boom.badImplementation(
-        `"${expand.find(_ => !Object.keys(data).includes(_))}" must be included in order to be expanded`
+        `"${expand.find(
+          (_) => !Object.keys(data).includes(_)
+        )}" must be included in order to be expanded`
       );
     }
 
     const expandedData = await Promise.all(
-      Object.entries(data)
-        .map(async ([ key, value ]) =>
-        {
-          let newValue: any;
+      Object.entries(data).map(async ([key, value]) => {
+        let newValue: any;
 
-          // Cannot be expanded
-          if (!kind.expand.find(_ => _.field === key))
-          {
-            newValue = value;
-          }
-          else if (!expand?.includes(key))
-          {
-            newValue = { id: value };
-          }
-          else
-          {
-            newValue = await kind.expand
-              .find(_ => _.field === key)!
-              .model
-              .getModel()
-              .retrieve(value, Utilities.getNestedExpandQuery(expand, key));
-          }
+        // Cannot be expanded
+        if (!kind.expand.find((_) => _.field === key)) {
+          newValue = value;
+        } else if (!expand?.includes(key)) {
+          newValue = { id: value };
+        } else {
+          newValue = await kind.expand
+            .find((_) => _.field === key)!
+            .model.getModel()
+            .retrieve(value, Utilities.getNestedExpandQuery(expand, key));
+        }
 
-          return { [key]: newValue };
-        }),
+        return { [key]: newValue };
+      })
     );
 
     return new Model(

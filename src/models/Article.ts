@@ -5,11 +5,7 @@ import { ISerializable } from "../common/ISerializable";
 import { SelectQuery } from "../common/SelectQuery";
 import { Config } from "../config/Config";
 import { Model } from "../config/Model";
-import {
-  ISerializedArticle,
-  IArticle,
-  ARTICLE_MODEL,
-} from "../types/article";
+import { ISerializedArticle, IArticle, ARTICLE_MODEL } from "../types/article";
 import Database from "../utilities/Database";
 import { Author } from "./Author";
 import { Bookmark } from "./Bookmark";
@@ -64,7 +60,7 @@ export class Article
   public static async retrieve(
     id: string,
     expand?: ExpandQuery,
-    select?: SelectQuery,
+    select?: SelectQuery
   ): Promise<Article> {
     return super._retrieve<Article>({
       kind: ARTICLE_MODEL,
@@ -102,7 +98,9 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
@@ -128,7 +126,9 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
@@ -203,7 +203,9 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, options.expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, options.expand)
+      )
     );
   }
 
@@ -228,7 +230,9 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
@@ -259,7 +263,9 @@ export class Article
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize<Article>(ARTICLE_MODEL, row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
