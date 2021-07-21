@@ -210,7 +210,7 @@ export default <ServerRoute[]>[
         throw Boom.badImplementation();
       }
 
-      if (bundle.organization.owner.id !== authenticatedUser.id) {
+      if (bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -246,7 +246,7 @@ export default <ServerRoute[]>[
         throw Boom.badImplementation();
       }
 
-      if (price.bundle.organization.owner.id !== authenticatedUser.id) {
+      if (price.bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 

@@ -57,7 +57,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -124,7 +124,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -154,7 +154,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (bundle.organization.owner.id !== authenticatedUser.id) {
+      if (bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 

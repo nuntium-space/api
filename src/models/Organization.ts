@@ -30,7 +30,7 @@ export class Organization
     return this.data.name;
   }
 
-  public get owner(): User {
+  public get user(): User {
     return this.data.user;
   }
 
@@ -123,14 +123,14 @@ export class Organization
   public serialize(options?: {
     for?: User | INotExpandedResource;
   }): ISerializedOrganization {
-    if (options?.for?.id !== this.owner.id) {
+    if (options?.for?.id !== this.user.id) {
       return { id: this.id } as any;
     }
 
     return {
       id: this.id,
       name: this.name,
-      owner: this.owner.serialize({ for: options?.for }),
+      user: this.user.serialize({ for: options?.for }),
       stripe_account_enabled: this.stripe_account_enabled,
     };
   }

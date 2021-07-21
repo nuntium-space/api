@@ -258,7 +258,7 @@ export class Publisher
   }
 
   public isOwnedByUser(user: User): boolean {
-    return this.organization.owner.id === user.id;
+    return this.organization.user.id === user.id;
   }
 
   public async setImage(image: any): Promise<{ url: string }> {
