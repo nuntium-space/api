@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Organization } from "../models/Organization";
@@ -13,7 +14,7 @@ export interface IPublisher {
   id: string;
   name: string;
   url: string;
-  organization: Organization;
+  organization: Organization | INotExpandedResource;
   verified: boolean;
   dns_txt_value: string;
 }
@@ -41,7 +42,7 @@ export interface ISerializedPublisher {
   id: string;
   name: string;
   url: string;
-  organization: ISerializedOrganization;
+  organization: ISerializedOrganization | INotExpandedResource;
   verified: boolean;
   imageUrl: string;
 }
@@ -65,7 +66,10 @@ export const PUBLISHER_SCHEMA = {
     id: Schema.ID.PUBLISHER.required(),
     name: Schema.STRING.max(50).required(),
     url: Schema.URL.required(),
-    organization: ORGANIZATION_SCHEMA.OBJ.required(),
+    organization: Joi.alternatives(
+      ORGANIZATION_SCHEMA.OBJ,
+      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
+    ).required(),
     verified: Schema.BOOLEAN.required(),
     imageUrl: Schema.STRING.required(),
     __metadata: Joi.object({

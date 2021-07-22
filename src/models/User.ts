@@ -375,7 +375,7 @@ export class User extends Model implements ISerializable<ISerializedUser> {
     /**
      * The owner of the publisher is considered subscribed to it
      */
-    if (publisher.isOwnedByUser(this)) {
+    if (await publisher.isOwnedByUser(this)) {
       return true;
     }
 

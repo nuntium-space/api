@@ -135,7 +135,7 @@ export default <ServerRoute[]>[
 
       const publisher = await Publisher.retrieve(request.params.id);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.paymentRequired();
       }
 

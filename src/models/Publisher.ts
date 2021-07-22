@@ -20,6 +20,7 @@ import imageType from "image-type";
 import imageSize from "image-size";
 import jdenticon from "jdenticon";
 import { Model } from "../config/Model";
+import { ExpandQuery } from "../common/ExpandQuery";
 
 export class Publisher
   extends Model
@@ -41,7 +42,7 @@ export class Publisher
     return this.data.url;
   }
 
-  public get organization(): Organization {
+  public get organization(): Organization | INotExpandedResource {
     return this.data.organization;
   }
 
@@ -112,22 +113,22 @@ export class Publisher
     return { id };
   }
 
-  public static async retrieve(id: string): Promise<Publisher> {
-    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { id } });
+  public static async retrieve(id: string, expand?: ExpandQuery): Promise<Publisher> {
+    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { id }, expand });
   }
 
-  public static async retrieveWithName(name: string): Promise<Publisher> {
-    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { name } });
+  public static async retrieveWithName(name: string, expand?: ExpandQuery): Promise<Publisher> {
+    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { name }, expand });
   }
 
-  public static async retrieveMultiple(ids: string[]): Promise<Publisher[]> {
+  public static async retrieveMultiple(ids: string[], expand?: ExpandQuery): Promise<Publisher[]> {
     const result = await Database.pool.query(
       `select * from "publishers" where "id" = any ($1)`,
       [ids]
     );
 
     return Promise.all(
-      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _))
+      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand))
     );
   }
 
@@ -216,10 +217,11 @@ export class Publisher
     client.release();
   }
 
-  public static async forBundle(bundle: Bundle): Promise<Publisher[]> {
+  public static async forBundle(bundle: Bundle, expand?: ExpandQuery): Promise<Publisher[]> {
     return super._for({
       kind: PUBLISHER_MODEL,
       filter: { key: "bundle", value: bundle.id },
+      expand,
     });
   }
 
@@ -227,7 +229,8 @@ export class Publisher
     organization: Organization,
     options: {
       not_in_bundle: string;
-    }
+    },
+    expand?: ExpandQuery
   ): Promise<Publisher[]> {
     let query = `select * from "publishers" where "organization" = $1`;
     let params = [organization.id];
@@ -253,12 +256,16 @@ export class Publisher
     const result = await Database.pool.query(query, params);
 
     return Promise.all(
-      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _))
+      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand))
     );
   }
 
-  public isOwnedByUser(user: User): boolean {
-    return this.organization.user.id === user.id;
+  public async isOwnedByUser(user: User): Promise<boolean> {
+    const organization = this.organization instanceof Organization
+      ? this.organization
+      : await Organization.retrieve(this.organization.id);
+
+    return organization.user.id === user.id;
   }
 
   public async setImage(image: any): Promise<{ url: string }> {
@@ -318,7 +325,9 @@ export class Publisher
       id: this.id,
       name: this.name,
       url: this.url,
-      organization: this.organization.serialize({ for: options?.for }),
+      organization: this.organization instanceof Organization
+        ? this.organization.serialize({ for: options?.for })
+        : this.organization,
       verified: this.verified,
       imageUrl: imageUrl.toString(),
     };

@@ -29,7 +29,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
@@ -112,7 +112,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
@@ -145,7 +145,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (!invite.publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await invite.publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
