@@ -47,7 +47,7 @@ export class Model {
     await (client ?? Database.pool)
       .query(
         `
-        inser into "${kind.table}"
+        insert into "${kind.table}"
           (${Object.keys(data)
             .map((_) => `"${_}"`)
             .join(", ")})
