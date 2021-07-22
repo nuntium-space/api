@@ -24,6 +24,7 @@ import { ARTICLE_SCHEMA } from "../src/types/article";
 import { PUBLISHER_SCHEMA } from "../src/types/publisher";
 import Utilities from "../src/utilities/Utilities";
 import serverless from "serverless-http";
+import { User } from "../src/models/User";
 
 const server = Hapi.server({
   port: process.env.PORT,
@@ -82,7 +83,12 @@ const init = async () => {
           throw Boom.unauthorized();
         }
 
-        const session = await Session.retrieve(authorization.split(" ")[1]);
+        const session = await Session.retrieve(authorization.split(" ")[1], ["user"]);
+
+        if (!(session.user instanceof User))
+        {
+          throw Boom.badImplementation();
+        }
 
         if (session.hasExpired()) {
           throw Boom.unauthorized();
@@ -120,6 +126,11 @@ const init = async () => {
       }
 
       const session = await Session.retrieve(id);
+
+      if (!(session.user instanceof User))
+      {
+        throw Boom.badImplementation();
+      }
 
       if (session.hasExpired()) {
         throw Boom.unauthorized();
