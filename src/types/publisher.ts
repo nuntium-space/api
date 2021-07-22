@@ -68,7 +68,7 @@ export const PUBLISHER_SCHEMA = {
     url: Schema.URL.required(),
     organization: Joi.alternatives(
       ORGANIZATION_SCHEMA.OBJ,
-      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION),
+      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.ORGANIZATION)
     ).required(),
     verified: Schema.BOOLEAN.required(),
     imageUrl: Schema.STRING.required(),

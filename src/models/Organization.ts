@@ -80,8 +80,15 @@ export class Organization
     return { id };
   }
 
-  public static async retrieve(id: string, expand?: ExpandQuery): Promise<Organization> {
-    return super._retrieve({ kind: ORGANIZATION_MODEL, filter: { id }, expand });
+  public static async retrieve(
+    id: string,
+    expand?: ExpandQuery
+  ): Promise<Organization> {
+    return super._retrieve({
+      kind: ORGANIZATION_MODEL,
+      filter: { id },
+      expand,
+    });
   }
 
   public static async existsWithName(name: string): Promise<boolean> {
@@ -114,7 +121,10 @@ export class Organization
     return super._delete({ id: this.id });
   }
 
-  public static async forUser(user: User, expand?: ExpandQuery): Promise<Organization[]> {
+  public static async forUser(
+    user: User,
+    expand?: ExpandQuery
+  ): Promise<Organization[]> {
     return super._for({
       kind: ORGANIZATION_MODEL,
       filter: { key: "user", value: user.id },
@@ -132,9 +142,10 @@ export class Organization
     return {
       id: this.id,
       name: this.name,
-      user: this.user instanceof User
-        ? this.user.serialize({ for: options?.for })
-        : this.user,
+      user:
+        this.user instanceof User
+          ? this.user.serialize({ for: options?.for })
+          : this.user,
       stripe_account_enabled: this.stripe_account_enabled,
     };
   }

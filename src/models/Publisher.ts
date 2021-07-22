@@ -113,22 +113,33 @@ export class Publisher
     return { id };
   }
 
-  public static async retrieve(id: string, expand?: ExpandQuery): Promise<Publisher> {
+  public static async retrieve(
+    id: string,
+    expand?: ExpandQuery
+  ): Promise<Publisher> {
     return super._retrieve({ kind: PUBLISHER_MODEL, filter: { id }, expand });
   }
 
-  public static async retrieveWithName(name: string, expand?: ExpandQuery): Promise<Publisher> {
+  public static async retrieveWithName(
+    name: string,
+    expand?: ExpandQuery
+  ): Promise<Publisher> {
     return super._retrieve({ kind: PUBLISHER_MODEL, filter: { name }, expand });
   }
 
-  public static async retrieveMultiple(ids: string[], expand?: ExpandQuery): Promise<Publisher[]> {
+  public static async retrieveMultiple(
+    ids: string[],
+    expand?: ExpandQuery
+  ): Promise<Publisher[]> {
     const result = await Database.pool.query(
       `select * from "publishers" where "id" = any ($1)`,
       [ids]
     );
 
     return Promise.all(
-      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand))
+      result.rows.map((_) =>
+        super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand)
+      )
     );
   }
 
@@ -217,7 +228,10 @@ export class Publisher
     client.release();
   }
 
-  public static async forBundle(bundle: Bundle, expand?: ExpandQuery): Promise<Publisher[]> {
+  public static async forBundle(
+    bundle: Bundle,
+    expand?: ExpandQuery
+  ): Promise<Publisher[]> {
     return super._for({
       kind: PUBLISHER_MODEL,
       filter: { key: "bundle", value: bundle.id },
@@ -256,14 +270,17 @@ export class Publisher
     const result = await Database.pool.query(query, params);
 
     return Promise.all(
-      result.rows.map((_) => super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand))
+      result.rows.map((_) =>
+        super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand)
+      )
     );
   }
 
   public async isOwnedByUser(user: User): Promise<boolean> {
-    const organization = this.organization instanceof Organization
-      ? this.organization
-      : await Organization.retrieve(this.organization.id);
+    const organization =
+      this.organization instanceof Organization
+        ? this.organization
+        : await Organization.retrieve(this.organization.id);
 
     return organization.user.id === user.id;
   }
@@ -325,9 +342,10 @@ export class Publisher
       id: this.id,
       name: this.name,
       url: this.url,
-      organization: this.organization instanceof Organization
-        ? this.organization.serialize({ for: options?.for })
-        : this.organization,
+      organization:
+        this.organization instanceof Organization
+          ? this.organization.serialize({ for: options?.for })
+          : this.organization,
       verified: this.verified,
       imageUrl: imageUrl.toString(),
     };

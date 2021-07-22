@@ -61,7 +61,10 @@ export default <ServerRoute[]>[
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      const publisher = await Publisher.retrieve(request.params.id, request.query.expand);
+      const publisher = await Publisher.retrieve(
+        request.params.id,
+        request.query.expand
+      );
 
       return {
         ...publisher.serialize({ for: authenticatedUser }),
@@ -128,7 +131,10 @@ export default <ServerRoute[]>[
 
       const bundle = await Bundle.retrieve(request.params.id);
 
-      const publishers = await Publisher.forBundle(bundle, request.query.expand);
+      const publishers = await Publisher.forBundle(
+        bundle,
+        request.query.expand
+      );
 
       return publishers.map((publisher) =>
         publisher.serialize({ for: authenticatedUser })
@@ -161,9 +167,13 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const publishers = await Publisher.forOrganization(organization, {
-        not_in_bundle: request.query.not_in_bundle,
-      }, request.query.expand);
+      const publishers = await Publisher.forOrganization(
+        organization,
+        {
+          not_in_bundle: request.query.not_in_bundle,
+        },
+        request.query.expand
+      );
 
       return publishers.map((publisher) =>
         publisher.serialize({ for: authenticatedUser })

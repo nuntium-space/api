@@ -25,7 +25,10 @@ export default <ServerRoute[]>[
       },
     },
     handler: async (request, h) => {
-      const organization = await Organization.retrieve(request.params.id, request.query.expand);
+      const organization = await Organization.retrieve(
+        request.params.id,
+        request.query.expand
+      );
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
@@ -120,7 +123,10 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const organizations = await Organization.forUser(authenticatedUser, request.query.expand);
+      const organizations = await Organization.forUser(
+        authenticatedUser,
+        request.query.expand
+      );
 
       return organizations.map((organization) =>
         organization.serialize({ for: authenticatedUser })

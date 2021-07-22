@@ -58,7 +58,7 @@ export const ORGANIZATION_SCHEMA = {
     name: Schema.STRING.max(50).optional(), // Not sent to users other than the owner
     user: Joi.alternatives(
       USER_SCHEMA.OBJ,
-      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
+      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER)
     ).optional(), // Not sent to users other than the owner
     stripe_account_enabled: Schema.BOOLEAN.optional(), // Not sent to users other than the owner
   }),
