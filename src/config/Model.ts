@@ -249,7 +249,7 @@ export class Model {
   ): Promise<T> {
     expand ??= [];
 
-    if (!expand.every((_) => kind.expand.some((__) => __.field === _))) {
+    if (!expand.filter(_ => !_.includes(".")).every((_) => kind.expand.some((__) => __.field === _))) {
       throw Boom.badImplementation(
         `"${expand.find(
           (_) => !kind.expand.find((__) => __.field === _)
@@ -257,7 +257,7 @@ export class Model {
       );
     }
 
-    if (!expand.every((_) => Object.keys(data).includes(_))) {
+    if (!expand.filter(_ => !_.includes(".")).every((_) => Object.keys(data).includes(_))) {
       throw Boom.badImplementation(
         `"${expand.find(
           (_) => !Object.keys(data).includes(_)
