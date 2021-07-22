@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Organization } from "../models/Organization";
@@ -8,7 +9,7 @@ import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
 export interface IOrganization {
   id: string;
   name: string;
-  user: User;
+  user: User | INotExpandedResource;
   stripe_account_id: string;
   stripe_account_enabled: boolean;
 }
@@ -33,7 +34,7 @@ export interface IUpdateOrganization {
 export interface ISerializedOrganization {
   id: string;
   name: string;
-  user: ISerializedUser;
+  user: ISerializedUser | INotExpandedResource;
   stripe_account_enabled: boolean;
 }
 
@@ -55,7 +56,10 @@ export const ORGANIZATION_SCHEMA = {
   OBJ: Joi.object({
     id: Schema.ID.ORGANIZATION.required(),
     name: Schema.STRING.max(50).optional(), // Not sent to users other than the owner
-    user: USER_SCHEMA.OBJ.optional(), // Not sent to users other than the owner
+    user: Joi.alternatives(
+      USER_SCHEMA.OBJ,
+      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
+    ).optional(), // Not sent to users other than the owner
     stripe_account_enabled: Schema.BOOLEAN.optional(), // Not sent to users other than the owner
   }),
   CREATE: Joi.object({

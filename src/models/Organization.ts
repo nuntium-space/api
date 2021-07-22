@@ -1,4 +1,5 @@
 import Boom from "@hapi/boom";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
@@ -30,7 +31,7 @@ export class Organization
     return this.data.name;
   }
 
-  public get user(): User {
+  public get user(): User | INotExpandedResource {
     return this.data.user;
   }
 
@@ -79,8 +80,8 @@ export class Organization
     return { id };
   }
 
-  public static async retrieve(id: string): Promise<Organization> {
-    return super._retrieve({ kind: ORGANIZATION_MODEL, filter: { id } });
+  public static async retrieve(id: string, expand?: ExpandQuery): Promise<Organization> {
+    return super._retrieve({ kind: ORGANIZATION_MODEL, filter: { id }, expand });
   }
 
   public static async existsWithName(name: string): Promise<boolean> {
@@ -113,10 +114,11 @@ export class Organization
     return super._delete({ id: this.id });
   }
 
-  public static async forUser(user: User): Promise<Organization[]> {
+  public static async forUser(user: User, expand?: ExpandQuery): Promise<Organization[]> {
     return super._for({
       kind: ORGANIZATION_MODEL,
       filter: { key: "user", value: user.id },
+      expand,
     });
   }
 
@@ -130,7 +132,9 @@ export class Organization
     return {
       id: this.id,
       name: this.name,
-      user: this.user.serialize({ for: options?.for }),
+      user: this.user instanceof User
+        ? this.user.serialize({ for: options?.for })
+        : this.user,
       stripe_account_enabled: this.stripe_account_enabled,
     };
   }
