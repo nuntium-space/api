@@ -43,7 +43,7 @@ export const SESSION_SCHEMA = {
     id: Schema.ID.SESSION.required(),
     user: Joi.alternatives(
       USER_SCHEMA.OBJ,
-      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER),
+      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER)
     ).required(),
     expires_at: Schema.DATETIME.required(),
   }),
