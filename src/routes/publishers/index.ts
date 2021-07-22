@@ -305,9 +305,6 @@ export default <ServerRoute[]>[
         }),
         payload: PUBLISHER_SCHEMA.UPDATE,
       },
-      response: {
-        schema: PUBLISHER_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const publisher = await Publisher.retrieve(request.params.id);
@@ -318,9 +315,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      await publisher.update(request.payload as any);
-
-      return publisher.serialize({ for: authenticatedUser });
+      return publisher.update(request.payload as any);
     },
   },
   {

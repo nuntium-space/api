@@ -154,9 +154,6 @@ export default <ServerRoute[]>[
         }),
         payload: ORGANIZATION_SCHEMA.UPDATE,
       },
-      response: {
-        schema: ORGANIZATION_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const organization = await Organization.retrieve(request.params.id);
@@ -167,9 +164,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      await organization.update(request.payload as any);
-
-      return organization.serialize({ for: authenticatedUser });
+      return organization.update(request.payload as any);
     },
   },
   {

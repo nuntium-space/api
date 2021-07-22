@@ -227,9 +227,6 @@ export default <ServerRoute[]>[
         }),
         payload: PRICE_SCHEMA.UPDATE,
       },
-      response: {
-        schema: PRICE_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
@@ -250,9 +247,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      await price.update(request.payload as any);
-
-      return price.serialize({ for: authenticatedUser });
+      return price.update(request.payload as any);
     },
   },
 ];

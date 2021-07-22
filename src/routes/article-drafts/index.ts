@@ -263,9 +263,6 @@ export default <ServerRoute[]>[
         }),
         payload: ARTICLE_DRAFT_SCHEMA.UPDATE,
       },
-      response: {
-        schema: ARTICLE_DRAFT_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
@@ -281,9 +278,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      await draft.update(request.payload as any);
-
-      return draft.serialize({ includeContent: true });
+      return draft.update(request.payload as any);
     },
   },
   {
