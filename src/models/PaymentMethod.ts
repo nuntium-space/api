@@ -53,10 +53,16 @@ export class PaymentMethod extends Model implements ISerializable<ISerializedPay
   public static async retrieveDefaultForUser(
     user: string
   ): Promise<PaymentMethod | null> {
-    return super._retrieve({
-      kind: PAYMENT_METHOD_MODEL,
-      filter: { user },
-    });
+    const result = await Database.pool.query(
+      `select * from "default_payment_methods" where "user" = $1`,
+      [user]
+    );
+
+    if (result.rowCount === 0) {
+      return null;
+    }
+
+    return PaymentMethod.retrieve(result.rows[0].payment_method);
   }
 
   public static async retrieveWithStripeId(
