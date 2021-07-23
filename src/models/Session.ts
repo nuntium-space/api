@@ -7,7 +7,10 @@ import { ISerializedSession, ISession, SESSION_MODEL } from "../types/session";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Session extends Model implements ISerializable<ISerializedSession> {
+export class Session
+  extends Model
+  implements ISerializable<ISerializedSession>
+{
   public constructor(protected readonly data: ISession) {
     super(SESSION_MODEL, data);
   }
@@ -43,7 +46,10 @@ export class Session extends Model implements ISerializable<ISerializedSession> 
     return { id };
   }
 
-  public static async retrieve(id: string, expand?: ExpandQuery): Promise<Session> {
+  public static async retrieve(
+    id: string,
+    expand?: ExpandQuery
+  ): Promise<Session> {
     return super._retrieve({ kind: SESSION_MODEL, filter: { id }, expand });
   }
 
@@ -60,9 +66,10 @@ export class Session extends Model implements ISerializable<ISerializedSession> 
   }): ISerializedSession {
     return {
       id: this.id,
-      user: this.user instanceof User
-        ? this.user.serialize({ for: options?.for })
-        : this.user,
+      user:
+        this.user instanceof User
+          ? this.user.serialize({ for: options?.for })
+          : this.user,
       expires_at: this.expires_at.toISOString(),
     };
   }

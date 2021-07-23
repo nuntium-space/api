@@ -83,10 +83,11 @@ const init = async () => {
           throw Boom.unauthorized();
         }
 
-        const session = await Session.retrieve(authorization.split(" ")[1], ["user"]);
+        const session = await Session.retrieve(authorization.split(" ")[1], [
+          "user",
+        ]);
 
-        if (!(session.user instanceof User))
-        {
+        if (!(session.user instanceof User)) {
           throw Boom.badImplementation();
         }
 
@@ -127,8 +128,7 @@ const init = async () => {
 
       const session = await Session.retrieve(id, ["user"]);
 
-      if (!(session.user instanceof User))
-      {
+      if (!(session.user instanceof User)) {
         throw Boom.badImplementation();
       }
 
