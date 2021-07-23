@@ -7,7 +7,10 @@ import Database from "../utilities/Database";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Like extends Model implements ISerializable<Promise<ISerializedLike>> {
+export class Like
+  extends Model
+  implements ISerializable<Promise<ISerializedLike>>
+{
   public constructor(protected readonly data: ILike) {
     super(LIKE_MODEL, data);
   }
@@ -35,10 +38,14 @@ export class Like extends Model implements ISerializable<Promise<ISerializedLike
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await super._create(LIKE_MODEL, {
-      user: user instanceof User ? user.id : user,
-      article: article instanceof Article ? article.id : article,
-    }, client);
+    await super._create(
+      LIKE_MODEL,
+      {
+        user: user instanceof User ? user.id : user,
+        article: article instanceof Article ? article.id : article,
+      },
+      client
+    );
 
     await client
       .query(
@@ -78,12 +85,15 @@ export class Like extends Model implements ISerializable<Promise<ISerializedLike
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await super._delete({
-      filter: {
-        user: this.user.id,
-        article: this.article.id,
+    await super._delete(
+      {
+        filter: {
+          user: this.user.id,
+          article: this.article.id,
+        },
       },
-    }, client);
+      client
+    );
 
     await client
       .query(

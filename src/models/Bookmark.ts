@@ -1,11 +1,18 @@
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Model } from "../config/Model";
-import { ISerializedBookmark, IBookmark, BOOKMARK_MODEL } from "../types/bookmark";
+import {
+  ISerializedBookmark,
+  IBookmark,
+  BOOKMARK_MODEL,
+} from "../types/bookmark";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Bookmark extends Model implements ISerializable<Promise<ISerializedBookmark>> {
+export class Bookmark
+  extends Model
+  implements ISerializable<Promise<ISerializedBookmark>>
+{
   public constructor(protected readonly data: IBookmark) {
     super(BOOKMARK_MODEL, data);
   }
