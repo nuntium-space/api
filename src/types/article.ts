@@ -16,16 +16,6 @@ export interface IArticle {
   updated_at: Date;
 }
 
-export interface IDatabaseArticle {
-  id: string;
-  title: string;
-  content: any;
-  author: string;
-  reading_time: number;
-  created_at: Date;
-  updated_at: Date;
-}
-
 export interface ISerializedArticle {
   id: string;
   title: string;

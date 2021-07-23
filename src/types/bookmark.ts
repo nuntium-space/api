@@ -14,12 +14,6 @@ export interface IBookmark {
   created_at: Date;
 }
 
-export interface IDatabaseBookmark {
-  user: string;
-  article: string;
-  created_at: Date;
-}
-
 export interface ISerializedBookmark {
   article: ISerializedArticle | INotExpandedResource;
   created_at: string;

@@ -14,13 +14,6 @@ export interface IAccount {
   external_id: string;
 }
 
-export interface IDatabaseAccount {
-  id: string;
-  user: string;
-  type: string;
-  external_id: string;
-}
-
 export interface ICreateAccount {
   user: User | INotExpandedResource | string;
   type: string;

@@ -18,12 +18,6 @@ export interface IAuthor {
   publisher: Publisher | INotExpandedResource;
 }
 
-export interface IDatabaseAuthor {
-  id: string;
-  user: string;
-  publisher: string;
-}
-
 export interface ISerializedAuthor {
   id: string;
   user: ISerializedUser | INotExpandedResource;

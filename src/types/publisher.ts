@@ -19,15 +19,6 @@ export interface IPublisher {
   dns_txt_value: string;
 }
 
-export interface IDatabasePublisher {
-  id: string;
-  name: string;
-  url: string;
-  organization: string;
-  verified: boolean;
-  dns_txt_value: string;
-}
-
 export interface ICreatePublisher {
   name: string;
   url: string;

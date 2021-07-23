@@ -14,14 +14,6 @@ export interface IOrganization {
   stripe_account_enabled: boolean;
 }
 
-export interface IDatabaseOrganization {
-  id: string;
-  name: string;
-  user: string;
-  stripe_account_id: string;
-  stripe_account_enabled: boolean;
-}
-
 export interface ICreateOrganization {
   name: string;
 }
