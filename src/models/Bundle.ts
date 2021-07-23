@@ -2,11 +2,13 @@ import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Model } from "../config/Model";
 import {
   ISerializedBundle,
   ICreateBundle,
   IUpdateBundle,
-  IDatabaseBundle,
+  IBundle,
+  BUNDLE_MODEL,
 } from "../types/bundle";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -14,22 +16,38 @@ import { Organization } from "./Organization";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
-export class Bundle implements ISerializable<ISerializedBundle> {
-  private constructor(
-    public readonly id: string,
-    private _name: string,
-    public readonly organization: Organization | INotExpandedResource,
-    public _active: boolean,
-    public readonly stripe_product_id: string | null
-  ) {}
+export class Bundle extends Model implements ISerializable<ISerializedBundle> {
+  public constructor(protected readonly record: IBundle) {
+    super(BUNDLE_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.record.id;
+  }
 
   public get name(): string {
-    return this._name;
+    return this.record.name;
+  }
+
+  public get organization(): Organization | INotExpandedResource {
+    return this.record.organization;
   }
 
   public get active(): boolean {
-    return this._active;
+    return this.record.active;
   }
+
+  public get stripe_product_id(): string | null {
+    return this.record.stripe_product_id;
+  }
+
+  //////////
+  // CRUD //
+  //////////
 
   public static async create(
     data: ICreateBundle,
@@ -86,16 +104,11 @@ export class Bundle implements ISerializable<ISerializedBundle> {
   }
 
   public static async retrieve(id: string, expand?: string[]): Promise<Bundle> {
-    const result = await Database.pool.query(
-      `select * from "bundles" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Bundle.deserialize(result.rows[0], expand);
+    return super._retrieve({
+      kind: BUNDLE_MODEL,
+      filter: { id },
+      expand,
+    });
   }
 
   public async update(data: IUpdateBundle): Promise<void> {
@@ -116,8 +129,8 @@ export class Bundle implements ISerializable<ISerializedBundle> {
       throw Boom.badImplementation();
     }
 
-    this._name = data.name ?? this.name;
-    this._active = data.active ?? this.active;
+    this.record.name = data.name ?? this.name;
+    this.record.active = data.active ?? this.active;
 
     const client = await Database.pool.connect();
 
@@ -193,29 +206,24 @@ export class Bundle implements ISerializable<ISerializedBundle> {
     name: string,
     organization: Organization | string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `select id from "bundles" where "name" = $1 and "organization" = $2`,
-      [
+    return super._exists({
+      kind: BUNDLE_MODEL,
+      filter: {
         name,
-        organization instanceof Organization ? organization.id : organization,
-      ]
-    );
-
-    return result.rowCount > 0;
+        organization,
+      },
+    });
   }
 
   public static async forOrganization(
     organization: Organization,
     expand?: string[]
   ): Promise<Bundle[]> {
-    const result = await Database.pool.query(
-      `select * from "bundles" where "organization" = $1`,
-      [organization.id]
-    );
-
-    return Promise.all(
-      result.rows.map((row) => Bundle.deserialize(row, expand))
-    );
+    return super._for({
+      kind: BUNDLE_MODEL,
+      filter: { key: "organization", value: organization },
+      expand,
+    });
   }
 
   public static async forPublisher(
@@ -235,7 +243,7 @@ export class Bundle implements ISerializable<ISerializedBundle> {
     );
 
     return Promise.all(
-      result.rows.map((row) => Bundle.deserialize(row, expand))
+      result.rows.map((row) => Bundle.deserialize<Bundle>(BUNDLE_MODEL, row, expand))
     );
   }
 
@@ -251,22 +259,5 @@ export class Bundle implements ISerializable<ISerializedBundle> {
           : this.organization,
       active: this.active,
     };
-  }
-
-  private static async deserialize(
-    data: IDatabaseBundle,
-    expand?: string[]
-  ): Promise<Bundle> {
-    const organization = expand?.includes("organization")
-      ? await Organization.retrieve(data.organization)
-      : { id: data.organization };
-
-    return new Bundle(
-      data.id,
-      data.name,
-      organization,
-      data.active,
-      data.stripe_product_id
-    );
   }
 }
