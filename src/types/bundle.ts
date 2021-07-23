@@ -40,6 +40,9 @@ export const BUNDLE_MODEL: ModelKind = {
     },
   ],
   fields: ["id", "name", "organization", "active", "stripe_product_id"],
+  serialization: {
+    include: ["id", "name", "organization", "active"],
+  },
   getModel: () => Bundle,
   getInstance: (data) => new Bundle(data),
 };

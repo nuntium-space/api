@@ -40,6 +40,29 @@ export const ORGANIZATION_MODEL: ModelKind = {
     },
   ],
   fields: ["id", "name", "user", "stripe_account_id", "stripe_account_enabled"],
+  serialization: {
+    include: ["id", "name", "user", "stripe_account_enabled"],
+    custom: {
+      name: {
+        if: (organization, options) =>
+        {
+          return organization.instance<Organization>().user.id === options.for?.id;
+        },
+      },
+      user: {
+        if: (organization, options) =>
+        {
+          return organization.instance<Organization>().user.id === options.for?.id;
+        },
+      },
+      stripe_account_enabled: {
+        if: (organization, options) =>
+        {
+          return organization.instance<Organization>().user.id === options.for?.id;
+        },
+      },
+    },
+  },
   getModel: () => Organization,
   getInstance: (data) => new Organization(data),
 };

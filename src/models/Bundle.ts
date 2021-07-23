@@ -250,9 +250,7 @@ export class Bundle extends Model implements ISerializable<ISerializedBundle> {
   public serialize(options?: {
     for?: User | INotExpandedResource;
   }): ISerializedBundle {
-    console.log(super._serialize({
-      select: ["id", "name", "organization", "active"]
-    }));
+    console.log(super._serialize());
 
     return {
       id: this.id,

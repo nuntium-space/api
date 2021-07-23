@@ -23,6 +23,21 @@ export interface ModelKind {
     model: ModelKind;
   }[];
   fields: string[];
+  serialization?: {
+    include?: SelectQuery,
+    custom?: {
+      [key: string]: {
+        /**
+         * Serialize this property only if `true` is returned
+         */
+        if?: (model: Model, options: { for?: User | INotExpandedResource }) => boolean,
+        /**
+         * Customize the serialization for this property
+         */
+        serialize?: (model: Model, options: { for?: User | INotExpandedResource }) => any,
+      },
+    },
+  },
   getModel(): any;
   getInstance(data: any): Model;
 }
@@ -244,17 +259,12 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  protected _serialize<T>({ select, options }: {
-    select?: SelectQuery,
-    options?: {
-      for?: User | INotExpandedResource;
-    },
+  protected _serialize<T>(options?: {
+    for?: User | INotExpandedResource;
   }): T {
-    select ??= this.kind.fields;
-
-    if (select.some((_) => !this.kind.fields.includes(_))) {
+    if (this.kind.serialization?.include?.some((_) => !this.kind.fields.includes(_))) {
       throw Boom.badImplementation(
-        `"${select.find((_) => !this.kind.fields.includes(_))}" is not a field of "${
+        `"${this.kind.serialization?.include?.find((_) => !this.kind.fields.includes(_))}" is not a field of "${
           this.kind.table
         }"`
       );
@@ -262,12 +272,19 @@ export class Model {
 
     return Object
       .entries(this.record)
-      .filter(([key]) => select!.includes(key))
+      .filter(([key]) => this.kind.serialization?.include?.includes(key))
       .map(([key, value]) => {
         let newValue: any = value;
 
-        if (value instanceof Model) {
-          newValue = value._serialize({options});
+        if (this.kind.serialization && this.kind.serialization.custom && Object.keys(this.kind.serialization.custom).includes(key) && this.kind.serialization.custom[key].serialize)
+        {
+          newValue = this.kind.serialization.custom[key].serialize!(this, options ?? {});
+        }
+        else if (value instanceof Model) {
+          newValue = value._serialize(options);
+        }
+        else if (value instanceof Date) {
+          newValue = value.toISOString();
         }
 
         return { [key]: newValue };
