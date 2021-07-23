@@ -4,10 +4,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Bundle } from "../models/Bundle";
 import { Organization } from "../models/Organization";
-import {
-  ORGANIZATION_MODEL,
-  ORGANIZATION_SCHEMA,
-} from "./organization";
+import { ORGANIZATION_MODEL, ORGANIZATION_SCHEMA } from "./organization";
 
 export interface IBundle {
   id: string;
