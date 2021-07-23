@@ -19,7 +19,7 @@ export class Organization
   extends Model
   implements ISerializable<ISerializedOrganization>
 {
-  public constructor(protected readonly data: IOrganization) {
+  public constructor(protected readonly record: IOrganization) {
     super(ORGANIZATION_MODEL, data);
   }
 
@@ -28,23 +28,23 @@ export class Organization
   ////////////////
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get name(): string {
-    return this.data.name;
+    return this.record.name;
   }
 
   public get user(): User | INotExpandedResource {
-    return this.data.user;
+    return this.record.user;
   }
 
   public get stripe_account_id(): string {
-    return this.data.stripe_account_id;
+    return this.record.stripe_account_id;
   }
 
   public get stripe_account_enabled(): boolean {
-    return this.data.stripe_account_enabled;
+    return this.record.stripe_account_enabled;
   }
 
   public static async create(
@@ -100,8 +100,8 @@ export class Organization
   }
 
   public async update(data: IUpdateOrganization): Promise<void> {
-    this.data.name = data.name ?? this.name;
-    this.data.stripe_account_enabled =
+    this.record.name = data.name ?? this.name;
+    this.record.stripe_account_enabled =
       data.stripe_account_enabled ?? this.stripe_account_enabled;
 
     await Database.pool

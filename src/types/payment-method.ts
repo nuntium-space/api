@@ -1,13 +1,16 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
-import { ISerializedUser, USER_SCHEMA } from "./user";
+import { PaymentMethod } from "../models/PaymentMethod";
+import { User } from "../models/User";
+import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
 
-export interface IDatabasePaymentMethod {
+export interface IPaymentMethod {
   id: string;
   type: string;
   data: any;
-  user: string;
+  user: User | INotExpandedResource;
   stripe_id: string;
 }
 
@@ -17,6 +20,20 @@ export interface ISerializedPaymentMethod {
   data: any;
   user: ISerializedUser | INotExpandedResource;
 }
+
+export const PAYMENT_METHOD_MODEL: ModelKind = {
+  table: "bookmarks",
+  keys: [["id", "stripe_id"]],
+  expand: [
+    {
+      field: "user",
+      model: USER_MODEL,
+    },
+  ],
+  fields: ["id", "type", "data", "user", "stripe_id"],
+  getModel: () => PaymentMethod,
+  getInstance: (data) => new PaymentMethod(data),
+};
 
 export const PAYMENT_METHOD_SCHEMA = {
   OBJ: Joi.object({

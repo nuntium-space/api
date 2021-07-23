@@ -11,20 +11,20 @@ export class Session
   extends Model
   implements ISerializable<ISerializedSession>
 {
-  public constructor(protected readonly data: ISession) {
+  public constructor(protected readonly record: ISession) {
     super(SESSION_MODEL, data);
   }
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get user(): User | INotExpandedResource {
-    return this.data.user;
+    return this.record.user;
   }
 
   public get expires_at(): Date {
-    return this.data.expires_at;
+    return this.record.expires_at;
   }
 
   public static async create(

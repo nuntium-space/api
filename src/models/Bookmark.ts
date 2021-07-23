@@ -13,7 +13,7 @@ export class Bookmark
   extends Model
   implements ISerializable<Promise<ISerializedBookmark>>
 {
-  public constructor(protected readonly data: IBookmark) {
+  public constructor(protected readonly record: IBookmark) {
     super(BOOKMARK_MODEL, data);
   }
 
@@ -22,15 +22,15 @@ export class Bookmark
   ////////////////
 
   public get user(): User | INotExpandedResource {
-    return this.data.user;
+    return this.record.user;
   }
 
   public get article(): Article | INotExpandedResource {
-    return this.data.article;
+    return this.record.article;
   }
 
   public get created_at(): Date {
-    return this.data.created_at;
+    return this.record.created_at;
   }
 
   //////////

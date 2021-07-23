@@ -11,7 +11,7 @@ export class Like
   extends Model
   implements ISerializable<Promise<ISerializedLike>>
 {
-  public constructor(protected readonly data: ILike) {
+  public constructor(protected readonly record: ILike) {
     super(LIKE_MODEL, data);
   }
 
@@ -20,11 +20,11 @@ export class Like
   ////////////////
 
   public get user(): User | INotExpandedResource {
-    return this.data.user;
+    return this.record.user;
   }
 
   public get article(): Article | INotExpandedResource {
-    return this.data.article;
+    return this.record.article;
   }
 
   //////////

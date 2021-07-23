@@ -28,11 +28,11 @@ export interface ModelKind {
 export class Model {
   constructor(
     protected readonly kind: ModelKind,
-    protected readonly data: DatabaseRecord
+    protected readonly record: DatabaseRecord
   ) {}
 
   public instance<T>(): T {
-    return this.kind.getInstance(this.data) as unknown as T;
+    return this.kind.getInstance(this.record) as unknown as T;
   }
 
   //////////

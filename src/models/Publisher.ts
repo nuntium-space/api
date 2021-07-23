@@ -26,7 +26,7 @@ export class Publisher
   extends Model
   implements ISerializable<ISerializedPublisher>
 {
-  public constructor(protected readonly data: IPublisher) {
+  public constructor(protected readonly record: IPublisher) {
     super(PUBLISHER_MODEL, data);
   }
 
@@ -35,27 +35,27 @@ export class Publisher
   ////////////////
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get name(): string {
-    return this.data.name;
+    return this.record.name;
   }
 
   public get url(): string {
-    return this.data.url;
+    return this.record.url;
   }
 
   public get organization(): Organization | INotExpandedResource {
-    return this.data.organization;
+    return this.record.organization;
   }
 
   public get verified(): boolean {
-    return this.data.verified;
+    return this.record.verified;
   }
 
   public get dns_txt_value(): string {
-    return this.data.dns_txt_value;
+    return this.record.dns_txt_value;
   }
 
   public static async create(
@@ -151,8 +151,8 @@ export class Publisher
     const shouldInvalidateDomainVerification =
       (data.url ?? this.url) !== this.url;
 
-    this.data.name = data.name ?? this.name;
-    this.data.url = data.url ?? this.url;
+    this.record.name = data.name ?? this.name;
+    this.record.url = data.url ?? this.url;
 
     const client = await Database.pool.connect();
 

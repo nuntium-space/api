@@ -6,7 +6,7 @@ import { Publisher } from "./Publisher";
 import { User } from "./User";
 
 export class Author extends Model implements ISerializable<ISerializedAuthor> {
-  public constructor(protected readonly data: IAuthor) {
+  public constructor(protected readonly record: IAuthor) {
     super(AUTHOR_MODEL, data);
   }
 
@@ -15,15 +15,15 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
   ////////////////
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get user(): User | INotExpandedResource {
-    return this.data.user;
+    return this.record.user;
   }
 
   public get publisher(): Publisher | INotExpandedResource {
-    return this.data.publisher;
+    return this.record.publisher;
   }
 
   //////////

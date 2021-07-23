@@ -7,7 +7,7 @@ import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
 export class Account extends Model {
-  public constructor(protected readonly data: IAccount) {
+  public constructor(protected readonly record: IAccount) {
     super(ACCOUNT_MODEL, data);
   }
 
@@ -16,19 +16,19 @@ export class Account extends Model {
   ////////////////
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get user(): User | INotExpandedResource {
-    return this.data.user;
+    return this.record.user;
   }
 
   public get type(): string {
-    return this.data.type;
+    return this.record.type;
   }
 
   public get external_id(): string {
-    return this.data.external_id;
+    return this.record.external_id;
   }
 
   //////////

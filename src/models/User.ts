@@ -23,7 +23,7 @@ import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
 export class User extends Model implements ISerializable<ISerializedUser> {
-  public constructor(protected readonly data: IUser) {
+  public constructor(protected readonly record: IUser) {
     super(USER_MODEL, data);
   }
 
@@ -32,23 +32,23 @@ export class User extends Model implements ISerializable<ISerializedUser> {
   ////////////////
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get type(): UserType {
-    return this.data.type;
+    return this.record.type;
   }
 
   public get full_name(): string | null {
-    return this.data.full_name;
+    return this.record.full_name;
   }
 
   public get email(): string {
-    return this.data.email;
+    return this.record.email;
   }
 
   public get stripe_customer_id(): string | null {
-    return this.data.stripe_customer_id;
+    return this.record.stripe_customer_id;
   }
 
   public static async create(data: ICreateUser): Promise<INotExpandedResource> {
@@ -120,8 +120,8 @@ export class User extends Model implements ISerializable<ISerializedUser> {
   }
 
   public async update(data: IUpdateUser): Promise<void> {
-    this.data.full_name = data.full_name ?? this.full_name;
-    this.data.email = data.email ?? this.email;
+    this.record.full_name = data.full_name ?? this.full_name;
+    this.record.email = data.email ?? this.email;
 
     const client = await Database.pool.connect();
     await client.query("begin");

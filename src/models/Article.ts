@@ -17,7 +17,7 @@ export class Article
   extends Model
   implements ISerializable<Promise<ISerializedArticle>>
 {
-  public constructor(protected readonly data: IArticle) {
+  public constructor(protected readonly record: IArticle) {
     super(ARTICLE_MODEL, data);
   }
 
@@ -26,31 +26,31 @@ export class Article
   ////////////////
 
   public get id(): string {
-    return this.data.id;
+    return this.record.id;
   }
 
   public get title(): string {
-    return this.data.title;
+    return this.record.title;
   }
 
   public get content(): string {
-    return this.data.content;
+    return this.record.content;
   }
 
   public get author(): Author | INotExpandedResource {
-    return this.data.author;
+    return this.record.author;
   }
 
   public get reading_time(): number {
-    return this.data.reading_time;
+    return this.record.reading_time;
   }
 
   public get created_at(): Date {
-    return this.data.created_at;
+    return this.record.created_at;
   }
 
   public get updated_at(): Date {
-    return this.data.updated_at;
+    return this.record.updated_at;
   }
 
   //////////

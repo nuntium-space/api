@@ -1,77 +1,85 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
+import { Model } from "../config/Model";
 import {
   ISerializedPaymentMethod,
-  IDatabasePaymentMethod,
+  IPaymentMethod,
+  PAYMENT_METHOD_MODEL,
 } from "../types/payment-method";
 import Database from "../utilities/Database";
 import { User } from "./User";
 
-export class PaymentMethod implements ISerializable<ISerializedPaymentMethod> {
-  private constructor(
-    public readonly id: string,
-    public readonly type: string,
-    public readonly data: any,
-    public readonly user: User | INotExpandedResource,
-    public readonly stripe_id: string
-  ) {}
+export class PaymentMethod extends Model implements ISerializable<ISerializedPaymentMethod> {
+  public constructor(protected readonly record: IPaymentMethod) {
+    super(PAYMENT_METHOD_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.record.id;
+  }
+
+  public get type(): string {
+    return this.record.type;
+  }
+
+  public get data(): any {
+    return this.record.data;
+  }
+
+  public get user(): User | INotExpandedResource {
+    return this.record.user;
+  }
+
+  public get stripe_id(): string {
+    return this.record.stripe_id;
+  }
+
+  //////////
+  // CRUD //
+  //////////
 
   public static async retrieve(id: string): Promise<PaymentMethod> {
-    const result = await Database.pool.query(
-      `select * from "payment_methods" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return PaymentMethod.deserialize(result.rows[0]);
+    return super._retrieve({
+      kind: PAYMENT_METHOD_MODEL,
+      filter: { id },
+    });
   }
 
   public static async retrieveDefaultForUser(
-    userId: string
+    user: string
   ): Promise<PaymentMethod | null> {
-    const result = await Database.pool.query(
-      `select * from "default_payment_methods" where "user" = $1`,
-      [userId]
-    );
-
-    if (result.rowCount === 0) {
-      return null;
-    }
-
-    return PaymentMethod.retrieve(result.rows[0].payment_method);
+    return super._retrieve({
+      kind: PAYMENT_METHOD_MODEL,
+      filter: { user },
+    });
   }
 
   public static async retrieveWithStripeId(
-    stripeId: string
+    stripe_id: string
   ): Promise<PaymentMethod> {
-    const result = await Database.pool.query(
-      `select * from "payment_methods" where "stripe_id" = $1`,
-      [stripeId]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return PaymentMethod.deserialize(result.rows[0]);
+    return super._retrieve({
+      kind: PAYMENT_METHOD_MODEL,
+      filter: { stripe_id },
+    });
   }
 
   public static async forUser(
     user: User,
     expand?: string[]
   ): Promise<PaymentMethod[]> {
-    const result = await Database.pool.query(
-      `select * from "payment_methods" where "user" = $1`,
-      [user.id]
-    );
-
-    return Promise.all(
-      result.rows.map((row) => PaymentMethod.deserialize(row, expand))
-    );
+    return super._for({
+      kind: PAYMENT_METHOD_MODEL,
+      filter: {
+        key: "user",
+        value: user instanceof User ? user.id : user,
+      },
+      expand,
+    });
   }
 
   public async setAsDefault(): Promise<void> {
@@ -107,22 +115,5 @@ export class PaymentMethod implements ISerializable<ISerializedPaymentMethod> {
           ? this.user.serialize({ for: options?.for })
           : this.user,
     };
-  }
-
-  private static async deserialize(
-    data: IDatabasePaymentMethod,
-    expand?: string[]
-  ): Promise<PaymentMethod> {
-    const user = expand?.includes("user")
-      ? await User.retrieve(data.user)
-      : { id: data.user };
-
-    return new PaymentMethod(
-      data.id,
-      data.type,
-      data.data,
-      user,
-      data.stripe_id
-    );
   }
 }
