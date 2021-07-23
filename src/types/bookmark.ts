@@ -5,18 +5,13 @@ import { Schema } from "../config/Schema";
 import { Article } from "../models/Article";
 import { Bookmark } from "../models/Bookmark";
 import { User } from "../models/User";
-import { ISerializedArticle, ARTICLE_SCHEMA, ARTICLE_MODEL } from "./article";
+import { ARTICLE_SCHEMA, ARTICLE_MODEL } from "./article";
 import { USER_MODEL } from "./user";
 
 export interface IBookmark {
   user: User | INotExpandedResource;
   article: Article | INotExpandedResource;
   created_at: Date;
-}
-
-export interface ISerializedBookmark {
-  article: ISerializedArticle | INotExpandedResource;
-  created_at: string;
 }
 
 export const BOOKMARK_MODEL: ModelKind = {

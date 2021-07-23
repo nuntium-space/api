@@ -5,7 +5,6 @@ import { Schema } from "../config/Schema";
 import { Bundle } from "../models/Bundle";
 import { Organization } from "../models/Organization";
 import {
-  ISerializedOrganization,
   ORGANIZATION_MODEL,
   ORGANIZATION_SCHEMA,
 } from "./organization";
@@ -25,13 +24,6 @@ export interface ICreateBundle {
 export interface IUpdateBundle {
   name?: string;
   active?: boolean;
-}
-
-export interface ISerializedBundle {
-  id: string;
-  name: string;
-  organization: ISerializedOrganization | INotExpandedResource;
-  active: boolean;
 }
 
 export const BUNDLE_MODEL: ModelKind = {

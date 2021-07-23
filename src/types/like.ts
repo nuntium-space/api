@@ -5,16 +5,12 @@ import { Schema } from "../config/Schema";
 import { Article } from "../models/Article";
 import { Like } from "../models/Like";
 import { User } from "../models/User";
-import { ISerializedArticle, ARTICLE_SCHEMA, ARTICLE_MODEL } from "./article";
+import { ARTICLE_SCHEMA, ARTICLE_MODEL } from "./article";
 import { USER_MODEL } from "./user";
 
 export interface ILike {
   user: User | INotExpandedResource;
   article: Article | INotExpandedResource;
-}
-
-export interface ISerializedLike {
-  article: ISerializedArticle | INotExpandedResource;
 }
 
 export const LIKE_MODEL: ModelKind = {

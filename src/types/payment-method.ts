@@ -4,7 +4,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { PaymentMethod } from "../models/PaymentMethod";
 import { User } from "../models/User";
-import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
+import { USER_MODEL, USER_SCHEMA } from "./user";
 
 export interface IPaymentMethod {
   id: string;
@@ -12,13 +12,6 @@ export interface IPaymentMethod {
   data: any;
   user: User | INotExpandedResource;
   stripe_id: string;
-}
-
-export interface ISerializedPaymentMethod {
-  id: string;
-  type: string;
-  data: any;
-  user: ISerializedUser | INotExpandedResource;
 }
 
 export const PAYMENT_METHOD_MODEL: ModelKind = {

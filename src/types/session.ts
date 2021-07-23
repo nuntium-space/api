@@ -4,7 +4,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Session } from "../models/Session";
 import { User } from "../models/User";
-import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
+import { USER_MODEL, USER_SCHEMA } from "./user";
 
 export interface ISession {
   id: string;
@@ -16,12 +16,6 @@ export interface IDatabaseSession {
   id: string;
   user: string;
   expires_at: Date;
-}
-
-export interface ISerializedSession {
-  id: string;
-  user: ISerializedUser | INotExpandedResource;
-  expires_at: string;
 }
 
 export const SESSION_MODEL: ModelKind = {

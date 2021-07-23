@@ -4,7 +4,7 @@ import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
 import { Organization } from "../models/Organization";
 import { User } from "../models/User";
-import { ISerializedUser, USER_MODEL, USER_SCHEMA } from "./user";
+import { USER_MODEL, USER_SCHEMA } from "./user";
 
 export interface IOrganization {
   id: string;
@@ -21,13 +21,6 @@ export interface ICreateOrganization {
 export interface IUpdateOrganization {
   name?: string;
   stripe_account_enabled?: boolean;
-}
-
-export interface ISerializedOrganization {
-  id: string;
-  name: string;
-  user: ISerializedUser | INotExpandedResource;
-  stripe_account_enabled: boolean;
 }
 
 export const ORGANIZATION_MODEL: ModelKind = {

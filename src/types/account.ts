@@ -20,12 +20,6 @@ export interface ICreateAccount {
   external_id: string;
 }
 
-export interface ISerializedAccount {
-  id: string;
-  display_name: string;
-  is_linked: boolean;
-}
-
 export const ACCOUNT_MODEL: ModelKind = {
   table: "accounts",
   keys: [["id"], ["user", "type"], ["type", "external_id"]],
