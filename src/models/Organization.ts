@@ -13,9 +13,7 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Organization
-  extends Model
-{
+export class Organization extends Model {
   public constructor(protected readonly record: IOrganization) {
     super(ORGANIZATION_MODEL, record);
   }

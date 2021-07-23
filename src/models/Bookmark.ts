@@ -1,15 +1,10 @@
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Model } from "../config/Model";
-import {
-  IBookmark,
-  BOOKMARK_MODEL,
-} from "../types/bookmark";
+import { IBookmark, BOOKMARK_MODEL } from "../types/bookmark";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Bookmark
-  extends Model
-{
+export class Bookmark extends Model {
   public constructor(protected readonly record: IBookmark) {
     super(BOOKMARK_MODEL, record);
   }

@@ -265,14 +265,14 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  public async serialize<T>(options?: { for?: User | INotExpandedResource }): Promise<T> {
+  public async serialize<T>(options?: {
+    for?: User | INotExpandedResource;
+  }): Promise<T> {
     this.kind.serialization ??= {};
     this.kind.serialization.include ??= this.kind.fields;
 
     if (
-      this.kind.serialization.include.some(
-        (_) => !this.kind.fields.includes(_)
-      )
+      this.kind.serialization.include.some((_) => !this.kind.fields.includes(_))
     ) {
       throw Boom.badImplementation(
         `"${this.kind.serialization.include.find(
@@ -304,10 +304,13 @@ export class Model {
           }
 
           return { [key]: newValue };
-        }),
+        })
     );
 
-    return serializedData.reduce((prev, curr) => ({ ...prev, ...curr }), {}) as T;
+    return serializedData.reduce(
+      (prev, curr) => ({ ...prev, ...curr }),
+      {}
+    ) as T;
   }
 
   protected static async deserialize<T>(

@@ -1,16 +1,11 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Model } from "../config/Model";
-import {
-  IPaymentMethod,
-  PAYMENT_METHOD_MODEL,
-} from "../types/payment-method";
+import { IPaymentMethod, PAYMENT_METHOD_MODEL } from "../types/payment-method";
 import Database from "../utilities/Database";
 import { User } from "./User";
 
-export class PaymentMethod
-  extends Model
-{
+export class PaymentMethod extends Model {
   public constructor(protected readonly record: IPaymentMethod) {
     super(PAYMENT_METHOD_MODEL, record);
   }

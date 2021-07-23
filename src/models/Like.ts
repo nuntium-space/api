@@ -6,9 +6,7 @@ import Database from "../utilities/Database";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Like
-  extends Model
-{
+export class Like extends Model {
   public constructor(protected readonly record: ILike) {
     super(LIKE_MODEL, record);
   }

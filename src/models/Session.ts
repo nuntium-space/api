@@ -6,9 +6,7 @@ import { ISession, SESSION_MODEL } from "../types/session";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Session
-  extends Model
-{
+export class Session extends Model {
   public constructor(protected readonly record: ISession) {
     super(SESSION_MODEL, record);
   }
