@@ -10,7 +10,10 @@ import {
 import Database from "../utilities/Database";
 import { User } from "./User";
 
-export class PaymentMethod extends Model implements ISerializable<ISerializedPaymentMethod> {
+export class PaymentMethod
+  extends Model
+  implements ISerializable<ISerializedPaymentMethod>
+{
   public constructor(protected readonly record: IPaymentMethod) {
     super(PAYMENT_METHOD_MODEL, record);
   }
