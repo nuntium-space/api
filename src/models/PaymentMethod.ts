@@ -1,9 +1,7 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Model } from "../config/Model";
 import {
-  ISerializedPaymentMethod,
   IPaymentMethod,
   PAYMENT_METHOD_MODEL,
 } from "../types/payment-method";
@@ -12,7 +10,6 @@ import { User } from "./User";
 
 export class PaymentMethod
   extends Model
-  implements ISerializable<ISerializedPaymentMethod>
 {
   public constructor(protected readonly record: IPaymentMethod) {
     super(PAYMENT_METHOD_MODEL, record);
@@ -110,19 +107,5 @@ export class PaymentMethod
       .catch(() => {
         throw Boom.badImplementation();
       });
-  }
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedPaymentMethod {
-    return {
-      id: this.id,
-      type: this.type,
-      data: this.data,
-      user:
-        this.user instanceof User
-          ? this.user.serialize({ for: options?.for })
-          : this.user,
-    };
   }
 }

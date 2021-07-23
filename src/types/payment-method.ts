@@ -31,6 +31,9 @@ export const PAYMENT_METHOD_MODEL: ModelKind = {
     },
   ],
   fields: ["id", "type", "data", "user", "stripe_id"],
+  serialization: {
+    include: ["id", "type", "data", "user"],
+  },
   getModel: () => PaymentMethod,
   getInstance: (data) => new PaymentMethod(data),
 };

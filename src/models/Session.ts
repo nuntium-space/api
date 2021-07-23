@@ -1,15 +1,13 @@
 import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Model } from "../config/Model";
-import { ISerializedSession, ISession, SESSION_MODEL } from "../types/session";
+import { ISession, SESSION_MODEL } from "../types/session";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
 export class Session
   extends Model
-  implements ISerializable<ISerializedSession>
 {
   public constructor(protected readonly record: ISession) {
     super(SESSION_MODEL, record);
@@ -59,18 +57,5 @@ export class Session
 
   public hasExpired(): boolean {
     return this.expires_at < new Date();
-  }
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedSession {
-    return {
-      id: this.id,
-      user:
-        this.user instanceof User
-          ? this.user.serialize({ for: options?.for })
-          : this.user,
-      expires_at: this.expires_at.toISOString(),
-    };
   }
 }
