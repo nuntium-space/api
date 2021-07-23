@@ -70,12 +70,7 @@ export default class Utilities {
   public static getAuthenticatedUser(request: Request): [User, boolean] {
     const session = request.auth.credentials.session as Session;
 
-    if (!(session.user instanceof User))
-    {
-      throw Boom.badImplementation();
-    }
-
-    return [session.user, session.user.type === "admin"];
+    return [session.user as any, (session.user as any).type === "admin"];
   }
 
   public static createHmac(value: string): string {

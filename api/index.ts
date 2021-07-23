@@ -125,7 +125,7 @@ const init = async () => {
         throw Boom.unauthorized();
       }
 
-      const session = await Session.retrieve(id);
+      const session = await Session.retrieve(id, ["user"]);
 
       if (!(session.user instanceof User))
       {
