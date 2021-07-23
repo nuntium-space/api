@@ -265,7 +265,7 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  protected serialize<T>(options?: { for?: User | INotExpandedResource }): T {
+  protected async serialize<T>(options?: { for?: User | INotExpandedResource }): Promise<T> {
     this.kind.serialization ??= {};
     this.kind.serialization.include ??= this.kind.fields;
 
@@ -281,30 +281,33 @@ export class Model {
       );
     }
 
-    return Object.entries(this.record)
-      .filter(([key]) => this.kind.serialization!.include!.includes(key))
-      .map(([key, value]) => {
-        let newValue: any = value;
+    const serializedData = await Promise.all(
+      Object.entries(this.record)
+        .filter(([key]) => this.kind.serialization!.include!.includes(key))
+        .map(async ([key, value]) => {
+          let newValue: any = value;
 
-        if (
-          this.kind.serialization &&
-          this.kind.serialization.custom &&
-          Object.keys(this.kind.serialization.custom).includes(key) &&
-          this.kind.serialization.custom[key].serialize
-        ) {
-          newValue = this.kind.serialization.custom[key].serialize!(
-            this,
-            options ?? {}
-          );
-        } else if (value instanceof Model) {
-          newValue = value.serialize(options);
-        } else if (value instanceof Date) {
-          newValue = value.toISOString();
-        }
+          if (
+            this.kind.serialization &&
+            this.kind.serialization.custom &&
+            Object.keys(this.kind.serialization.custom).includes(key) &&
+            this.kind.serialization.custom[key].serialize
+          ) {
+            newValue = this.kind.serialization.custom[key].serialize!(
+              this,
+              options ?? {}
+            );
+          } else if (value instanceof Model) {
+            newValue = await value.serialize(options);
+          } else if (value instanceof Date) {
+            newValue = value.toISOString();
+          }
 
-        return { [key]: newValue };
-      })
-      .reduce((prev, curr) => ({ ...prev, ...curr }), {}) as T;
+          return { [key]: newValue };
+        }),
+    );
+
+    return serializedData.reduce((prev, curr) => ({ ...prev, ...curr }), {}) as T;
   }
 
   protected static async deserialize<T>(
