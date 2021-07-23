@@ -265,21 +265,24 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  protected _serialize<T>(options?: { for?: User | INotExpandedResource }): T {
+  protected serialize<T>(options?: { for?: User | INotExpandedResource }): T {
+    this.kind.serialization ??= {};
+    this.kind.serialization.include ??= this.kind.fields;
+
     if (
-      this.kind.serialization?.include?.some(
+      this.kind.serialization.include.some(
         (_) => !this.kind.fields.includes(_)
       )
     ) {
       throw Boom.badImplementation(
-        `"${this.kind.serialization?.include?.find(
+        `"${this.kind.serialization.include.find(
           (_) => !this.kind.fields.includes(_)
         )}" is not a field of "${this.kind.table}"`
       );
     }
 
     return Object.entries(this.record)
-      .filter(([key]) => this.kind.serialization?.include?.includes(key))
+      .filter(([key]) => this.kind.serialization!.include!.includes(key))
       .map(([key, value]) => {
         let newValue: any = value;
 
@@ -294,7 +297,7 @@ export class Model {
             options ?? {}
           );
         } else if (value instanceof Model) {
-          newValue = value._serialize(options);
+          newValue = value.serialize(options);
         } else if (value instanceof Date) {
           newValue = value.toISOString();
         }

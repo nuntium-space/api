@@ -1,10 +1,8 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Model } from "../config/Model";
 import {
-  ISerializedBundle,
   ICreateBundle,
   IUpdateBundle,
   IBundle,
@@ -14,9 +12,8 @@ import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Organization } from "./Organization";
 import { Publisher } from "./Publisher";
-import { User } from "./User";
 
-export class Bundle extends Model implements ISerializable<ISerializedBundle> {
+export class Bundle extends Model {
   public constructor(protected readonly record: IBundle) {
     super(BUNDLE_MODEL, record);
   }
@@ -247,21 +244,5 @@ export class Bundle extends Model implements ISerializable<ISerializedBundle> {
         Bundle.deserialize<Bundle>(BUNDLE_MODEL, row, expand)
       )
     );
-  }
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedBundle {
-    console.log(super._serialize());
-
-    return {
-      id: this.id,
-      name: this.name,
-      organization:
-        this.organization instanceof Organization
-          ? this.organization.serialize({ for: options?.for })
-          : this.organization,
-      active: this.active,
-    };
   }
 }
