@@ -265,7 +265,7 @@ export class Model {
   // SERIALIZATION //
   ///////////////////
 
-  protected async serialize<T>(options?: { for?: User | INotExpandedResource }): Promise<T> {
+  public async serialize<T>(options?: { for?: User | INotExpandedResource }): Promise<T> {
     this.kind.serialization ??= {};
     this.kind.serialization.include ??= this.kind.fields;
 
