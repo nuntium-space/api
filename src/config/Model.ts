@@ -3,7 +3,9 @@ import { isEqual } from "lodash";
 import { PoolClient } from "pg";
 import { DatabaseRecord } from "../common/DatabaseRecord";
 import { ExpandQuery } from "../common/ExpandQuery";
+import { INotExpandedResource } from "../common/INotExpandedResource";
 import { SelectQuery } from "../common/SelectQuery";
+import { User } from "../models/User";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 
@@ -241,6 +243,37 @@ export class Model {
   ///////////////////
   // SERIALIZATION //
   ///////////////////
+
+  protected _serialize<T>({ select, options }: {
+    select?: SelectQuery,
+    options?: {
+      for?: User | INotExpandedResource;
+    },
+  }): T {
+    select ??= this.kind.fields;
+
+    if (select.some((_) => !this.kind.fields.includes(_))) {
+      throw Boom.badImplementation(
+        `"${select.find((_) => !this.kind.fields.includes(_))}" is not a field of "${
+          this.kind.table
+        }"`
+      );
+    }
+
+    return Object
+      .entries(this.record)
+      .filter(([key]) => select!.includes(key))
+      .map(([key, value]) => {
+        let newValue: any = value;
+
+        if (value instanceof Model) {
+          newValue = value._serialize({options});
+        }
+
+        return { [key]: newValue };
+      })
+      .reduce((prev, curr) => ({ ...prev, ...curr }), {}) as T;
+  }
 
   protected static async deserialize<T>(
     kind: ModelKind,
