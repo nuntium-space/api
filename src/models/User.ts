@@ -24,7 +24,7 @@ import { Publisher } from "./Publisher";
 
 export class User extends Model implements ISerializable<ISerializedUser> {
   public constructor(protected readonly record: IUser) {
-    super(USER_MODEL, data);
+    super(USER_MODEL, record);
   }
 
   ////////////////

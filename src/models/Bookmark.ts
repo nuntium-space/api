@@ -14,7 +14,7 @@ export class Bookmark
   implements ISerializable<Promise<ISerializedBookmark>>
 {
   public constructor(protected readonly record: IBookmark) {
-    super(BOOKMARK_MODEL, data);
+    super(BOOKMARK_MODEL, record);
   }
 
   ////////////////

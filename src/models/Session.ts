@@ -12,7 +12,7 @@ export class Session
   implements ISerializable<ISerializedSession>
 {
   public constructor(protected readonly record: ISession) {
-    super(SESSION_MODEL, data);
+    super(SESSION_MODEL, record);
   }
 
   public get id(): string {

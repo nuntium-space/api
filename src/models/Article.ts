@@ -18,7 +18,7 @@ export class Article
   implements ISerializable<Promise<ISerializedArticle>>
 {
   public constructor(protected readonly record: IArticle) {
-    super(ARTICLE_MODEL, data);
+    super(ARTICLE_MODEL, record);
   }
 
   ////////////////

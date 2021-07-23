@@ -12,7 +12,7 @@ export class Like
   implements ISerializable<Promise<ISerializedLike>>
 {
   public constructor(protected readonly record: ILike) {
-    super(LIKE_MODEL, data);
+    super(LIKE_MODEL, record);
   }
 
   ////////////////

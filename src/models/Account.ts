@@ -8,7 +8,7 @@ import { User } from "./User";
 
 export class Account extends Model {
   public constructor(protected readonly record: IAccount) {
-    super(ACCOUNT_MODEL, data);
+    super(ACCOUNT_MODEL, record);
   }
 
   ////////////////

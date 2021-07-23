@@ -7,7 +7,7 @@ import { User } from "./User";
 
 export class Author extends Model implements ISerializable<ISerializedAuthor> {
   public constructor(protected readonly record: IAuthor) {
-    super(AUTHOR_MODEL, data);
+    super(AUTHOR_MODEL, record);
   }
 
   ////////////////

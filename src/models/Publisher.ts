@@ -27,7 +27,7 @@ export class Publisher
   implements ISerializable<ISerializedPublisher>
 {
   public constructor(protected readonly record: IPublisher) {
-    super(PUBLISHER_MODEL, data);
+    super(PUBLISHER_MODEL, record);
   }
 
   ////////////////

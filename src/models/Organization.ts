@@ -20,7 +20,7 @@ export class Organization
   implements ISerializable<ISerializedOrganization>
 {
   public constructor(protected readonly record: IOrganization) {
-    super(ORGANIZATION_MODEL, data);
+    super(ORGANIZATION_MODEL, record);
   }
 
   ////////////////
