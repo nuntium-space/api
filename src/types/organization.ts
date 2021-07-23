@@ -44,21 +44,24 @@ export const ORGANIZATION_MODEL: ModelKind = {
     include: ["id", "name", "user", "stripe_account_enabled"],
     custom: {
       name: {
-        if: (organization, options) =>
-        {
-          return organization.instance<Organization>().user.id === options.for?.id;
+        if: (organization, options) => {
+          return (
+            organization.instance<Organization>().user.id === options.for?.id
+          );
         },
       },
       user: {
-        if: (organization, options) =>
-        {
-          return organization.instance<Organization>().user.id === options.for?.id;
+        if: (organization, options) => {
+          return (
+            organization.instance<Organization>().user.id === options.for?.id
+          );
         },
       },
       stripe_account_enabled: {
-        if: (organization, options) =>
-        {
-          return organization.instance<Organization>().user.id === options.for?.id;
+        if: (organization, options) => {
+          return (
+            organization.instance<Organization>().user.id === options.for?.id
+          );
         },
       },
     },

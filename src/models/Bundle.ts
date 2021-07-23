@@ -243,7 +243,9 @@ export class Bundle extends Model implements ISerializable<ISerializedBundle> {
     );
 
     return Promise.all(
-      result.rows.map((row) => Bundle.deserialize<Bundle>(BUNDLE_MODEL, row, expand))
+      result.rows.map((row) =>
+        Bundle.deserialize<Bundle>(BUNDLE_MODEL, row, expand)
+      )
     );
   }
 
