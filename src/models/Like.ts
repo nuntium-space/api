@@ -1,15 +1,13 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Model } from "../config/Model";
-import { ILike, ISerializedLike, LIKE_MODEL } from "../types/like";
+import { ILike, LIKE_MODEL } from "../types/like";
 import Database from "../utilities/Database";
 import { Article } from "./Article";
 import { User } from "./User";
 
 export class Like
   extends Model
-  implements ISerializable<Promise<ISerializedLike>>
 {
   public constructor(protected readonly record: ILike) {
     super(LIKE_MODEL, record);
@@ -143,18 +141,5 @@ export class Like
       },
       expand,
     });
-  }
-
-  ///////////////////
-  // SERIALIZATION //
-  ///////////////////
-
-  public async serialize(): Promise<ISerializedLike> {
-    return {
-      article:
-        this.article instanceof Article
-          ? await this.article.serialize()
-          : this.article,
-    };
   }
 }

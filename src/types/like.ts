@@ -31,6 +31,9 @@ export const LIKE_MODEL: ModelKind = {
     },
   ],
   fields: ["user", "article"],
+  serialization: {
+    include: ["article"],
+  },
   getModel: () => Like,
   getInstance: (data) => new Like(data),
 };

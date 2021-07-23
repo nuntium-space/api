@@ -1,11 +1,10 @@
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Model } from "../config/Model";
-import { ISerializedAuthor, IAuthor, AUTHOR_MODEL } from "../types/author";
+import { IAuthor, AUTHOR_MODEL } from "../types/author";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
-export class Author extends Model implements ISerializable<ISerializedAuthor> {
+export class Author extends Model {
   public constructor(protected readonly record: IAuthor) {
     super(AUTHOR_MODEL, record);
   }
@@ -81,25 +80,5 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
       filter: { key: "user", value: user.id },
       expand,
     });
-  }
-
-  ///////////////////
-  // SERIALIZATION //
-  ///////////////////
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedAuthor {
-    return {
-      id: this.id,
-      user:
-        this.user instanceof User
-          ? this.user.serialize({ for: options?.for })
-          : this.user,
-      publisher:
-        this.publisher instanceof Publisher
-          ? this.publisher.serialize({ for: options?.for })
-          : this.publisher,
-    };
   }
 }

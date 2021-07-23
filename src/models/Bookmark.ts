@@ -1,8 +1,6 @@
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Model } from "../config/Model";
 import {
-  ISerializedBookmark,
   IBookmark,
   BOOKMARK_MODEL,
 } from "../types/bookmark";
@@ -11,7 +9,6 @@ import { User } from "./User";
 
 export class Bookmark
   extends Model
-  implements ISerializable<Promise<ISerializedBookmark>>
 {
   public constructor(protected readonly record: IBookmark) {
     super(BOOKMARK_MODEL, record);
@@ -100,19 +97,5 @@ export class Bookmark
       },
       expand,
     });
-  }
-
-  ///////////////////
-  // SERIALIZATION //
-  ///////////////////
-
-  public async serialize(): Promise<ISerializedBookmark> {
-    return {
-      article:
-        this.article instanceof Article
-          ? await this.article.serialize()
-          : this.article,
-      created_at: this.created_at.toISOString(),
-    };
   }
 }

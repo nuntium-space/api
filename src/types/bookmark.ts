@@ -33,6 +33,9 @@ export const BOOKMARK_MODEL: ModelKind = {
     },
   ],
   fields: ["user", "article", "created_at"],
+  serialization: {
+    include: ["article", "created_at"]
+  },
   getModel: () => Bookmark,
   getInstance: (data) => new Bookmark(data),
 };
