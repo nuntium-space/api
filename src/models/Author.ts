@@ -10,6 +10,10 @@ export class Author extends Model implements ISerializable<ISerializedAuthor> {
     super(AUTHOR_MODEL, data);
   }
 
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
   public get id(): string {
     return this.data.id;
   }

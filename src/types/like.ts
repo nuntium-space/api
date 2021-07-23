@@ -1,16 +1,39 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
-import { ISerializedArticle, ARTICLE_SCHEMA } from "./article";
+import { Article } from "../models/Article";
+import { Like } from "../models/Like";
+import { User } from "../models/User";
+import { ISerializedArticle, ARTICLE_SCHEMA, ARTICLE_MODEL } from "./article";
+import { USER_MODEL } from "./user";
 
-export interface IDatabaseLike {
-  user: string;
-  article: string;
+export interface ILike {
+  user: User | INotExpandedResource;
+  article: Article | INotExpandedResource;
 }
 
 export interface ISerializedLike {
   article: ISerializedArticle | INotExpandedResource;
 }
+
+export const LIKE_MODEL: ModelKind = {
+  table: "bookmarks",
+  keys: [["user", "article"]],
+  expand: [
+    {
+      field: "user",
+      model: USER_MODEL,
+    },
+    {
+      field: "article",
+      model: ARTICLE_MODEL,
+    },
+  ],
+  fields: ["user", "article"],
+  getModel: () => Like,
+  getInstance: (data) => new Like(data),
+};
 
 export const LIKE_SCHEMA = {
   OBJ: Joi.object({

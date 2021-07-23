@@ -1,17 +1,28 @@
 import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
-import { IDatabaseLike, ISerializedLike } from "../types/like";
+import { Model } from "../config/Model";
+import { ILike, ISerializedLike, LIKE_MODEL } from "../types/like";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Like implements ISerializable<Promise<ISerializedLike>> {
-  private constructor(
-    public readonly user: User | INotExpandedResource,
-    public readonly article: Article | INotExpandedResource
-  ) {}
+export class Like extends Model implements ISerializable<Promise<ISerializedLike>> {
+  public constructor(protected readonly data: ILike) {
+    super(LIKE_MODEL, data);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get user(): User | INotExpandedResource {
+    return this.data.user;
+  }
+
+  public get article(): Article | INotExpandedResource {
+    return this.data.article;
+  }
 
   //////////
   // CRUD //
@@ -24,24 +35,10 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await client
-      .query(
-        `
-        insert into "likes"
-          ("user", "article")
-        values
-          ($1, $2)
-        `,
-        [
-          user instanceof User ? user.id : user,
-          article instanceof Article ? article.id : article,
-        ]
-      )
-      .catch(async () => {
-        await client.query("rollback");
-
-        throw Boom.badImplementation();
-      });
+    await super._create(LIKE_MODEL, {
+      user: user instanceof User ? user.id : user,
+      article: article instanceof Article ? article.id : article,
+    }, client);
 
     await client
       .query(
@@ -67,48 +64,26 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     article: Article | string,
     expand?: string[]
   ): Promise<Like> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "likes"
-      where
-        "user" = $1
-        and
-        "article" = $2
-      `,
-      [
-        user instanceof User ? user.id : user,
-        article instanceof Article ? article.id : article,
-      ]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Like.deserialize(result.rows[0], expand);
+    return super._retrieve({
+      kind: LIKE_MODEL,
+      filter: {
+        user: user instanceof User ? user.id : user,
+        article: article instanceof Article ? article.id : article,
+      },
+      expand,
+    });
   }
 
   public async delete(): Promise<void> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await client
-      .query(
-        `
-        delete from "likes"
-        where
-          "user" = $1
-          and
-          "article" = $2
-        `,
-        [this.user.id, this.article.id]
-      )
-      .catch(async () => {
-        await client.query("rollback");
-
-        throw Boom.badImplementation();
-      });
+    await super._delete({
+      filter: {
+        user: this.user.id,
+        article: this.article.id,
+      },
+    }, client);
 
     await client
       .query(
@@ -137,39 +112,27 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
     user: User | string,
     article: Article | string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "likes"
-      where
-        "user" = $1
-        and
-        "article" = $2
-      limit 1
-      `,
-      [
-        user instanceof User ? user.id : user,
-        article instanceof Article ? article.id : article,
-      ]
-    );
-
-    return result.rows.length > 0;
+    return super._exists({
+      kind: LIKE_MODEL,
+      filter: {
+        user: user instanceof User ? user.id : user,
+        article: article instanceof Article ? article.id : article,
+      },
+    });
   }
 
   public static async forUser(
     user: User | string,
     expand?: string[]
   ): Promise<Like[]> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "likes"
-      where "user" = $1
-      `,
-      [user instanceof User ? user.id : user]
-    );
-
-    return Promise.all(result.rows.map((row) => Like.deserialize(row, expand)));
+    return super._for({
+      kind: LIKE_MODEL,
+      filter: {
+        key: "user",
+        value: user instanceof User ? user.id : user,
+      },
+      expand,
+    });
   }
 
   ///////////////////
@@ -183,23 +146,5 @@ export class Like implements ISerializable<Promise<ISerializedLike>> {
           ? await this.article.serialize()
           : this.article,
     };
-  }
-
-  private static async deserialize(
-    data: IDatabaseLike,
-    expand?: string[]
-  ): Promise<Like> {
-    const user = expand?.includes("user")
-      ? await User.retrieve(data.user)
-      : { id: data.user };
-
-    const article = expand?.includes("article")
-      ? await Article.retrieve(
-          data.article,
-          Utilities.getNestedExpandQuery(expand, "article")
-        )
-      : { id: data.article };
-
-    return new Like(user, article);
   }
 }

@@ -15,6 +15,7 @@ import {
   IUpdateUserSettings,
   UserType,
   USER_MODEL,
+  IUser,
 } from "../types/user";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
@@ -22,9 +23,13 @@ import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
 export class User extends Model implements ISerializable<ISerializedUser> {
-  public constructor(protected readonly data: any) {
+  public constructor(protected readonly data: IUser) {
     super(USER_MODEL, data);
   }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
 
   public get id(): string {
     return this.data.id;

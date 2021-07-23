@@ -23,6 +23,10 @@ export class Organization
     super(ORGANIZATION_MODEL, data);
   }
 
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
   public get id(): string {
     return this.data.id;
   }

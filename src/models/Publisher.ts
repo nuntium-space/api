@@ -30,6 +30,10 @@ export class Publisher
     super(PUBLISHER_MODEL, data);
   }
 
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
   public get id(): string {
     return this.data.id;
   }

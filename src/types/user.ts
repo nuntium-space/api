@@ -5,7 +5,7 @@ import { User } from "../models/User";
 
 export type UserType = "admin" | "user";
 
-export interface IDatabaseUser {
+export interface IUser {
   id: string;
   type: UserType;
   full_name: string | null;
