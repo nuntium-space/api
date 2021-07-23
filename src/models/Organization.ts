@@ -1,11 +1,9 @@
 import Boom from "@hapi/boom";
 import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
 import { Model } from "../config/Model";
 import {
-  ISerializedOrganization,
   ICreateOrganization,
   IUpdateOrganization,
   IOrganization,
@@ -17,7 +15,6 @@ import { User } from "./User";
 
 export class Organization
   extends Model
-  implements ISerializable<ISerializedOrganization>
 {
   public constructor(protected readonly record: IOrganization) {
     super(ORGANIZATION_MODEL, record);
@@ -134,23 +131,5 @@ export class Organization
       filter: { key: "user", value: user.id },
       expand,
     });
-  }
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedOrganization {
-    if (options?.for?.id !== this.user.id) {
-      return { id: this.id } as any;
-    }
-
-    return {
-      id: this.id,
-      name: this.name,
-      user:
-        this.user instanceof User
-          ? this.user.serialize({ for: options?.for })
-          : this.user,
-      stripe_account_enabled: this.stripe_account_enabled,
-    };
   }
 }
