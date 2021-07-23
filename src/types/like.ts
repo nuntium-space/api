@@ -18,7 +18,7 @@ export interface ISerializedLike {
 }
 
 export const LIKE_MODEL: ModelKind = {
-  table: "bookmarks",
+  table: "likes",
   keys: [["user", "article"]],
   expand: [
     {

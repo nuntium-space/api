@@ -22,7 +22,7 @@ export interface ISerializedPaymentMethod {
 }
 
 export const PAYMENT_METHOD_MODEL: ModelKind = {
-  table: "bookmarks",
+  table: "payment_methods",
   keys: [["id", "stripe_id"]],
   expand: [
     {
