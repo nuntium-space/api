@@ -88,6 +88,4 @@ Run
 sls deploy
 ```
 
-**\*Note:** if the deployment fails try to delete the `.build` folder.\*
-
-[nuntium]: https://github.com/nuntium-space/nuntium
+*__Note:__ if the deployment fails try to delete the `.build` folder.*
