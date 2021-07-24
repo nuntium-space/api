@@ -88,4 +88,4 @@ Run
 sls deploy
 ```
 
-*__Note:__ if the deployment fails try to delete the `.build` folder.*
+_**Note:** if the deployment fails try to delete the `.build` folder._
