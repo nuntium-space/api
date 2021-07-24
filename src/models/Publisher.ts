@@ -13,32 +13,49 @@ import {
   ISerializedPublisher,
   ICreatePublisher,
   IUpdatePublisher,
-  IDatabasePublisher,
+  IPublisher,
+  PUBLISHER_MODEL,
 } from "../types/publisher";
 import imageType from "image-type";
 import imageSize from "image-size";
 import jdenticon from "jdenticon";
+import { Model } from "../config/Model";
+import { ExpandQuery } from "../common/ExpandQuery";
 
-export class Publisher implements ISerializable<ISerializedPublisher> {
-  private constructor(
-    public readonly _id: string,
-    private _name: string,
-    private _url: string,
-    public readonly organization: Organization,
-    public readonly verified: boolean,
-    public readonly dns_txt_value: string
-  ) {}
+export class Publisher
+  extends Model
+  implements ISerializable<ISerializedPublisher>
+{
+  public constructor(protected readonly record: IPublisher) {
+    super(PUBLISHER_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
 
   public get id(): string {
-    return this._id;
+    return this.record.id;
   }
 
   public get name(): string {
-    return this._name;
+    return this.record.name;
   }
 
   public get url(): string {
-    return this._url;
+    return this.record.url;
+  }
+
+  public get organization(): Organization | INotExpandedResource {
+    return this.record.organization;
+  }
+
+  public get verified(): boolean {
+    return this.record.verified;
+  }
+
+  public get dns_txt_value(): string {
+    return this.record.dns_txt_value;
   }
 
   public static async create(
@@ -89,7 +106,10 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     await client.query("commit");
     client.release();
 
-    const publisher = await Publisher.deserialize(result.rows[0]);
+    const publisher = await super.deserialize<Publisher>(
+      PUBLISHER_MODEL,
+      result.rows[0]
+    );
 
     const png = jdenticon.toPng(publisher.id, 500, { backColor: "#ffffff" });
     await publisher.setImage(png);
@@ -97,47 +117,42 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     return { id };
   }
 
-  public static async retrieve(id: string): Promise<Publisher> {
-    const result = await Database.pool.query(
-      `select * from "publishers" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Publisher.deserialize(result.rows[0]);
+  public static async retrieve(
+    id: string,
+    expand?: ExpandQuery
+  ): Promise<Publisher> {
+    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { id }, expand });
   }
 
-  public static async retrieveWithName(name: string): Promise<Publisher> {
-    const result = await Database.pool.query(
-      `select * from "publishers" where "name" = $1`,
-      [name]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Publisher.deserialize(result.rows[0]);
+  public static async retrieveWithName(
+    name: string,
+    expand?: ExpandQuery
+  ): Promise<Publisher> {
+    return super._retrieve({ kind: PUBLISHER_MODEL, filter: { name }, expand });
   }
 
-  public static async retrieveMultiple(ids: string[]): Promise<Publisher[]> {
+  public static async retrieveMultiple(
+    ids: string[],
+    expand?: ExpandQuery
+  ): Promise<Publisher[]> {
     const result = await Database.pool.query(
       `select * from "publishers" where "id" = any ($1)`,
       [ids]
     );
 
-    return Promise.all(result.rows.map(Publisher.deserialize));
+    return Promise.all(
+      result.rows.map((_) =>
+        super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand)
+      )
+    );
   }
 
   public async update(data: IUpdatePublisher): Promise<void> {
     const shouldInvalidateDomainVerification =
       (data.url ?? this.url) !== this.url;
 
-    this._name = data.name ?? this.name;
-    this._url = data.url ?? this.url;
+    this.record.name = data.name ?? this.name;
+    this.record.url = data.url ?? this.url;
 
     const client = await Database.pool.connect();
 
@@ -185,13 +200,7 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     const client = await Database.pool.connect();
     await client.query("begin");
 
-    await client
-      .query(`delete from "publishers" where "id" = $1`, [this.id])
-      .catch(async () => {
-        await client.query("rollback");
-
-        throw Boom.badImplementation();
-      });
+    await super._delete({ id: this.id });
 
     await Config.ELASTICSEARCH.delete({
       index: "publishers",
@@ -223,28 +232,23 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
     client.release();
   }
 
-  public static async forBundle(bundle: Bundle): Promise<Publisher[]> {
-    const result = await Database.pool.query(
-      `
-      select p.*
-      from
-        bundles_publishers as bp
-        inner join
-        publishers as p
-        on bp.publisher = p.id
-      where bp.bundle = $1
-      `,
-      [bundle.id]
-    );
-
-    return Promise.all(result.rows.map((row) => Publisher.deserialize(row)));
+  public static async forBundle(
+    bundle: Bundle,
+    expand?: ExpandQuery
+  ): Promise<Publisher[]> {
+    return super._for({
+      kind: PUBLISHER_MODEL,
+      filter: { key: "bundle", value: bundle.id },
+      expand,
+    });
   }
 
   public static async forOrganization(
     organization: Organization,
     options: {
       not_in_bundle: string;
-    }
+    },
+    expand?: ExpandQuery
   ): Promise<Publisher[]> {
     let query = `select * from "publishers" where "organization" = $1`;
     let params = [organization.id];
@@ -269,11 +273,20 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
 
     const result = await Database.pool.query(query, params);
 
-    return Promise.all(result.rows.map(Publisher.deserialize));
+    return Promise.all(
+      result.rows.map((_) =>
+        super.deserialize<Publisher>(PUBLISHER_MODEL, _, expand)
+      )
+    );
   }
 
-  public isOwnedByUser(user: User): boolean {
-    return this.organization.owner.id === user.id;
+  public async isOwnedByUser(user: User): Promise<boolean> {
+    const organization =
+      this.organization instanceof Organization
+        ? this.organization
+        : await Organization.retrieve(this.organization.id);
+
+    return organization.user.id === user.id;
   }
 
   public async setImage(image: any): Promise<{ url: string }> {
@@ -333,24 +346,12 @@ export class Publisher implements ISerializable<ISerializedPublisher> {
       id: this.id,
       name: this.name,
       url: this.url,
-      organization: this.organization.serialize({ for: options?.for }),
+      organization:
+        this.organization instanceof Organization
+          ? this.organization.serialize({ for: options?.for })
+          : this.organization,
       verified: this.verified,
       imageUrl: imageUrl.toString(),
     };
-  }
-
-  private static async deserialize(
-    data: IDatabasePublisher
-  ): Promise<Publisher> {
-    const organization = await Organization.retrieve(data.organization);
-
-    return new Publisher(
-      data.id,
-      data.name,
-      data.url,
-      organization,
-      data.verified,
-      data.dns_txt_value
-    );
   }
 }

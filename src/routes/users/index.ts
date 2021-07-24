@@ -160,9 +160,6 @@ export default <ServerRoute[]>[
         }),
         payload: USER_SCHEMA.UPDATE,
       },
-      response: {
-        schema: USER_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
@@ -171,9 +168,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      await authenticatedUser.update(request.payload as any);
-
-      return authenticatedUser.serialize({ for: authenticatedUser });
+      return authenticatedUser.update(request.payload as any);
     },
   },
   {
@@ -196,9 +191,7 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      await authenticatedUser.updateSettings(request.payload as any);
-
-      return h.response();
+      return authenticatedUser.updateSettings(request.payload as any);
     },
   },
   {

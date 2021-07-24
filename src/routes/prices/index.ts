@@ -210,7 +210,7 @@ export default <ServerRoute[]>[
         throw Boom.badImplementation();
       }
 
-      if (bundle.organization.owner.id !== authenticatedUser.id) {
+      if (bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -226,9 +226,6 @@ export default <ServerRoute[]>[
           id: Schema.ID.PRICE.required(),
         }),
         payload: PRICE_SCHEMA.UPDATE,
-      },
-      response: {
-        schema: PRICE_SCHEMA.OBJ,
       },
     },
     handler: async (request, h) => {
@@ -246,13 +243,11 @@ export default <ServerRoute[]>[
         throw Boom.badImplementation();
       }
 
-      if (price.bundle.organization.owner.id !== authenticatedUser.id) {
+      if (price.bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
-      await price.update(request.payload as any);
-
-      return price.serialize({ for: authenticatedUser });
+      return price.update(request.payload as any);
     },
   },
 ];

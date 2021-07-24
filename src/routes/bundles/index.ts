@@ -57,7 +57,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -124,7 +124,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -141,9 +141,6 @@ export default <ServerRoute[]>[
         }),
         payload: BUNDLE_SCHEMA.UPDATE,
       },
-      response: {
-        schema: BUNDLE_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const bundle = await Bundle.retrieve(request.params.id, ["organization"]);
@@ -154,13 +151,11 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (bundle.organization.owner.id !== authenticatedUser.id) {
+      if (bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
-      await bundle.update(request.payload as any);
-
-      return bundle.serialize({ for: authenticatedUser });
+      return bundle.update(request.payload as any);
     },
   },
 ];

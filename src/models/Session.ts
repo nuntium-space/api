@@ -1,18 +1,27 @@
-import Boom from "@hapi/boom";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
-import { ISerializedSession, IDatabaseSession } from "../types/session";
-import Database from "../utilities/Database";
+import { Model } from "../config/Model";
+import { ISession, SESSION_MODEL } from "../types/session";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Session implements ISerializable<ISerializedSession> {
-  private constructor(
-    public readonly id: string,
-    public readonly user: User,
-    public readonly expires_at: Date
-  ) {}
+export class Session extends Model {
+  public constructor(protected readonly record: ISession) {
+    super(SESSION_MODEL, record);
+  }
+
+  public get id(): string {
+    return this.record.id;
+  }
+
+  public get user(): User | INotExpandedResource {
+    return this.record.user;
+  }
+
+  public get expires_at(): Date {
+    return this.record.expires_at;
+  }
 
   public static async create(
     user: User | INotExpandedResource | string
@@ -24,59 +33,27 @@ export class Session implements ISerializable<ISerializedSession> {
       expiresAt.getSeconds() + Config.SESSION_DURATION_IN_SECONDS
     );
 
-    await Database.pool
-      .query(
-        `
-        insert into "sessions"
-          ("id", "user", "expires_at")
-        values
-          ($1, $2, $3)
-        `,
-        [id, typeof user === "string" ? user : user.id, expiresAt.toISOString()]
-      )
-      .catch(() => {
-        throw Boom.badRequest();
-      });
+    await super._create(SESSION_MODEL, {
+      id,
+      user: typeof user === "string" ? user : user.id,
+      expires_at: expiresAt.toISOString(),
+    });
 
     return { id };
   }
 
-  public static async retrieve(id: string): Promise<Session> {
-    const result = await Database.pool.query(
-      `select * from "sessions" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Session.deserialize(result.rows[0]);
+  public static async retrieve(
+    id: string,
+    expand?: ExpandQuery
+  ): Promise<Session> {
+    return super._retrieve({ kind: SESSION_MODEL, filter: { id }, expand });
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(`delete from "sessions" where "id" = $1`, [
-      this.id,
-    ]);
+    return super._delete({ kind: SESSION_MODEL, filter: { id: this.id } });
   }
 
   public hasExpired(): boolean {
     return this.expires_at < new Date();
-  }
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedSession {
-    return {
-      id: this.id,
-      user: this.user.serialize({ for: options?.for }),
-      expires_at: this.expires_at.toISOString(),
-    };
-  }
-
-  private static async deserialize(data: IDatabaseSession): Promise<Session> {
-    const user = await User.retrieve(data.user);
-
-    return new Session(data.id, user, data.expires_at);
   }
 }

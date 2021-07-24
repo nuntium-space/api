@@ -19,6 +19,7 @@ export default <ServerRoute[]>[
       validate: {
         query: Joi.object({
           name: PUBLISHER_SCHEMA.OBJ.extract("name").required(),
+          expand: Schema.EXPAND_QUERY,
         }),
       },
       response: {
@@ -49,6 +50,9 @@ export default <ServerRoute[]>[
         params: Joi.object({
           id: Schema.ID.PUBLISHER.required(),
         }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
       },
       response: {
         schema: PUBLISHER_SCHEMA.OBJ,
@@ -57,7 +61,10 @@ export default <ServerRoute[]>[
     handler: async (request, h) => {
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      const publisher = await Publisher.retrieve(request.params.id);
+      const publisher = await Publisher.retrieve(
+        request.params.id,
+        request.query.expand
+      );
 
       return {
         ...publisher.serialize({ for: authenticatedUser }),
@@ -92,7 +99,7 @@ export default <ServerRoute[]>[
 
       const publisher = await Publisher.retrieve(request.params.id);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
@@ -111,6 +118,9 @@ export default <ServerRoute[]>[
         params: Joi.object({
           id: Schema.ID.BUNDLE.required(),
         }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
       },
       response: {
         schema: Schema.ARRAY(PUBLISHER_SCHEMA.OBJ).required(),
@@ -121,7 +131,10 @@ export default <ServerRoute[]>[
 
       const bundle = await Bundle.retrieve(request.params.id);
 
-      const publishers = await Publisher.forBundle(bundle);
+      const publishers = await Publisher.forBundle(
+        bundle,
+        request.query.expand
+      );
 
       return publishers.map((publisher) =>
         publisher.serialize({ for: authenticatedUser })
@@ -138,6 +151,7 @@ export default <ServerRoute[]>[
         }),
         query: Joi.object({
           not_in_bundle: Schema.ID.BUNDLE,
+          expand: Schema.EXPAND_QUERY,
         }),
       },
       response: {
@@ -149,13 +163,17 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
-      const publishers = await Publisher.forOrganization(organization, {
-        not_in_bundle: request.query.not_in_bundle,
-      });
+      const publishers = await Publisher.forOrganization(
+        organization,
+        {
+          not_in_bundle: request.query.not_in_bundle,
+        },
+        request.query.expand
+      );
 
       return publishers.map((publisher) =>
         publisher.serialize({ for: authenticatedUser })
@@ -184,13 +202,13 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (bundle.organization.owner.id !== authenticatedUser.id) {
+      if (bundle.organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
       const publisher = await Publisher.retrieve(request.params.publisher_id);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.badImplementation();
       }
 
@@ -226,7 +244,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -241,7 +259,7 @@ export default <ServerRoute[]>[
 
       const publisher = await Publisher.retrieve(request.params.id);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
@@ -297,22 +315,17 @@ export default <ServerRoute[]>[
         }),
         payload: PUBLISHER_SCHEMA.UPDATE,
       },
-      response: {
-        schema: PUBLISHER_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const publisher = await Publisher.retrieve(request.params.id);
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
-      await publisher.update(request.payload as any);
-
-      return publisher.serialize({ for: authenticatedUser });
+      return publisher.update(request.payload as any);
     },
   },
   {
@@ -343,7 +356,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 
@@ -367,7 +380,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 

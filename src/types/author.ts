@@ -1,20 +1,36 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
-import { ISerializedPublisher, PUBLISHER_SCHEMA } from "./publisher";
-import { ISerializedUser, USER_SCHEMA } from "./user";
+import { Author } from "../models/Author";
+import { Publisher } from "../models/Publisher";
+import { User } from "../models/User";
+import { PUBLISHER_MODEL, PUBLISHER_SCHEMA } from "./publisher";
+import { USER_MODEL, USER_SCHEMA } from "./user";
 
-export interface IDatabaseAuthor {
+export interface IAuthor {
   id: string;
-  user: string;
-  publisher: string;
+  user: User | INotExpandedResource;
+  publisher: Publisher | INotExpandedResource;
 }
 
-export interface ISerializedAuthor {
-  id: string;
-  user: ISerializedUser | INotExpandedResource;
-  publisher: ISerializedPublisher | INotExpandedResource;
-}
+export const AUTHOR_MODEL: ModelKind = {
+  table: "authors",
+  keys: [["id"], ["user", "publisher"]],
+  expand: [
+    {
+      field: "user",
+      model: USER_MODEL,
+    },
+    {
+      field: "publisher",
+      model: PUBLISHER_MODEL,
+    },
+  ],
+  fields: ["id", "user", "publisher"],
+  getModel: () => Author,
+  getInstance: (data) => new Author(data),
+};
 
 export const AUTHOR_SCHEMA = {
   OBJ: Joi.object({

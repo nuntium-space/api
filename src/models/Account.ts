@@ -1,187 +1,135 @@
-import Boom from "@hapi/boom";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { Config } from "../config/Config";
-import { ICreateAccount, IDatabaseAccount } from "../types/account";
-import Database from "../utilities/Database";
+import { Model } from "../config/Model";
+import { ACCOUNT_MODEL, IAccount, ICreateAccount } from "../types/account";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Account {
-  private constructor(
-    public readonly id: string,
-    public readonly user: User | INotExpandedResource,
-    public readonly type: string,
-    public readonly external_id: string
-  ) {}
+export class Account extends Model {
+  public constructor(protected readonly record: IAccount) {
+    super(ACCOUNT_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.record.id;
+  }
+
+  public get user(): User | INotExpandedResource {
+    return this.record.user;
+  }
+
+  public get type(): string {
+    return this.record.type;
+  }
+
+  public get external_id(): string {
+    return this.record.external_id;
+  }
 
   //////////
   // CRUD //
   //////////
 
-  public static async create(
-    data: ICreateAccount
-  ): Promise<INotExpandedResource> {
+  public static async create({
+    user,
+    type,
+    external_id,
+  }: ICreateAccount): Promise<INotExpandedResource> {
     const id = Utilities.id(Config.ID_PREFIXES.ACCOUNT);
 
-    await Database.pool
-      .query(
-        `
-        insert into "accounts"
-          ("id", "user", "type", "external_id")
-        values
-          ($1, $2, $3, $4)
-        `,
-        [
-          id,
-          typeof data.user === "string" ? data.user : data.user.id,
-          data.type,
-          data.external_id,
-        ]
-      )
-      .catch(() => {
-        throw Boom.badRequest();
-      });
+    await super._create(ACCOUNT_MODEL, {
+      id,
+      user: typeof user === "string" ? user : user.id,
+      type,
+      external_id,
+    });
 
     return { id };
   }
 
   public static async retrieve(id: string): Promise<Account> {
-    const result = await Database.pool.query(
-      `select * from "accounts" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Account.deserialize(result.rows[0]);
+    return super._retrieve<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: { id },
+    });
   }
 
   public static async retrieveWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<Account> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "accounts"
-      where
-        "user" = $1
-        and
-        "type" = $2
-      `,
-      [typeof user === "string" ? user : user.id, type]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Account.deserialize(result.rows[0]);
+    return super._retrieve<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        user: typeof user === "string" ? user : user.id,
+        type,
+      },
+    });
   }
 
   public static async retrieveWithTypeAndExternalId(
     type: string,
-    externalId: string
+    external_id: string
   ): Promise<Account> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "accounts"
-      where
-        "type" = $1
-        and
-        "external_id" = $2
-      `,
-      [type, externalId]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Account.deserialize(result.rows[0]);
+    return super._retrieve<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        type,
+        external_id,
+      },
+    });
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(`delete from "accounts" where "id" = $1`, [
-      this.id,
-    ]);
+    return super._delete({ id: this.id });
   }
 
   ///////////////
   // UTILITIES //
   ///////////////
 
-  public static async exists(
+  public static async existsWithUserAndType(
     user: User | INotExpandedResource | string,
     type: string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "accounts"
-      where
-        "user" = $1
-        and
-        "type" = $2
-      limit 1
-      `,
-      [typeof user === "string" ? user : user.id, type]
-    );
-
-    return result.rows.length > 0;
+    return super._exists({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        user: typeof user === "string" ? user : user.id,
+        type,
+      },
+    });
   }
 
   public static async existsWithTypeAndExternalId(
     type: string,
-    externalId: string
+    external_id: string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "accounts"
-      where
-        "type" = $1
-        and
-        "external_id" = $2
-      limit 1
-      `,
-      [type, externalId]
-    );
-
-    return result.rows.length > 0;
+    return super._exists({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        type,
+        external_id,
+      },
+    });
   }
 
   public static async forUser(
     user: User | INotExpandedResource | string,
-    expand?: string[]
+    expand?: ExpandQuery
   ): Promise<Account[]> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "accounts"
-      where "user" = $1
-      `,
-      [typeof user === "string" ? user : user.id]
-    );
-
-    return Promise.all(result.rows.map((_) => Account.deserialize(_, expand)));
-  }
-
-  ///////////////////
-  // SERIALIZATION //
-  ///////////////////
-
-  private static async deserialize(
-    data: IDatabaseAccount,
-    expand?: string[]
-  ): Promise<Account> {
-    const user = expand?.includes("user")
-      ? await User.retrieve(data.user)
-      : { id: data.user };
-
-    return new Account(data.id, user, data.type, data.external_id);
+    return super._for<Account>({
+      kind: ACCOUNT_MODEL,
+      filter: {
+        key: "user",
+        value: typeof user === "string" ? user : user.id,
+      },
+      expand,
+    });
   }
 }

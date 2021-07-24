@@ -16,17 +16,23 @@ export default <ServerRoute[]>[
         params: Joi.object({
           id: Schema.ID.ORGANIZATION.required(),
         }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
       },
       response: {
         schema: ORGANIZATION_SCHEMA.OBJ,
       },
     },
     handler: async (request, h) => {
-      const organization = await Organization.retrieve(request.params.id);
+      const organization = await Organization.retrieve(
+        request.params.id,
+        request.query.expand
+      );
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -48,7 +54,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -81,7 +87,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
@@ -102,6 +108,9 @@ export default <ServerRoute[]>[
         params: Joi.object({
           id: Schema.ID.USER.required(),
         }),
+        query: Joi.object({
+          expand: Schema.EXPAND_QUERY,
+        }),
       },
       response: {
         schema: Schema.ARRAY(ORGANIZATION_SCHEMA.OBJ).required(),
@@ -114,7 +123,10 @@ export default <ServerRoute[]>[
         throw Boom.forbidden();
       }
 
-      const organizations = await Organization.forUser(authenticatedUser);
+      const organizations = await Organization.forUser(
+        authenticatedUser,
+        request.query.expand
+      );
 
       return organizations.map((organization) =>
         organization.serialize({ for: authenticatedUser })
@@ -148,22 +160,17 @@ export default <ServerRoute[]>[
         }),
         payload: ORGANIZATION_SCHEMA.UPDATE,
       },
-      response: {
-        schema: ORGANIZATION_SCHEMA.OBJ,
-      },
     },
     handler: async (request, h) => {
       const organization = await Organization.retrieve(request.params.id);
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 
-      await organization.update(request.payload as any);
-
-      return organization.serialize({ for: authenticatedUser });
+      return organization.update(request.payload as any);
     },
   },
   {
@@ -181,7 +188,7 @@ export default <ServerRoute[]>[
 
       const [authenticatedUser] = Utilities.getAuthenticatedUser(request);
 
-      if (organization.owner.id !== authenticatedUser.id) {
+      if (organization.user.id !== authenticatedUser.id) {
         throw Boom.forbidden();
       }
 

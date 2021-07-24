@@ -1,13 +1,16 @@
 import Joi from "joi";
 import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
-import { AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
+import { Article } from "../models/Article";
+import { Author } from "../models/Author";
+import { AUTHOR_MODEL, AUTHOR_SCHEMA, ISerializedAuthor } from "./author";
 
-export interface IDatabaseArticle {
+export interface IArticle {
   id: string;
   title: string;
-  content: any;
-  author: string;
+  content: string;
+  author: Author | INotExpandedResource;
   reading_time: number;
   created_at: Date;
   updated_at: Date;
@@ -25,6 +28,28 @@ export interface ISerializedArticle {
     is_bookmarked: boolean;
   };
 }
+
+export const ARTICLE_MODEL: ModelKind = {
+  table: "articles",
+  keys: [["id"]],
+  expand: [
+    {
+      field: "author",
+      model: AUTHOR_MODEL,
+    },
+  ],
+  fields: [
+    "id",
+    "title",
+    "content",
+    "author",
+    "reading_time",
+    "created_at",
+    "updated_at",
+  ],
+  getModel: () => Article,
+  getInstance: (data) => new Article(data),
+};
 
 export const ARTICLE_SCHEMA = {
   OBJ: Joi.object({

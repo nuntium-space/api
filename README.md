@@ -70,7 +70,7 @@ AWS_PROFILE_IMAGES_BUCKET_NAME=profile-images
 SENDGRID_API_KEY=
 ```
 
-**\*Note:** `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network.\*
+_**Note:** `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network._
 
 ### Serve locally
 
@@ -88,6 +88,4 @@ Run
 sls deploy
 ```
 
-**\*Note:** if the deployment fails try to delete the `.build` folder.\*
-
-[nuntium]: https://github.com/nuntium-space/nuntium
+_**Note:** if the deployment fails try to delete the `.build` folder._

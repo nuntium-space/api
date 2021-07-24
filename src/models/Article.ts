@@ -1,25 +1,57 @@
 import Boom from "@hapi/boom";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
+import { SelectQuery } from "../common/SelectQuery";
 import { Config } from "../config/Config";
-import { ISerializedArticle, IDatabaseArticle } from "../types/article";
+import { Model } from "../config/Model";
+import { ISerializedArticle, IArticle, ARTICLE_MODEL } from "../types/article";
 import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
 import { Author } from "./Author";
 import { Bookmark } from "./Bookmark";
 import { Like } from "./Like";
 import { Publisher } from "./Publisher";
 import { User } from "./User";
 
-export class Article implements ISerializable<Promise<ISerializedArticle>> {
-  private constructor(
-    public readonly id: string,
-    public readonly title: string,
-    public readonly author: Author | INotExpandedResource,
-    public readonly reading_time: number,
-    public readonly created_at: Date,
-    public readonly updated_at: Date
-  ) {}
+export class Article
+  extends Model
+  implements ISerializable<Promise<ISerializedArticle>>
+{
+  public constructor(protected readonly record: IArticle) {
+    super(ARTICLE_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.record.id;
+  }
+
+  public get title(): string {
+    return this.record.title;
+  }
+
+  public get content(): string {
+    return this.record.content;
+  }
+
+  public get author(): Author | INotExpandedResource {
+    return this.record.author;
+  }
+
+  public get reading_time(): number {
+    return this.record.reading_time;
+  }
+
+  public get created_at(): Date {
+    return this.record.created_at;
+  }
+
+  public get updated_at(): Date {
+    return this.record.updated_at;
+  }
 
   //////////
   // CRUD //
@@ -27,28 +59,22 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
 
   public static async retrieve(
     id: string,
-    expand?: string[]
+    expand?: ExpandQuery,
+    select?: SelectQuery
   ): Promise<Article> {
-    const result = await Database.pool.query(
-      `
-      select
+    return super._retrieve<Article>({
+      kind: ARTICLE_MODEL,
+      filter: { id },
+      expand,
+      select: select ?? [
         "id",
         "title",
         "author",
         "reading_time",
         "created_at",
-        "updated_at"
-      from "articles"
-      where "id" = $1
-      `,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Article.deserialize(result.rows[0], expand);
+        "updated_at",
+      ],
+    });
   }
 
   public static async retrieveMultiple(
@@ -72,7 +98,9 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
@@ -98,16 +126,17 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
   public async delete(): Promise<void> {
     const client = await Database.pool.connect();
-
     await client.query("begin");
 
-    await client.query(`delete from "articles" where "id" = $1`, [this.id]);
+    await super._delete({ id: this.id }, client);
 
     await Config.ELASTICSEARCH.delete({
       index: "articles",
@@ -119,7 +148,6 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     });
 
     await client.query("commit");
-
     client.release();
   }
 
@@ -127,17 +155,8 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
   // UTILITIES //
   ///////////////
 
-  public async retrieveContent() {
-    const {
-      rows: [{ content }],
-    } = await Database.pool.query(
-      `
-        select "content"
-        from "articles"
-        where "id" = $1
-        `,
-      [this.id]
-    );
+  public async retrieveContent(): Promise<string> {
+    const { content } = await Article.retrieve(this.id, undefined, ["content"]);
 
     return content;
   }
@@ -184,7 +203,9 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, options.expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, options.expand)
+      )
     );
   }
 
@@ -192,25 +213,23 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     author: Author | INotExpandedResource | string,
     expand?: string[]
   ): Promise<Article[]> {
-    const result = await Database.pool.query(
-      `
-      select
+    return super._for({
+      kind: ARTICLE_MODEL,
+      filter: {
+        key: "author",
+        value: typeof author === "string" ? author : author.id,
+      },
+      expand,
+      select: [
         "id",
         "title",
         "author",
         "reading_time",
         "created_at",
-        "updated_at"
-      from "articles"
-      where "author" = $1
-      order by "created_at" desc
-      `,
-      [typeof author === "string" ? author : author.id]
-    );
-
-    return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
-    );
+        "updated_at",
+      ],
+      order: { field: "created_at", direction: "desc" },
+    });
   }
 
   public static async forPublisher(
@@ -240,7 +259,9 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     );
 
     return Promise.all(
-      result.rows.map((row) => Article.deserialize(row, expand))
+      result.rows.map((row) =>
+        Article.deserialize<Article>(ARTICLE_MODEL, row, expand)
+      )
     );
   }
 
@@ -288,26 +309,5 @@ export class Article implements ISerializable<Promise<ISerializedArticle>> {
     }
 
     return obj;
-  }
-
-  private static async deserialize(
-    data: IDatabaseArticle,
-    expand?: string[]
-  ): Promise<Article> {
-    const author = expand?.includes("author")
-      ? await Author.retrieve(
-          data.author,
-          Utilities.getNestedExpandQuery(expand, "author")
-        )
-      : { id: data.author };
-
-    return new Article(
-      data.id,
-      data.title,
-      author,
-      parseInt(data.reading_time.toString()),
-      data.created_at,
-      data.updated_at
-    );
   }
 }

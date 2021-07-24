@@ -1,18 +1,29 @@
-import Boom from "@hapi/boom";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
-import { ISerializedBookmark, IDatabaseBookmark } from "../types/bookmark";
-import Database from "../utilities/Database";
-import Utilities from "../utilities/Utilities";
+import { Model } from "../config/Model";
+import { IBookmark, BOOKMARK_MODEL } from "../types/bookmark";
 import { Article } from "./Article";
 import { User } from "./User";
 
-export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
-  private constructor(
-    public readonly user: User | INotExpandedResource,
-    public readonly article: Article | INotExpandedResource,
-    public readonly created_at: Date
-  ) {}
+export class Bookmark extends Model {
+  public constructor(protected readonly record: IBookmark) {
+    super(BOOKMARK_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get user(): User | INotExpandedResource {
+    return this.record.user;
+  }
+
+  public get article(): Article | INotExpandedResource {
+    return this.record.article;
+  }
+
+  public get created_at(): Date {
+    return this.record.created_at;
+  }
 
   //////////
   // CRUD //
@@ -22,22 +33,10 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
     user: User | string,
     article: Article | string
   ): Promise<void> {
-    await Database.pool
-      .query(
-        `
-        insert into "bookmarks"
-          ("user", "article")
-        values
-          ($1, $2)
-        `,
-        [
-          user instanceof User ? user.id : user,
-          article instanceof Article ? article.id : article,
-        ]
-      )
-      .catch(() => {
-        throw Boom.badImplementation();
-      });
+    return super._create(BOOKMARK_MODEL, {
+      user: user instanceof User ? user.id : user,
+      article: article instanceof Article ? article.id : article,
+    });
   }
 
   public static async retrieveWithUserAndArticle(
@@ -45,39 +44,23 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
     article: Article | string,
     expand?: string[]
   ): Promise<Bookmark> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "bookmarks"
-      where
-        "user" = $1
-        and
-        "article" = $2
-      `,
-      [
-        user instanceof User ? user.id : user,
-        article instanceof Article ? article.id : article,
-      ]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Bookmark.deserialize(result.rows[0], expand);
+    return super._retrieve({
+      kind: BOOKMARK_MODEL,
+      filter: {
+        user: user instanceof User ? user.id : user,
+        article: article instanceof Article ? article.id : article,
+      },
+      expand,
+    });
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(
-      `
-      delete from "bookmarks"
-      where
-        "user" = $1
-        and
-        "article" = $2
-      `,
-      [this.user.id, this.article.id]
-    );
+    return super._delete({
+      filter: {
+        user: this.user.id,
+        article: this.article.id,
+      },
+    });
   }
 
   ///////////////
@@ -88,72 +71,26 @@ export class Bookmark implements ISerializable<Promise<ISerializedBookmark>> {
     user: User | string,
     article: Article | string
   ): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "bookmarks"
-      where
-        "user" = $1
-        and
-        "article" = $2
-      limit 1
-      `,
-      [
-        user instanceof User ? user.id : user,
-        article instanceof Article ? article.id : article,
-      ]
-    );
-
-    return result.rows.length > 0;
+    return super._exists({
+      kind: BOOKMARK_MODEL,
+      filter: {
+        user: user instanceof User ? user.id : user,
+        article: article instanceof Article ? article.id : article,
+      },
+    });
   }
 
   public static async forUser(
     user: User | string,
     expand?: string[]
   ): Promise<Bookmark[]> {
-    const result = await Database.pool.query(
-      `
-      select *
-      from "bookmarks"
-      where "user" = $1
-      `,
-      [user instanceof User ? user.id : user]
-    );
-
-    return Promise.all(
-      result.rows.map((row) => Bookmark.deserialize(row, expand))
-    );
-  }
-
-  ///////////////////
-  // SERIALIZATION //
-  ///////////////////
-
-  public async serialize(): Promise<ISerializedBookmark> {
-    return {
-      article:
-        this.article instanceof Article
-          ? await this.article.serialize()
-          : this.article,
-      created_at: this.created_at.toISOString(),
-    };
-  }
-
-  private static async deserialize(
-    data: IDatabaseBookmark,
-    expand?: string[]
-  ): Promise<Bookmark> {
-    const user = expand?.includes("user")
-      ? await User.retrieve(data.user)
-      : { id: data.user };
-
-    const article = expand?.includes("article")
-      ? await Article.retrieve(
-          data.article,
-          Utilities.getNestedExpandQuery(expand, "article")
-        )
-      : { id: data.article };
-
-    return new Bookmark(user, article, data.created_at);
+    return super._for({
+      kind: BOOKMARK_MODEL,
+      filter: {
+        key: "user",
+        value: user instanceof User ? user.id : user,
+      },
+      expand,
+    });
   }
 }

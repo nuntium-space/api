@@ -50,7 +50,7 @@ export default <ServerRoute[]>[
 
       if (
         authenticatedUser.id !== article.author.user.id &&
-        !article.author.publisher.isOwnedByUser(authenticatedUser)
+        !(await article.author.publisher.isOwnedByUser(authenticatedUser))
       ) {
         throw Boom.forbidden();
       }
@@ -114,7 +114,7 @@ export default <ServerRoute[]>[
 
       const publisher = await Publisher.retrieve(request.params.id);
 
-      if (!publisher.isOwnedByUser(authenticatedUser)) {
+      if (!(await publisher.isOwnedByUser(authenticatedUser))) {
         throw Boom.forbidden();
       }
 

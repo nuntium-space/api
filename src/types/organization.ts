@@ -1,11 +1,15 @@
 import Joi from "joi";
+import { INotExpandedResource } from "../common/INotExpandedResource";
+import { ModelKind } from "../config/Model";
 import { Schema } from "../config/Schema";
-import { ISerializedUser, USER_SCHEMA } from "./user";
+import { Organization } from "../models/Organization";
+import { User } from "../models/User";
+import { USER_MODEL, USER_SCHEMA } from "./user";
 
-export interface IDatabaseOrganization {
+export interface IOrganization {
   id: string;
   name: string;
-  user: string;
+  user: User | INotExpandedResource;
   stripe_account_id: string;
   stripe_account_enabled: boolean;
 }
@@ -19,18 +23,54 @@ export interface IUpdateOrganization {
   stripe_account_enabled?: boolean;
 }
 
-export interface ISerializedOrganization {
-  id: string;
-  name: string;
-  owner: ISerializedUser;
-  stripe_account_enabled: boolean;
-}
+export const ORGANIZATION_MODEL: ModelKind = {
+  table: "organizations",
+  keys: [["id"], ["name"], ["stripe_account_id"]],
+  expand: [
+    {
+      field: "user",
+      model: USER_MODEL,
+    },
+  ],
+  fields: ["id", "name", "user", "stripe_account_id", "stripe_account_enabled"],
+  serialization: {
+    include: ["id", "name", "user", "stripe_account_enabled"],
+    custom: {
+      name: {
+        if: (organization, options) => {
+          return (
+            organization.instance<Organization>().user.id === options.for?.id
+          );
+        },
+      },
+      user: {
+        if: (organization, options) => {
+          return (
+            organization.instance<Organization>().user.id === options.for?.id
+          );
+        },
+      },
+      stripe_account_enabled: {
+        if: (organization, options) => {
+          return (
+            organization.instance<Organization>().user.id === options.for?.id
+          );
+        },
+      },
+    },
+  },
+  getModel: () => Organization,
+  getInstance: (data) => new Organization(data),
+};
 
 export const ORGANIZATION_SCHEMA = {
   OBJ: Joi.object({
     id: Schema.ID.ORGANIZATION.required(),
     name: Schema.STRING.max(50).optional(), // Not sent to users other than the owner
-    owner: USER_SCHEMA.OBJ.optional(), // Not sent to users other than the owner
+    user: Joi.alternatives(
+      USER_SCHEMA.OBJ,
+      Schema.NOT_EXPANDED_RESOURCE(Schema.ID.USER)
+    ).optional(), // Not sent to users other than the owner
     stripe_account_enabled: Schema.BOOLEAN.optional(), // Not sent to users other than the owner
   }),
   CREATE: Joi.object({

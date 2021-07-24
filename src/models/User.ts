@@ -6,35 +6,49 @@ import jdenticon from "jdenticon";
 import { INotExpandedResource } from "../common/INotExpandedResource";
 import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Model } from "../config/Model";
 import {
   ISerializedUser,
   ICreateUser,
   IUpdateUser,
   IUserSettings,
   IUpdateUserSettings,
-  IDatabaseUser,
   UserType,
+  USER_MODEL,
+  IUser,
 } from "../types/user";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { Bundle } from "./Bundle";
 import { Publisher } from "./Publisher";
 
-export class User implements ISerializable<ISerializedUser> {
-  private constructor(
-    public readonly id: string,
-    public readonly type: UserType,
-    private _full_name: string | null,
-    private _email: string,
-    public readonly stripe_customer_id: string | null
-  ) {}
+export class User extends Model implements ISerializable<ISerializedUser> {
+  public constructor(protected readonly record: IUser) {
+    super(USER_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.record.id;
+  }
+
+  public get type(): UserType {
+    return this.record.type;
+  }
 
   public get full_name(): string | null {
-    return this._full_name;
+    return this.record.full_name;
   }
 
   public get email(): string {
-    return this._email;
+    return this.record.email;
+  }
+
+  public get stripe_customer_id(): string | null {
+    return this.record.stripe_customer_id;
   }
 
   public static async create(data: ICreateUser): Promise<INotExpandedResource> {
@@ -76,7 +90,7 @@ export class User implements ISerializable<ISerializedUser> {
     await client.query("commit");
     client.release();
 
-    const user = await User.deserialize(result.rows[0]);
+    const user = await super.deserialize<User>(USER_MODEL, result.rows[0]);
 
     const png = jdenticon.toPng(user.id, 500, { backColor: "#ffffff" });
     await user.setImage(png);
@@ -85,66 +99,31 @@ export class User implements ISerializable<ISerializedUser> {
   }
 
   public static async retrieve(id: string): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return super._retrieve({ kind: USER_MODEL, filter: { id } });
   }
 
   public static async retrieveWithEmail(email: string): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "email" = $1`,
-      [email]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return super._retrieve({ kind: USER_MODEL, filter: { email } });
   }
 
   public static async retrieveWithCustomerId(
-    customerId: string
+    stripe_customer_id: string
   ): Promise<User> {
-    const result = await Database.pool.query(
-      `select * from "users" where "stripe_customer_id" = $1`,
-      [customerId]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return User.deserialize(result.rows[0]);
+    return super._retrieve({
+      kind: USER_MODEL,
+      filter: { stripe_customer_id },
+    });
   }
 
   public static async existsWithEmail(email: string): Promise<boolean> {
-    const result = await Database.pool.query(
-      `
-      select 1
-      from "users"
-      where "email" = $1
-      limit 1
-      `,
-      [email]
-    );
-
-    return result.rows.length > 0;
+    return super._exists({ kind: USER_MODEL, filter: { email } });
   }
 
   public async update(data: IUpdateUser): Promise<void> {
-    this._full_name = data.full_name ?? this.full_name;
-    this._email = data.email ?? this.email;
+    this.record.full_name = data.full_name ?? this.full_name;
+    this.record.email = data.email ?? this.email;
 
     const client = await Database.pool.connect();
-
     await client.query("begin");
 
     await client
@@ -179,7 +158,6 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     await client.query("commit");
-
     client.release();
   }
 
@@ -194,10 +172,9 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     const client = await Database.pool.connect();
-
     await client.query("begin");
 
-    await client.query(`delete from "users" where "id" = $1`, [this.id]);
+    await super._delete({ id: this.id });
 
     if (this.stripe_customer_id) {
       await Config.STRIPE.customers
@@ -210,7 +187,6 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     await client.query("commit");
-
     client.release();
   }
 
@@ -404,7 +380,7 @@ export class User implements ISerializable<ISerializedUser> {
     /**
      * The owner of the publisher is considered subscribed to it
      */
-    if (publisher.isOwnedByUser(this)) {
+    if (await publisher.isOwnedByUser(this)) {
       return true;
     }
 
@@ -520,15 +496,5 @@ export class User implements ISerializable<ISerializedUser> {
     }
 
     return response;
-  }
-
-  private static async deserialize(data: IDatabaseUser): Promise<User> {
-    return new User(
-      data.id,
-      data.type,
-      data.full_name,
-      data.email,
-      data.stripe_customer_id
-    );
   }
 }

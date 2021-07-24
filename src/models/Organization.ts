@@ -1,32 +1,45 @@
 import Boom from "@hapi/boom";
+import { ExpandQuery } from "../common/ExpandQuery";
 import { INotExpandedResource } from "../common/INotExpandedResource";
-import { ISerializable } from "../common/ISerializable";
 import { Config } from "../config/Config";
+import { Model } from "../config/Model";
 import {
-  ISerializedOrganization,
   ICreateOrganization,
   IUpdateOrganization,
-  IDatabaseOrganization,
+  IOrganization,
+  ORGANIZATION_MODEL,
 } from "../types/organization";
 import Database from "../utilities/Database";
 import Utilities from "../utilities/Utilities";
 import { User } from "./User";
 
-export class Organization implements ISerializable<ISerializedOrganization> {
-  private constructor(
-    public readonly id: string,
-    private _name: string,
-    public readonly owner: User,
-    public readonly stripe_account_id: string,
-    private _stripe_account_enabled: boolean
-  ) {}
+export class Organization extends Model {
+  public constructor(protected readonly record: IOrganization) {
+    super(ORGANIZATION_MODEL, record);
+  }
+
+  ////////////////
+  // PROPERTIES //
+  ////////////////
+
+  public get id(): string {
+    return this.record.id;
+  }
 
   public get name(): string {
-    return this._name;
+    return this.record.name;
+  }
+
+  public get user(): User | INotExpandedResource {
+    return this.record.user;
+  }
+
+  public get stripe_account_id(): string {
+    return this.record.stripe_account_id;
   }
 
   public get stripe_account_enabled(): boolean {
-    return this._stripe_account_enabled;
+    return this.record.stripe_account_enabled;
   }
 
   public static async create(
@@ -56,48 +69,34 @@ export class Organization implements ISerializable<ISerializedOrganization> {
         throw Boom.badImplementation();
       });
 
-    await Database.pool
-      .query(
-        `
-        insert into "organizations"
-          ("id", "name", "user", "stripe_account_id")
-        values
-          ($1, $2, $3, $4)
-        `,
-        [id, data.name, user.id, account.id]
-      )
-      .catch(() => {
-        throw Boom.badRequest();
-      });
+    await super._create(ORGANIZATION_MODEL, {
+      id,
+      name: data.name,
+      user: user.id,
+      stripe_account_id: account.id,
+    });
 
     return { id };
   }
 
-  public static async retrieve(id: string): Promise<Organization> {
-    const result = await Database.pool.query(
-      `select * from "organizations" where "id" = $1`,
-      [id]
-    );
-
-    if (result.rowCount === 0) {
-      throw Boom.notFound();
-    }
-
-    return Organization.deserialize(result.rows[0]);
+  public static async retrieve(
+    id: string,
+    expand?: ExpandQuery
+  ): Promise<Organization> {
+    return super._retrieve({
+      kind: ORGANIZATION_MODEL,
+      filter: { id },
+      expand,
+    });
   }
 
   public static async existsWithName(name: string): Promise<boolean> {
-    const { rowCount } = await Database.pool.query(
-      `select "id" from "organizations" where "name" = $1 limit 1`,
-      [name]
-    );
-
-    return rowCount > 0;
+    return super._exists({ kind: ORGANIZATION_MODEL, filter: { name } });
   }
 
   public async update(data: IUpdateOrganization): Promise<void> {
-    this._name = data.name ?? this.name;
-    this._stripe_account_enabled =
+    this.record.name = data.name ?? this.name;
+    this.record.stripe_account_enabled =
       data.stripe_account_enabled ?? this.stripe_account_enabled;
 
     await Database.pool
@@ -118,46 +117,17 @@ export class Organization implements ISerializable<ISerializedOrganization> {
   }
 
   public async delete(): Promise<void> {
-    await Database.pool.query(`delete from "organizations" where "id" = $1`, [
-      this.id,
-    ]);
+    return super._delete({ id: this.id });
   }
 
-  public static async forUser(user: User): Promise<Organization[]> {
-    const result = await Database.pool.query(
-      `select * from "organizations" where "user" = $1`,
-      [user.id]
-    );
-
-    return Promise.all(result.rows.map(Organization.deserialize));
-  }
-
-  public serialize(options?: {
-    for?: User | INotExpandedResource;
-  }): ISerializedOrganization {
-    if (options?.for?.id !== this.owner.id) {
-      return { id: this.id } as any;
-    }
-
-    return {
-      id: this.id,
-      name: this.name,
-      owner: this.owner.serialize({ for: options?.for }),
-      stripe_account_enabled: this.stripe_account_enabled,
-    };
-  }
-
-  private static async deserialize(
-    data: IDatabaseOrganization
-  ): Promise<Organization> {
-    const owner = await User.retrieve(data.user);
-
-    return new Organization(
-      data.id,
-      data.name,
-      owner,
-      data.stripe_account_id,
-      data.stripe_account_enabled
-    );
+  public static async forUser(
+    user: User,
+    expand?: ExpandQuery
+  ): Promise<Organization[]> {
+    return super._for({
+      kind: ORGANIZATION_MODEL,
+      filter: { key: "user", value: user.id },
+      expand,
+    });
   }
 }
