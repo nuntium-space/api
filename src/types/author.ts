@@ -5,10 +5,7 @@ import { Schema } from "../config/Schema";
 import { Author } from "../models/Author";
 import { Publisher } from "../models/Publisher";
 import { User } from "../models/User";
-import {
-  PUBLISHER_MODEL,
-  PUBLISHER_SCHEMA,
-} from "./publisher";
+import { PUBLISHER_MODEL, PUBLISHER_SCHEMA } from "./publisher";
 import { USER_MODEL, USER_SCHEMA } from "./user";
 
 export interface IAuthor {
