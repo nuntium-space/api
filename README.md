@@ -70,7 +70,7 @@ AWS_PROFILE_IMAGES_BUCKET_NAME=profile-images
 SENDGRID_API_KEY=
 ```
 
-**\*Note:** `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network.\*
+*__Note:__ `HOST` must be an IP address, and `not localhost`, because when running on the local lambda emulator the function will be in a Docker container, and so it won't have access to the host's network.*
 
 ### Serve locally
 
